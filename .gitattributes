@@ -1,0 +1,23 @@
+# Line endings stay LF everywhere, on every OS. The page's tickboxes find
+# their line by a hash of its text, and the habits Log line must never be
+# reformatted — a Windows clone silently rewriting CRLF would corrupt both.
+* text=auto eol=lf
+
+# Windows script files are the one place CRLF is the correct ending.
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binaries: never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.mp4 binary
+*.mp3 binary
+*.m4a binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.db binary
+*.pdf binary

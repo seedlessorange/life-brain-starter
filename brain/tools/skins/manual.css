@@ -1,0 +1,1021 @@
+/* ============================================================ FIELD MANUAL
+   Full skin — baked only when "manual" is active, emitted after the token
+   and theme blocks (equal specificity wins by order). Spec: SPECS.md §4;
+   ground truth: the "Today - field manual v2" mockup. Faces, state dots
+   and the FAB stay round; state colors keep their meanings. */
+
+:root[data-style="manual"]{
+  /* cool near-neutral greys */
+  --paper:oklch(.948 .004 100);
+  --surface:oklch(.972 .004 100);
+  --sunken:oklch(.930 .004 100);
+  --ink:oklch(.245 .006 250);
+  --dim:oklch(.48 .006 250);
+  --faint:oklch(.58 .006 250);
+  --line:oklch(.885 .005 250);      /* hairline rules */
+  --line2:oklch(.855 .005 250);     /* ghost borders */
+
+  /* one accent: rust — rides the --green/--accent alias so links, ✦
+     actions, bar fills and the FAB follow without per-site rules */
+  --green:oklch(.545 .140 42);
+  --greenbg:color-mix(in oklab,var(--green) 11%,var(--paper));
+
+  /* the five states keep their meanings (square swatch values) */
+  --bad:oklch(.505 .135 28);  --badbg:color-mix(in oklab,var(--bad) 10%,var(--paper));
+  --wait:oklch(.640 .105 78); --waitbg:color-mix(in oklab,var(--wait) 12%,var(--paper));
+  --cold:oklch(.505 .080 250);--coldbg:color-mix(in oklab,var(--cold) 10%,var(--paper));
+  --terra:oklch(.575 .125 55);
+  --ok:oklch(.500 .085 150);  --okt:color-mix(in oklab,var(--ok) 12%,var(--paper));
+
+  --r-xl:0px;--r-lg:0px;--r-card:0px;--r-md:0px;--r-btn:0px;--r-sm:0px;
+  --shadow:none;--shadow-lift:none;
+
+  --serif:'Archivo',-apple-system,sans-serif;
+  --sans:'IBM Plex Sans',-apple-system,sans-serif;
+  --coach:'Newsreader',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+
+  --fm-bleed:var(--s5);             /* band left bleed = main's side padding */
+}
+
+/* dark twins — pinned primitives; the tints above are color-mix and follow */
+:root[data-style="manual"][data-theme="dark"]{
+  --paper:oklch(.215 .006 250);--surface:oklch(.245 .006 250);
+  --sunken:oklch(.190 .006 250);--ink:oklch(.930 .004 100);
+  --dim:oklch(.72 .005 250);--faint:oklch(.60 .005 250);
+  --line:oklch(.325 .006 250);--line2:oklch(.40 .006 250);
+  --green:oklch(.620 .150 42);
+  --bad:oklch(.660 .130 30);--wait:oklch(.750 .100 80);
+  --cold:oklch(.700 .075 250);--terra:oklch(.700 .120 55);
+  --ok:oklch(.640 .100 150);
+}
+@media (prefers-color-scheme:dark){
+  :root[data-style="manual"]:not([data-theme="light"]){
+    --paper:oklch(.215 .006 250);--surface:oklch(.245 .006 250);
+    --sunken:oklch(.190 .006 250);--ink:oklch(.930 .004 100);
+    --dim:oklch(.72 .005 250);--faint:oklch(.60 .005 250);
+    --line:oklch(.325 .006 250);--line2:oklch(.40 .006 250);
+    --green:oklch(.620 .150 42);
+    --bad:oklch(.660 .130 30);--wait:oklch(.750 .100 80);
+    --cold:oklch(.700 .075 250);--terra:oklch(.700 .120 55);
+    --ok:oklch(.640 .100 150);
+  }
+}
+
+/* ---------------------------------------------------------------- base */
+[data-style="manual"] body{font-variant-numeric:tabular-nums}
+[data-style="manual"] a{color:var(--green)}
+[data-style="manual"] a:hover{color:var(--ink)}
+[data-style="manual"] input,[data-style="manual"] select,
+[data-style="manual"] textarea{border-radius:0}
+
+/* the coaching voice stays an italic serif */
+[data-style="manual"] .hero-why,[data-style="manual"] .hznone,
+[data-style="manual"] .tiernote{font-family:var(--coach);font-style:italic}
+
+/* kill the squiggles — the element and every ::after that draws one */
+[data-style="manual"] .wav,
+[data-style="manual"] h3.area::after,
+[data-style="manual"] .qcard .eyebrow::after,
+[data-style="manual"] .offercard .eyebrow::after,
+[data-style="manual"] #queue>h2::after,
+[data-style="manual"] #drafts>h2::after,
+[data-style="manual"] #connections>h2::after,
+[data-style="manual"] #recordings>h2::after,
+[data-style="manual"] #newfiles>h2::after,
+[data-style="manual"] #people>h2::after,
+[data-style="manual"] #attention>h2::after,
+[data-style="manual"] #all>h2::after,
+[data-style="manual"] .doc h2::after,
+[data-style="manual"] .todaydoc h2::after{display:none}
+
+/* -------------------------------------------------------------- labels
+   every eyebrow is a mono spec label with an 8px rust square; the square
+   rides the ::before background so numbered variants only change content */
+[data-style="manual"] .eyebrow,[data-style="manual"] h3.area{
+  font:600 11px/1.5 var(--mono);letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink)}
+[data-style="manual"] .eyebrow::before,
+[data-style="manual"] h3.area::before,
+[data-style="manual"] .todaywrap .todaydoc>h1::before{
+  content:"";
+  font:600 11.5px/1 var(--mono);letter-spacing:.15em;color:var(--ink);
+  background:linear-gradient(var(--green),var(--green)) left center/8px 8px no-repeat;
+  padding-left:17px;vertical-align:1px}
+[data-style="manual"] .meta{
+  font:400 10.5px/1.7 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* ---------------------------------------------------- numbered sections
+   main column 01–06 in DOM order; the rail counts 10.1, 10.2, … */
+[data-style="manual"] .todaymain{counter-reset:fmsec}
+[data-style="manual"] .todaymain>.hero,
+[data-style="manual"] .todaymain>.todaywrap,
+[data-style="manual"] .todaywrap .cardhead:has(+ .qwins),
+[data-style="manual"] .todaymain>.hzcard,
+[data-style="manual"] .todaymain>.offercard,
+[data-style="manual"] .todaymain>.bscard{counter-increment:fmsec}
+[data-style="manual"] .hero .eyebrow::before,
+[data-style="manual"] .todaywrap .todaydoc>h1::before,
+[data-style="manual"] .cardhead:has(+ .qwins) h3.area::before,
+[data-style="manual"] .hzcard .eyebrow::before,
+[data-style="manual"] .offercard .eyebrow::before,
+[data-style="manual"] .bscard .eyebrow::before{
+  content:counter(fmsec,decimal-leading-zero) " — "}
+
+[data-style="manual"] .todayrail{counter-reset:fmrail}
+[data-style="manual"] .todayrail>section{counter-increment:fmrail}
+[data-style="manual"] .todayrail>section .eyebrow::before,
+[data-style="manual"] .todayrail>section h3.area::before{
+  content:"10." counter(fmrail) " — "}
+
+/* plan sub-labels: 0N.1 — DO THESE THREE, no square */
+[data-style="manual"] .todaydoc{counter-reset:fmsub}
+[data-style="manual"] .todaydoc>h2{counter-increment:fmsub}
+[data-style="manual"] .todaywrap .todaydoc>h2{
+  font:600 10px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .todaydoc>h2::before{
+  content:counter(fmsec,decimal-leading-zero) "." counter(fmsub) " — "}
+
+/* --------------------------------------------------------------- header */
+[data-style="manual"] header.top{border-bottom:2px solid var(--ink);box-shadow:none}
+[data-style="manual"] .wordmark{
+  font:700 15px/1 var(--serif);letter-spacing:.13em;text-transform:uppercase}
+[data-style="manual"] .syncstate{
+  font:500 10.5px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+/* the stamp rides inside the sync pill and matches its type */
+[data-style="manual"] .skinx-stamp{display:inline}
+
+[data-style="manual"] .topnav a{
+  font:500 11px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;
+  border-radius:0;padding:8px 9px}
+[data-style="manual"] .topnav a.on{
+  color:var(--ink);
+  background:linear-gradient(var(--green),var(--green)) left bottom/100% 2px no-repeat}
+[data-style="manual"] .topnav a:hover{background:var(--sunken)}
+
+/* the five-swatch state legend, unhidden */
+[data-style="manual"] .skinx-legend{
+  display:inline-flex;align-items:center;gap:12px;padding:8px 11px;
+  border:1px solid var(--line2);
+  font:400 9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dim);white-space:nowrap}
+[data-style="manual"] .skinx-legend .lgch{display:inline-flex;align-items:center;gap:5px}
+[data-style="manual"] .skinx-legend .lgch i{width:7px;height:7px;flex:none}
+[data-style="manual"] .lg-red{background:var(--bad)}
+[data-style="manual"] .lg-amber{background:var(--wait)}
+[data-style="manual"] .lg-blue{background:var(--cold)}
+[data-style="manual"] .lg-terra{background:var(--terra)}
+[data-style="manual"] .lg-ok{background:var(--ok)}
+
+[data-style="manual"] .ghostbtn{
+  border:1px solid var(--line2);border-radius:0;color:var(--dim);
+  font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  padding:9px 13px}
+[data-style="manual"] .ghostbtn:hover{background:var(--sunken);color:var(--ink)}
+[data-style="manual"] .askopen{
+  background:var(--green);color:var(--paper);border:1px solid var(--green);
+  border-radius:0;font:600 11px/1 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase;padding:9px 14px}
+[data-style="manual"] .askopen:hover{filter:brightness(1.07)}
+[data-style="manual"] .banner{border-radius:0;border-bottom:1px solid var(--line2)}
+
+/* ------------------------------------------------------- bands & column
+   the main column is a spec sheet: full-width bands, 2px ink rules, a 2px
+   column rule against the rail */
+[data-style="manual"] .todaygrid>.todaymain{border-right:2px solid var(--ink)}
+[data-style="manual"] .todaymain>.hero,
+[data-style="manual"] .todaymain>.todaywrap{
+  background:transparent;border:0;border-radius:0;box-shadow:none;
+  border-bottom:2px solid var(--ink);
+  margin:0 0 0 calc(-1*var(--fm-bleed));
+  padding:var(--s5) var(--s5) var(--s5) var(--fm-bleed)}
+[data-style="manual"] .todaymain>.hzcard,
+[data-style="manual"] .todaymain>.offercard,
+[data-style="manual"] .todaymain>.bscard{
+  background:transparent;border:0;border-radius:0;box-shadow:none;
+  border-bottom:1px solid var(--line);
+  margin:0 0 0 calc(-1*var(--fm-bleed));
+  padding:var(--s5) var(--s5) var(--s5) var(--fm-bleed)}
+[data-style="manual"] .todaymain>.bscard{border-bottom:0}
+
+/* the weather line as a grey band */
+[data-style="manual"] .wxline{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;
+  font:400 var(--t-sm)/1.5 var(--sans);color:var(--ink);
+  background:var(--sunken);border-bottom:2px solid var(--ink);
+  margin:0 0 0 calc(-1*var(--fm-bleed));
+  padding:12px var(--s5) 12px var(--fm-bleed)}
+[data-style="manual"] .skinx-wx{
+  display:inline-block;margin-left:auto;
+  font:400 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint)}
+
+/* ----------------------------------------------------------------- hero */
+[data-style="manual"] .hero h1{
+  font:700 clamp(1.9rem,3.2vw,2.875rem)/1.05 var(--serif);
+  letter-spacing:.005em;text-transform:uppercase}
+[data-style="manual"] .skinx-prov{
+  display:block;margin:2px 0 0;
+  font:400 11px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .hero-why{font-size:1.16rem}
+[data-style="manual"] .hero-next{
+  display:block;margin:var(--s4) 0 var(--s3);padding-top:14px;
+  border-top:2px solid var(--ink);
+  font:500 1.28rem/1.35 var(--sans);color:var(--ink);max-width:660px}
+[data-style="manual"] .hero-next span{
+  display:block;margin:0 0 9px;
+  font:600 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim)}
+[data-style="manual"] .heroplan{
+  font:500 11px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+[data-style="manual"] .hero-matters{font:400 var(--t-sm)/1.6 var(--sans)}
+
+/* the spec table beside the goal — ruled dt/dd rows */
+[data-style="manual"] dl.skinx-spec{display:block;margin:var(--s4) 0 0;max-width:420px}
+[data-style="manual"] .skinx-spec>div{
+  display:grid;grid-template-columns:104px minmax(0,1fr);gap:0 10px;
+  align-items:baseline;padding:5px 0;border-bottom:1px solid var(--line)}
+[data-style="manual"] .skinx-spec dt{
+  margin:0;font:400 11px/1.5 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--faint)}
+[data-style="manual"] .skinx-spec dd{margin:0;font:400 var(--t-sm)/1.5 var(--sans)}
+
+/* the ticked decay gauge: ink frame, rust fill riding under the ticks */
+[data-style="manual"] main .bar{
+  height:12px;border-radius:0;overflow:hidden;
+  border-left:1px solid var(--ink);border-right:2px solid var(--ink);
+  background:repeating-linear-gradient(to right,
+    color-mix(in oklab,var(--ink) 45%,var(--paper)) 0 1px,transparent 1px 33.3px)}
+[data-style="manual"] main .bar>i{
+  height:6px;margin-top:3px;border-radius:0;background:var(--green)}
+[data-style="manual"] .row .bar{height:9px}
+[data-style="manual"] .row .bar>i{height:5px;margin-top:2px}
+[data-style="manual"] .wbar,[data-style="manual"] .wbar i{border-radius:0}
+
+/* --------------------------------------------------------------- buttons
+   all labels uppercase mono, square */
+[data-style="manual"] .act,[data-style="manual"] .mini{
+  border:1px solid var(--line2);border-radius:0;color:var(--dim);
+  font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  padding:8px 12px}
+[data-style="manual"] .act{border-color:var(--ink);color:var(--ink)}
+[data-style="manual"] .act:hover,[data-style="manual"] .mini:hover{
+  background:var(--sunken);color:var(--ink);border-color:var(--ink)}
+[data-style="manual"] .act[data-addtask]{background:var(--ink);color:var(--paper)}
+[data-style="manual"] .act[data-addtask] b{color:var(--paper)}
+[data-style="manual"] .act[data-addtask]:hover{background:var(--ink);color:var(--paper);
+  filter:brightness(1.12)}
+[data-style="manual"] .ball{
+  border-radius:0;font:600 10.5px/1 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase}
+[data-style="manual"] .ball.on{background:var(--ink);color:var(--paper);
+  border-color:var(--ink)}
+[data-style="manual"] .balllabel,[data-style="manual"] .actsfor{
+  font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .aopt,[data-style="manual"] .addbutton{
+  border-radius:0;font:600 10.5px/1 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase}
+/* ✦ actions read as rust text, borderless */
+[data-style="manual"] .tstart,[data-style="manual"] .hzstart,
+[data-style="manual"] .hzpush{border-color:transparent;color:var(--green)}
+[data-style="manual"] .tstart:hover,[data-style="manual"] .hzstart:hover,
+[data-style="manual"] .hzpush:hover{border-color:var(--green);background:transparent;
+  color:var(--green)}
+[data-style="manual"] .offerbtn{border-color:var(--ink);color:var(--ink)}
+
+/* checkbox: 15px square, 1.5px ink; the tick keeps the moving green */
+[data-style="manual"] .box{
+  width:15px;height:15px;min-width:15px;border:1.5px solid var(--ink);
+  border-radius:0;margin-top:3px;line-height:12px;font-size:9px;color:var(--ok)}
+[data-style="manual"] button.box:hover,[data-style="manual"] .box.done{
+  border-color:var(--ok)}
+
+/* task-row chips go square + mono (state dots and faces stay round) */
+[data-style="manual"] .test{
+  background:transparent;border-radius:0;padding:0;margin-left:8px;
+  font:500 10.5px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .tws{
+  border-radius:0;border:1px solid var(--line2);
+  font:500 10px/1.5 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+[data-style="manual"] .ballpill{
+  border-radius:0;font:600 10.5px/1.5 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase}
+[data-style="manual"] .wpill,[data-style="manual"] .cchip,
+[data-style="manual"] .szchip{border-radius:0}
+
+/* ------------------------------------------------------------- the plan */
+[data-style="manual"] .skinx-planstamp{
+  display:inline-block;margin:0 var(--s3) var(--s3) 0;
+  font:400 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .updnudge{
+  background:transparent;border:0;border-radius:0;
+  border-bottom:1px solid var(--line);padding:12px 0}
+[data-style="manual"] .todaywrap .doc h1{
+  font:700 var(--t-xl)/1.15 var(--serif);letter-spacing:.01em;
+  text-transform:uppercase}
+[data-style="manual"] .todaywrap .doc p{font-size:var(--t-sm)}
+
+/* the three as a ruled column table, bounded 2px ink */
+[data-style="manual"] ul.tasks li{border-top:1px solid var(--line);padding:11px 0}
+[data-style="manual"] ul.tasks li:first-child{border-top:0}
+[data-style="manual"] .todaydoc>h2:first-of-type+ul.tasks{
+  border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+[data-style="manual"] .todaydoc>h2:first-of-type+ul.tasks>li:first-child{
+  border-top:0}
+[data-style="manual"] .todaydoc>h2:first-of-type+ul.tasks>li{
+  border-top:1px solid var(--line)}
+
+/* a/b/c letter indices on the chase and not-today lists */
+[data-style="manual"] .todaydoc>h2:not(:first-of-type)+ul{
+  counter-reset:fmabc;list-style:none;padding-left:0}
+[data-style="manual"] .todaydoc>h2:not(:first-of-type)+ul>li{
+  counter-increment:fmabc;display:flex;gap:12px;align-items:flex-start}
+[data-style="manual"] .todaydoc>h2:not(:first-of-type)+ul>li::before{
+  content:counter(fmabc,lower-alpha);flex:none;width:12px;margin-top:2px;
+  font:400 11px/1.6 var(--mono);color:var(--faint)}
+
+[data-style="manual"] .weekstrip>summary{
+  font:600 var(--t-xs)/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+
+/* ------------------------------------------------- evening check, inverted */
+[data-style="manual"] .evwrap{
+  background:var(--ink);color:var(--paper);border:0;border-radius:0;
+  margin:var(--s4) 0 var(--s4) calc(-1*var(--fm-bleed));
+  padding:20px var(--s5) 20px var(--fm-bleed)}
+[data-style="manual"] .evwrap .area{color:var(--paper)}
+[data-style="manual"] .evwrap .area::before{
+  background:linear-gradient(oklch(.620 .150 42),oklch(.620 .150 42))
+    left center/8px 8px no-repeat}
+[data-style="manual"] .evwrap .evhead,[data-style="manual"] .evwrap p{
+  color:color-mix(in oklab,var(--paper) 80%,var(--ink))}
+[data-style="manual"] .evwrap .ttext{color:var(--paper)}
+[data-style="manual"] .evwrap ul.tasks li{
+  border-top:1px solid color-mix(in oklab,var(--paper) 25%,var(--ink))}
+[data-style="manual"] .evwrap .box{border-color:var(--paper);color:var(--paper)}
+[data-style="manual"] .evwrap .mini{
+  border-color:color-mix(in oklab,var(--paper) 40%,var(--ink));
+  color:color-mix(in oklab,var(--paper) 88%,var(--ink));background:transparent}
+[data-style="manual"] .evwrap .mini:hover{
+  background:color-mix(in oklab,var(--paper) 12%,var(--ink));color:var(--paper);
+  border-color:var(--paper)}
+[data-style="manual"] .evwrap .evact:first-child{
+  background:var(--paper);color:var(--ink);border-color:var(--paper)}
+[data-style="manual"] .evwrap a{
+  color:color-mix(in oklab,var(--green) 65%,var(--paper))}
+[data-style="manual"] .evwrap .meta{
+  color:color-mix(in oklab,var(--paper) 65%,var(--ink))}
+
+/* --------------------------------------------------------- the quadrants */
+[data-style="manual"] .hzrow{border-top:1px solid var(--line)}
+[data-style="manual"] .hzrow:first-of-type{border-top:0}
+[data-style="manual"] .hzkind,[data-style="manual"] .hzsince{
+  font:500 10.5px/1.6 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+[data-style="manual"] .hzmore{
+  font:400 10.5px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .offer{border-top:1px solid var(--line);padding:10px 0}
+[data-style="manual"] .offer:first-of-type{border-top:0}
+[data-style="manual"] .offerwhen{
+  font:500 10.5px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .offerwould{font:italic 400 .9em/1.5 var(--coach)}
+[data-style="manual"] .bspot{border-top:1px solid var(--line);padding:10px 0}
+[data-style="manual"] .bspot:first-of-type{border-top:0}
+[data-style="manual"] .qwlegend{color:var(--faint)}
+
+/* ----------------------------------------------------------------- rail */
+[data-style="manual"] .todayrail{gap:0}
+[data-style="manual"] .todayrail>section{
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  border-bottom:1px solid var(--line);padding:22px 4px 20px;margin:0}
+[data-style="manual"] .todayrail>section:last-child{border-bottom:0}
+
+/* countdowns: mono day-numbers, urgency by position color */
+[data-style="manual"] .cdcard .cdn{
+  font:600 .82rem/1.2 var(--mono);letter-spacing:.02em;color:var(--dim)}
+[data-style="manual"] .cdcard .cdrow:nth-of-type(1) .cdn{color:var(--bad)}
+[data-style="manual"] .cdcard .cdrow:nth-of-type(2) .cdn{color:var(--terra)}
+[data-style="manual"] .cdcard .cdrow{border-top:1px solid var(--line);
+  padding:6px 0;margin:0}
+[data-style="manual"] .cdcard .cdrow:first-of-type{border-top:0}
+[data-style="manual"] .cdcard .cddate{
+  font:400 10px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* answer-them roster rows (the faces stay round) */
+[data-style="manual"] .drow{
+  border-radius:0;border-top:1px solid var(--line);padding:9px 0}
+[data-style="manual"] .drow:first-of-type{border-top:0}
+[data-style="manual"] .drow:hover{background:var(--sunken)}
+[data-style="manual"] .drow .dname{font:500 var(--t-sm)/1.3 var(--sans)}
+
+/* habits as a ruled table; "the floor" quoted under a 2px rule */
+[data-style="manual"] .habit2{
+  border:0;border-radius:0;background:transparent;
+  border-top:1px solid var(--line);padding:8px 0}
+[data-style="manual"] .habit2:first-of-type{border-top:0}
+[data-style="manual"] .habit2.done{background:transparent}
+[data-style="manual"] .h2tick{border:1.5px solid var(--ink);border-radius:0}
+[data-style="manual"] .habit2.done .h2tick{
+  background:var(--ok);border-color:var(--ok)}
+[data-style="manual"] .h2count{
+  font:500 var(--t-xs)/1 var(--mono);letter-spacing:.04em}
+[data-style="manual"] .h2steps{
+  border-top:2px solid var(--ink);padding-top:10px;margin-top:10px;
+  font:italic 400 .95rem/1.5 var(--coach)}
+
+/* forecast + money + questions */
+[data-style="manual"] .fc-when,[data-style="manual"] .fc-gap{
+  font:400 10.5px/1.6 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+[data-style="manual"] .money .mo-total b{font:600 1.35rem/1.1 var(--mono)}
+[data-style="manual"] .qlead{font-size:var(--t-sm)}
+[data-style="manual"] .qin{
+  border:1px solid var(--line2);border-radius:0;background:var(--surface)}
+
+/* ------------------------------------------------------- floating chrome */
+[data-style="manual"] .panel,[data-style="manual"] .appanel,
+[data-style="manual"] .actdrawer{
+  border:1px solid var(--ink);border-radius:0;box-shadow:none;
+  background:var(--surface)}
+[data-style="manual"] .runbar{
+  border:1px solid var(--ink);border-radius:0;box-shadow:none;
+  font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase}
+[data-style="manual"] .runbar.rb-live{box-shadow:none}
+/* the FAB stays round — rust via the accent alias; ✎ pad stays a pill */
+[data-style="manual"] .fab{box-shadow:none}
+[data-style="manual"] .ramblefab{box-shadow:none;
+  font:600 var(--t-xs)/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .stchip{border-radius:0}
+[data-style="manual"] .aplabel{
+  font:600 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint)}
+
+/* ------------------------------------------------------------ Plate
+   the ledger: ruled stack bounded 2px ink, mono rank numbers */
+[data-style="manual"] #attention>h2,[data-style="manual"] #all>h2{
+  font:700 var(--t-lg)/1.2 var(--serif);letter-spacing:.03em;
+  text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:10px}
+[data-style="manual"] #attention .stack{border-bottom:2px solid var(--ink)}
+[data-style="manual"] .row summary{border-radius:0}
+[data-style="manual"] .rank{
+  font:600 .82rem/1.4 var(--mono);letter-spacing:.02em;min-width:24px}
+[data-style="manual"] .stackrow{
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  border-bottom:1px solid var(--line)}
+[data-style="manual"] .calmrow{border-radius:0;border-bottom:1px solid var(--line)}
+[data-style="manual"] .platehead .triage{
+  font:700 1.3rem/1.3 var(--serif);letter-spacing:.02em;text-transform:uppercase}
+[data-style="manual"] .tile{
+  border-radius:0;border:1px solid var(--line2);
+  font:500 10.5px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  padding:9px 13px}
+[data-style="manual"] .tile.active{border-color:var(--ink)}
+[data-style="manual"] .tcount{
+  font:400 10.5px/1.6 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+
+/* ------------------------------------------------------------ People
+   the roster: ruled rows, mono circle headings; faces and rings untouched */
+[data-style="manual"] #people>h2{
+  font:700 var(--t-lg)/1.2 var(--serif);letter-spacing:.03em;
+  text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:10px}
+[data-style="manual"] .psub{
+  font:700 1.3rem/1.3 var(--serif);letter-spacing:.02em;text-transform:uppercase}
+[data-style="manual"] .csection>summary.circlehead{
+  font:600 var(--t-sm)/1.4 var(--mono);letter-spacing:.12em;
+  text-transform:uppercase;border-top:2px solid var(--ink);padding-top:var(--s3)}
+
+/* ------------------------------------------------------------ Claude
+   the job sheet */
+[data-style="manual"] #queue>h2,[data-style="manual"] #drafts>h2,
+[data-style="manual"] #connections>h2,[data-style="manual"] #recordings>h2,
+[data-style="manual"] #newfiles>h2{
+  font:700 var(--t-lg)/1.2 var(--serif);letter-spacing:.03em;
+  text-transform:uppercase;border-bottom:2px solid var(--ink);padding-bottom:10px}
+[data-style="manual"] .draft,[data-style="manual"] .draftcard{
+  border:1px solid var(--line2);border-radius:0;box-shadow:none}
+[data-style="manual"] .draftsub{
+  font:600 10px/1.5 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .qitem,[data-style="manual"] .qhead{border-radius:0}
+
+/* ------------------------------------------------------------ News · Season */
+[data-style="manual"] .nwsec h3{
+  font:600 var(--t-sm)/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+[data-style="manual"] .nwsec h3::after{height:2px;background:var(--ink)}
+[data-style="manual"] .nwhead{font:600 1.05rem/1.35 var(--sans);letter-spacing:0}
+[data-style="manual"] .szbar{border-bottom:2px solid var(--ink);padding-bottom:var(--s3)}
+[data-style="manual"] .szwd{
+  border-radius:0;border:1px solid var(--line);
+  font:500 10.5px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .szwecell{border-radius:0;border:1px solid var(--line)}
+
+/* ------------------------------------------------------- narrow screens */
+@media (max-width:1180px){
+  /* single column: the rail stacks under, so the column rule comes off */
+  [data-style="manual"] .todaygrid>.todaymain{border-right:0}
+  [data-style="manual"] .todayrail{border-top:2px solid var(--ink);
+    padding-top:var(--s4)}
+  [data-style="manual"] .skinx-legend{display:none}
+}
+@media (max-width:760px){
+  :root[data-style="manual"]{--fm-bleed:var(--s4)}
+  [data-style="manual"] .hero h1{font-size:1.75rem}
+  [data-style="manual"] .skinx-spec>div{grid-template-columns:88px minmax(0,1fr)}
+  [data-style="manual"] .skinx-wx{margin-left:0;flex-basis:100%}
+  [data-style="manual"] .wxline{padding-right:var(--s4)}
+  [data-style="manual"] .hero-next{font-size:1.1rem}
+}
+
+/* The legend must never cost her the Ask button — show it only where the
+   header genuinely has the width. */
+@media (max-width:1700px){
+  [data-style="manual"] .skinx-legend{display:none}
+}
+
+/* ================================================== the other views
+   Extends the numbered-section gesture beyond Today. Everything below
+   rides the tokens above, so the dark twins cover it with no new blocks. */
+
+/* numbered heads — mono kicker + rust square inline before the big title.
+   Claude's five sections live in different DOM parents, so those are
+   hand-numbered with fixed strings; counters handle the rest. */
+[data-style="manual"] #attention>h2::before,
+[data-style="manual"] #all>h2::before,
+[data-style="manual"] #queue>h2::before,
+[data-style="manual"] #drafts>h2::before,
+[data-style="manual"] #connections>h2::before,
+[data-style="manual"] #recordings>h2::before,
+[data-style="manual"] #newfiles>h2::before{
+  font:600 11.5px/1 var(--mono);letter-spacing:.15em;color:var(--ink);
+  background:linear-gradient(var(--green),var(--green)) left center/8px 8px no-repeat;
+  padding-left:17px;margin-right:10px;vertical-align:4px}
+[data-style="manual"] #attention>h2::before{content:"01 — "}
+[data-style="manual"] #all>h2::before{content:"02 — "}
+[data-style="manual"] #queue>h2::before{content:"01 — "}
+[data-style="manual"] #drafts>h2::before{content:"02 — "}
+[data-style="manual"] #connections>h2::before{content:"03 — "}
+[data-style="manual"] #recordings>h2::before{content:"04 — "}
+[data-style="manual"] #newfiles>h2::before{content:"05 — "}
+
+/* ---------------------------------------------------------- Plate, deeper
+   rows as a ruled ledger; area heads inside Ticking Over count 02.1, 02.2 … */
+[data-style="manual"] #attention .stack,[data-style="manual"] #all .stack{gap:0}
+[data-style="manual"] #attention .stack>details.row,
+[data-style="manual"] #all .stack>details.row{
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  margin:0;border-bottom:1px solid var(--line)}
+[data-style="manual"] #all .stack{border-bottom:2px solid var(--ink)}
+[data-style="manual"] #attention .stack>details.row:last-child,
+[data-style="manual"] #all .stack>details.row:last-child{border-bottom:0}
+[data-style="manual"] #all{counter-reset:fmarea}
+[data-style="manual"] #all .stack>h3.area{counter-increment:fmarea}
+[data-style="manual"] #all .stack>h3.area::before{
+  content:"02." counter(fmarea) " — "}
+
+/* row meta as machine strings; chips square */
+[data-style="manual"] .row .rowwhy{
+  font:400 10.5px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--dim)}
+[data-style="manual"] .row .rowwhy b{font-weight:600}
+[data-style="manual"] .tcount{
+  border-radius:0;background:transparent;border:1px solid var(--line2);
+  padding:4px 8px}
+[data-style="manual"] .v{
+  border-radius:0;font:500 10px/1.5 var(--mono);letter-spacing:.05em;
+  text-transform:uppercase}
+
+/* the open-row dock reads as a spec sheet: ink rule on top, ruled tasks
+   (the global ul.tasks rules already apply), mono stamps below */
+[data-style="manual"] .row .rowbody{border-top:2px solid var(--ink)}
+[data-style="manual"] .coach{font-family:var(--coach);font-style:italic}
+
+/* ---------------------------------------------------------- People, roster
+   Today's five is 01, the shelves 02, each circle 02.n — counters ride
+   #people's DOM order, which matches the page's flex order here. */
+[data-style="manual"] #pneeds h3.area::before{content:"01 — "}
+[data-style="manual"] .shelvesbar .eyebrow::before{content:"02 — "}
+[data-style="manual"] #people{counter-reset:fmcir}
+[data-style="manual"] #people>.csection{counter-increment:fmcir}
+[data-style="manual"] .csection>summary.circlehead::before{
+  content:"02." counter(fmcir) " — ";
+  font:600 11px/1 var(--mono);letter-spacing:.15em;color:var(--ink);
+  background:linear-gradient(var(--green),var(--green)) left center/7px 7px no-repeat;
+  padding-left:15px}
+[data-style="manual"] .csection>summary.circlehead .csub{
+  border-radius:0;background:transparent;border:1px solid var(--line2);
+  font:500 10.5px/1 var(--mono);padding:3px 8px}
+[data-style="manual"] .crhythm,[data-style="manual"] .crename,
+[data-style="manual"] .pill{
+  border-radius:0;font:600 10px/1 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase}
+[data-style="manual"] .csection .shelf{border-bottom:1px solid var(--line);
+  padding-bottom:10px}
+[data-style="manual"] .shwhy,[data-style="manual"] .ptier{
+  font:400 10px/1.5 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+[data-style="manual"] .ptier{border-radius:0}
+
+/* ---------------------------------------------------------- Claude, job sheet
+   job buttons as spec boxes; the drafts list as ruled rows with numbered
+   TO SEND / NOTES heads (02.1, 02.2) */
+[data-style="manual"] .jobrow2 .jobbtn{
+  border:1px solid var(--ink);border-radius:0;background:transparent;
+  font:600 11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink)}
+[data-style="manual"] .jobrow2 .jobbtn:hover{background:var(--sunken);
+  border-color:var(--ink)}
+[data-style="manual"] .jobrow2 .jobbtn span{
+  font:400 10.5px/1.5 var(--sans);letter-spacing:0;text-transform:none;
+  color:var(--dim)}
+[data-style="manual"] .jobrow2 .jobbtn .jobwhen{
+  font:400 9.5px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .jobrow2 .jobqueue{border-color:var(--green);
+  color:var(--green)}
+
+[data-style="manual"] #drafts .draftlist{counter-reset:fmdrf}
+[data-style="manual"] #drafts .draftsub{counter-increment:fmdrf}
+[data-style="manual"] #drafts .draftsub::before{
+  content:"02." counter(fmdrf) " — ";
+  background:linear-gradient(var(--green),var(--green)) left center/7px 7px no-repeat;
+  padding-left:15px}
+[data-style="manual"] .draftlist .draft,[data-style="manual"] .draftcard{
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  border-top:1px solid var(--line)}
+[data-style="manual"] .draftlist{border-bottom:2px solid var(--ink)}
+[data-style="manual"] .dmeta{
+  font:400 10px/1.6 var(--mono);letter-spacing:.05em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .dhead{font:600 var(--t-sm)/1.35 var(--sans)}
+[data-style="manual"] .dedit{
+  font:600 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .connlist .connrow+.connrow{border-top:1px solid var(--line)}
+[data-style="manual"] .connrow b{
+  font:600 11px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------------------------------------------------------- News, the log
+   each section a numbered block closed by 2px ink; every story a log entry:
+   mono outlet+time line above the headline, hairlines between */
+[data-style="manual"] .newsmain{counter-reset:fmnws}
+[data-style="manual"] .newsmain>.nwsec{counter-increment:fmnws;
+  border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:22px}
+[data-style="manual"] .newsmain>.nwsec h3::before{
+  content:counter(fmnws,decimal-leading-zero) " — ";
+  background:linear-gradient(var(--green),var(--green)) left center/8px 8px no-repeat;
+  padding-left:17px}
+[data-style="manual"] .nwitem{display:flex;flex-direction:column;
+  align-items:flex-start;gap:3px}
+[data-style="manual"] .nwitem>.meta{order:-1;margin:0;color:var(--faint)}
+[data-style="manual"] .nwitem .nwhead{font:600 1.02rem/1.35 var(--sans)}
+[data-style="manual"] .newsrail{counter-reset:fmnwr}
+[data-style="manual"] .newsrail .nrbox{counter-increment:fmnwr;
+  border:1px solid var(--line2);border-radius:0;background:transparent}
+[data-style="manual"] .newsrail .nrbox .eyebrow::before{
+  content:"10." counter(fmnwr) " — "}
+[data-style="manual"] .nwchip,[data-style="manual"] #nwaddin{border-radius:0}
+
+/* ---------------------------------------------------------- Season, ruled
+   the tray a solid ruled box, month labels and repeats as machine strings,
+   the view switch square */
+[data-style="manual"] .szviews{border-radius:0;border:1px solid var(--line2);
+  background:transparent;padding:0}
+[data-style="manual"] .szvbtn{border-radius:0;
+  font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  padding:8px 12px}
+[data-style="manual"] .szvbtn.on{background:var(--ink);color:var(--paper);
+  box-shadow:none}
+[data-style="manual"] .sznav b{
+  font:600 12px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+[data-style="manual"] .sztray{border:1px solid var(--ink);border-radius:0}
+[data-style="manual"] .szgroup+.szgroup{border-top:1px solid var(--line)}
+[data-style="manual"] .szglabel{
+  font:600 10px/1.5 var(--mono);letter-spacing:.14em;color:var(--dim)}
+[data-style="manual"] .szchip{border:1px solid var(--line2);background:transparent}
+[data-style="manual"] .szrep,[data-style="manual"] .szspan,
+[data-style="manual"] .szwho,[data-style="manual"] .szn{
+  font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
+
+/* Squiggles reach some eyebrows through view-specific rules the enumerated
+   kill misses (the news rail) — blanket the decorative pseudo instead. */
+html[data-style="manual"] .eyebrow::after,html[data-style="manual"] .area::after,
+html[data-style="manual"] h3::after,html[data-style="manual"] .newsv h2::after,
+html[data-style="manual"] .wav{display:none;
+  -webkit-mask:none;mask:none;background:none;height:0;content:none}
+
+/* ================================================== rooms.html + map.html
+   The floor plan, the rooms and the map wear the same spec sheet: numbered
+   wings and zones, mono machine strings, 2px ink structure, square chips.
+   Colors ride the tokens above, so the dark twins cover this block. The
+   map's canvas — dots, rings, threads, mascot — is untouched, as is the
+   rooms mascot in the title strip (typography only there). */
+
+/* ---- the shared title strip (rooms + map): typography only.
+   body>.bar keeps this off Today's decay gauge, which also answers to .bar */
+[data-style="manual"] body>.bar b{
+  font:700 15px/1.2 var(--serif);letter-spacing:.09em;text-transform:uppercase}
+[data-style="manual"] body>.bar .n{
+  font:400 10.5px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* back links and map tools: square mono spec buttons */
+[data-style="manual"] a.back,[data-style="manual"] button.tool{
+  border-radius:0;border:1px solid var(--line2);color:var(--dim);
+  font:600 10.5px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] a.back:hover,[data-style="manual"] button.tool:hover{
+  background:var(--sunken);color:var(--ink);border-color:var(--ink)}
+/* the ± pair keeps a legible glyph size and its fused-square shape */
+[data-style="manual"] .zgrp .tool,
+[data-style="manual"] .zgrp .tool:first-child,
+[data-style="manual"] .zgrp .tool:last-child{border-radius:0;font-size:14px}
+
+/* the ask-Claude context chips (shared chrome) */
+[data-style="manual"] .ctxchip{
+  border-radius:0;font:500 10.5px/1.3 var(--mono);letter-spacing:.05em;
+  text-transform:uppercase}
+
+/* hints and machine strings, both pages */
+[data-style="manual"] .hint{font:400 10.5px/1.6 var(--mono);letter-spacing:.03em}
+[data-style="manual"] .tws,[data-style="manual"] .pdd,
+[data-style="manual"] .hcount,[data-style="manual"] .docmeta,
+[data-style="manual"] .hoffas,[data-style="manual"] .hoffmeta,
+[data-style="manual"] .gprog,[data-style="manual"] .savednote,
+[data-style="manual"] .pulse .cd,[data-style="manual"] .hit .where{
+  font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  text-transform:uppercase}
+[data-style="manual"] .urg{font:700 9.5px/1.6 var(--mono);letter-spacing:.1em}
+
+/* ------------------------------------------------- rooms: the floor plan
+   wings as numbered ruled bands — 2px ink top rule, card chrome flattened */
+[data-style="manual"] #floor{counter-reset:fmwing}
+[data-style="manual"] #floor .wing{
+  counter-increment:fmwing;background:transparent;border:0;border-radius:0;
+  border-top:2px solid var(--ink);overflow:visible;margin:0}
+[data-style="manual"] #floor>section.wing:last-of-type{
+  border-bottom:2px solid var(--ink)}
+[data-style="manual"] .wing>header{padding:13px 0}
+[data-style="manual"] .wing h2{
+  font:700 15px/1.2 var(--serif);letter-spacing:.06em;text-transform:uppercase}
+[data-style="manual"] .wing h2::before{
+  content:counter(fmwing,decimal-leading-zero) " — ";
+  font:600 11.5px/1 var(--mono);letter-spacing:.12em;
+  background:linear-gradient(var(--green),var(--green)) left center/8px 8px no-repeat;
+  padding-left:17px;vertical-align:2px}
+[data-style="manual"] .whealth{
+  font:400 10.5px/1.6 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+[data-style="manual"] .waudit{
+  border-radius:0;background:transparent;
+  font:600 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .wcaret{font-size:10px}
+[data-style="manual"] .roomgrid{padding:0 0 16px}
+
+/* room cards: ruled entries — square, mono state line, ink on hover */
+[data-style="manual"] .room{border-radius:0}
+[data-style="manual"] .room:hover{border-color:var(--ink)}
+[data-style="manual"] .room .line{
+  font:400 10px/1.6 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+
+/* the finish-line strip: squared machine chips */
+[data-style="manual"] .goalstrip b{
+  font:600 10px/1.6 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .gchip{
+  border-radius:0;background:transparent;
+  font:500 10.5px/1.5 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+[data-style="manual"] .gchip:hover{border-color:var(--ink);color:var(--ink)}
+[data-style="manual"] .gline{
+  font:400 10px/1.6 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+
+/* ------------------------------------------------- rooms: inside a room
+   the head keeps its dot; wing tag gets the rust square, title goes Archivo */
+[data-style="manual"] .rhead .wingtag{
+  font:600 10px/1.2 var(--mono);letter-spacing:.15em;color:var(--ink);
+  background:linear-gradient(var(--green),var(--green)) left center/8px 8px no-repeat;
+  padding-left:17px}
+[data-style="manual"] .rhead h1{
+  font:700 24px/1.15 var(--serif);letter-spacing:.02em;text-transform:uppercase}
+[data-style="manual"] .rml{
+  font:500 10.5px/1.6 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+
+/* zones as ruled numbered bands — card chrome flattened, 2px ink rule on
+   top, 01 — THE NEXT THING style labels. The big-questions room opts out
+   through its own higher-tied #roomview.bigq rules (page CSS comes later),
+   and the numbers are scoped off it here. */
+[data-style="manual"] #roomview{counter-reset:fmzone}
+[data-style="manual"] #roomview .zone{
+  counter-increment:fmzone;background:transparent;border:0;border-radius:0;
+  border-top:2px solid var(--ink);padding:12px 0 4px;margin:0 0 14px}
+[data-style="manual"] .zone>h2{
+  font:600 11px/1.5 var(--mono);letter-spacing:.15em;color:var(--ink)}
+[data-style="manual"] #roomview:not(.bigq) .zone>h2::before{
+  content:counter(fmzone,decimal-leading-zero) " — ";
+  background:linear-gradient(var(--green),var(--green)) left center/8px 8px no-repeat;
+  padding-left:17px}
+
+/* ticks and boxes square, moving tick kept */
+[data-style="manual"] .ptick{border-radius:0;border:1.5px solid var(--ink)}
+[data-style="manual"] .ptick:hover{border-color:var(--ok)}
+[data-style="manual"] .mdbox{border-radius:0}
+[data-style="manual"] .memread code{border-radius:0}
+
+/* Claude-prepared folds and the handoff box */
+[data-style="manual"] .prep summary{
+  font:600 10px/1.7 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dim)}
+[data-style="manual"] .hoff{border-radius:0}
+[data-style="manual"] .hoffopen{
+  border-radius:0;font:600 10px/1.3 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase}
+
+/* the docs list as a mono file index — hairline per row */
+[data-style="manual"] .docs>li{border-top:1px solid var(--line);padding:7px 0}
+[data-style="manual"] .docs>li:first-child{border-top:0}
+[data-style="manual"] .doclink{font:500 12px/1.5 var(--mono)}
+[data-style="manual"] .doclink:hover{color:var(--green);text-decoration:none}
+[data-style="manual"] .docreveal{font-family:var(--mono)}
+[data-style="manual"] .docmore{
+  font:600 10px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .docbody{border-radius:0;border-color:var(--line2)}
+[data-style="manual"] .docbody pre{border-radius:0}
+
+/* conversations, people chips, inputs and buttons */
+[data-style="manual"] .convo{border-radius:0}
+[data-style="manual"] .chands,[data-style="manual"] .cwhen{
+  font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase}
+[data-style="manual"] .pchip{
+  border-radius:0;font:500 10.5px/1.3 var(--mono);letter-spacing:.05em;
+  text-transform:uppercase}
+[data-style="manual"] .addrow button,[data-style="manual"] .addrow select,
+[data-style="manual"] .askrow button,[data-style="manual"] .askrow select,
+[data-style="manual"] .tract button,[data-style="manual"] .noterow button{
+  border-radius:0;font:600 10.5px/1.4 var(--mono);letter-spacing:.06em;
+  text-transform:uppercase}
+[data-style="manual"] .addrow input,[data-style="manual"] .askrow textarea,
+[data-style="manual"] #notes{border-radius:0}
+[data-style="manual"] #search{border-radius:0;font:400 12px/1.4 var(--mono)}
+
+/* floating chrome on both pages: square, ink-framed, mono */
+[data-style="manual"] .toast,[data-style="manual"] .mtoast{border-radius:0}
+[data-style="manual"] .agentbar,[data-style="manual"] .mapbar{
+  border-radius:0;border:1px solid var(--ink);box-shadow:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  text-transform:uppercase}
+[data-style="manual"] .agentbar button,[data-style="manual"] .mapbar button{
+  border-radius:0;font:700 10px/1.3 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase}
+
+/* ------------------------------------------------------- map: the chrome
+   (the drawing itself — dots, rings, threads, mascot — stays untouched) */
+[data-style="manual"] .modes{
+  border-radius:0;background:transparent;border:1px solid var(--line2);
+  padding:0;gap:0}
+[data-style="manual"] .modes button{
+  border-radius:0;font:600 10.5px/1.3 var(--mono);letter-spacing:.07em;
+  text-transform:uppercase;padding:7px 12px}
+[data-style="manual"] .modes button.on{background:var(--ink);color:var(--paper)}
+
+/* the legend, which is also the filter: squared mono chips, square swatches
+   — the state colors keep their meanings */
+[data-style="manual"] .keylab{font:600 9.5px/1.3 var(--mono);letter-spacing:.14em}
+[data-style="manual"] .lg{
+  border-radius:0;font:500 10px/1.3 var(--mono);letter-spacing:.06em;
+  text-transform:uppercase}
+[data-style="manual"] .lg:hover{background:var(--sunken);border-color:var(--line2)}
+[data-style="manual"] .lg i{border-radius:0;width:7px;height:7px}
+[data-style="manual"] .lg .c{font-size:10px}
+[data-style="manual"] .lgclear{
+  font:600 10px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .lgclear.on{border-radius:0}
+
+/* the detail panel as a ruled spec box: mono dt/dd rows under hairlines
+   (the 1px-ink square frame comes from the floating-chrome .panel rule) */
+[data-style="manual"] .panel .area{
+  font:600 10px/1.5 var(--mono);letter-spacing:.15em;color:var(--ink);
+  background:linear-gradient(var(--green),var(--green)) left center/7px 7px no-repeat;
+  padding-left:15px}
+[data-style="manual"] .panel h2{
+  font:700 15px/1.25 var(--serif);letter-spacing:.03em;text-transform:uppercase}
+[data-style="manual"] .panel dl{gap:0 12px}
+[data-style="manual"] .panel dt,[data-style="manual"] .panel dd{
+  border-top:1px solid var(--line);padding:5px 0;margin:0}
+[data-style="manual"] .panel dt{
+  font:400 10px/1.7 var(--mono);letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="manual"] .panel dt:first-of-type,
+[data-style="manual"] .panel dt:first-of-type+dd{border-top:0}
+[data-style="manual"] .pprog,[data-style="manual"] .pprog i{border-radius:0}
+[data-style="manual"] .pprog span{font-family:var(--mono);letter-spacing:.04em}
+
+/* the key card explains round marks, so its glyphs stay round — only the
+   box and its labels join the spec sheet */
+[data-style="manual"] .keycard{border-radius:0;border:1px solid var(--ink);
+  box-shadow:none}
+[data-style="manual"] .keycard summary{
+  font:600 10.5px/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+[data-style="manual"] .keycard summary::after{border-radius:0}
+[data-style="manual"] .keysec{font-family:var(--mono);letter-spacing:.12em}
+
+/* replay scrub, focus chip, add-dialog */
+[data-style="manual"] .focuschip{
+  border-radius:0;box-shadow:none;
+  font:700 10.5px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+[data-style="manual"] .scrub{border-radius:0;border-color:var(--ink)}
+[data-style="manual"] .sc-lab{font-family:var(--mono)}
+[data-style="manual"] #sc-date{
+  font:500 11px/1.4 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+[data-style="manual"] .mdlg{border-radius:0;border:1px solid var(--ink);
+  box-shadow:none}
+[data-style="manual"] .md-title{
+  font:700 14px/1.3 var(--serif);letter-spacing:.05em;text-transform:uppercase}
+[data-style="manual"] .md-field label{
+  font-family:var(--mono);letter-spacing:.14em}
+[data-style="manual"] .md-field input{border-radius:0}
+[data-style="manual"] .md-go{
+  border-radius:0;font:700 11px/1.3 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase}
+
+/* ================== her review pass, 2026-08-28 ==================== */
+
+/* The rail ran together: each box closes on a 2px ink rule with real
+   air, so WEEK AHEAD / MONEY / ANSWERS read as separate instruments. */
+[data-style="manual"] .todayrail>section,[data-style="manual"] .todayrail>.railcard,
+[data-style="manual"] .todayrail>.forecast,[data-style="manual"] .todayrail>.qcard{
+  border-bottom:2px solid color-mix(in oklab,var(--ink) 70%,var(--paper));
+  padding-bottom:22px;margin-bottom:24px}
+
+/* Claude-can-get-ahead rows: a strict three-column ledger — when · what ·
+   the action pinned right — instead of the ragged float. */
+[data-style="manual"] .offer{display:grid;grid-template-columns:56px 1fr auto;
+  column-gap:14px;align-items:start;padding:10px 0;
+  border-bottom:1px solid color-mix(in oklab,var(--ink) 14%,var(--paper))}
+[data-style="manual"] .offer:last-of-type{border-bottom:0}
+[data-style="manual"] .offerwhen{padding-top:2px}
+[data-style="manual"] .offerbtn{justify-self:end;white-space:nowrap}
+[data-style="manual"] .offercard>.meta,[data-style="manual"] .offernote{
+  letter-spacing:.06em;font-size:.62rem;
+  color:color-mix(in oklab,var(--ink) 55%,var(--paper))}
+
+/* =============== the briefing as a daily log, 2026-08-28 ===============
+   Deepens the News block above: log-stamp masthead, numbered story lines
+   riding fmnws, Archivo headlines, FIELD NOTE explainer, mono glossary. */
+
+/* masthead: Archivo head closed by a 2px ink rule; the freshness line a
+   mono stamp — the existing text, styled, not rewritten */
+[data-style="manual"] .nwtop{border-bottom:2px solid var(--ink);
+  padding-bottom:10px}
+[data-style="manual"] .nwtop h2{font:700 var(--t-lg)/1.2 var(--serif);
+  letter-spacing:.03em;text-transform:uppercase}
+[data-style="manual"] .nwdate{font:500 11px/1.8 var(--mono);font-style:normal;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+
+/* every story a numbered log line: the fmnws section number gains a
+   per-item sub-index on the mono line above the headline */
+[data-style="manual"] .newsmain>.nwsec{counter-reset:fmnwi}
+[data-style="manual"] .newsmain .nwitem{counter-increment:fmnwi}
+[data-style="manual"] .newsmain .nwitem>.meta::before{
+  content:counter(fmnws,decimal-leading-zero) "." counter(fmnwi) " — ";
+  font-weight:600;color:var(--ink)}
+
+/* headlines: Archivo 600 at sentence weight — never uppercase */
+[data-style="manual"] .nwitem .nwhead{font:600 1.05rem/1.35 var(--serif);
+  letter-spacing:.005em;text-transform:none}
+[data-style="manual"] .nwitem .nwhead:hover{color:var(--green)}
+
+/* actions as rust mono links */
+[data-style="manual"] .nwread{font:600 10px/1 var(--mono);letter-spacing:.08em;
+  text-transform:uppercase;color:var(--green);text-decoration:none;padding:4px 0}
+[data-style="manual"] .nwread:hover{color:var(--green);
+  text-decoration:underline;text-underline-offset:3px}
+
+/* the explainer: a ruled FIELD NOTE box (label via the eyebrow pseudo —
+   the square and padding ride the global eyebrow rule) */
+[data-style="manual"] .nwexplain{background:transparent;
+  border:1px solid var(--ink);border-radius:0;padding:12px 14px}
+[data-style="manual"] .nwexplain .eyebrow::before{content:"FIELD NOTE · "}
+[data-style="manual"] .nwexpact{font:400 10px/1.7 var(--mono);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+
+/* glossary: numbered mono definitions */
+[data-style="manual"] .nwgloss dl{counter-reset:fmdef}
+[data-style="manual"] .nwgloss dt{counter-increment:fmdef;
+  font:600 11px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+[data-style="manual"] .nwgloss dt::before{
+  content:counter(fmdef,decimal-leading-zero) " — ";color:var(--faint)}
+[data-style="manual"] .nwgloss dd{font:400 .85rem/1.5 var(--sans)}
+
+/* The inverted evening band must stop at the column rule, not run under
+   the rail — bleed left only, and breathe inside. */
+[data-style="manual"] .evwrap{margin-right:0;padding:20px 24px 18px}
+
+/* The decay gauge as a real instrument at any width: proportional ticks
+   (quarters), a quiet end-stop, the rust fill riding a thin baseline. */
+[data-style="manual"] main .bar{
+  height:10px;border-left:1px solid color-mix(in oklab,var(--ink) 55%,var(--paper));
+  border-right:1px solid color-mix(in oklab,var(--ink) 55%,var(--paper));
+  background:
+    repeating-linear-gradient(to right,
+      color-mix(in oklab,var(--ink) 38%,var(--paper)) 0 1px,transparent 1px 25%),
+    linear-gradient(to bottom,transparent 0 4px,
+      color-mix(in oklab,var(--ink) 22%,var(--paper)) 4px 5px,transparent 5px)}
+[data-style="manual"] main .bar i,[data-style="manual"] main .bar>i{
+  height:5px;margin-top:2px;background:var(--green)}

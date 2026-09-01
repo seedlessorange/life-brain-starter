@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en" data-style="workroom">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sessions — the brain</title>
+<link rel="icon" href="logo-192.png?v=5" type="image/png">
+<link rel="apple-touch-icon" href="logo-180.png?v=5">
+<link rel="stylesheet" href="appearance.css"><script>try{var _bs=localStorage.getItem('brain-style');if(_bs)document.documentElement.setAttribute('data-style',_bs);}catch(e){}</script>
+<style>
+:root{--greent:var(--okt);--moving:var(--accent)}
+/* Palette and type come from appearance.css — the same generated
+   sheet as every other page, so the appearance panel reaches this
+   page too. Only names the shared sheet lacks are bridged above. */
+.sesshdr{flex:none;z-index:20}
+.sesshdr .apptop{padding:11px 24px;background:var(--card)}
+.sesshdr .apbrand{font:700 20px/1 var(--serif)}
+.needspill{display:none;align-items:center;gap:8px;padding:6px 13px;border-radius:20px;
+  background:var(--redt);font:600 12.5px/1.4 var(--sans);color:var(--red)}
+.needspill .npd{width:7px;height:7px;border-radius:50%;background:var(--red)}
+.needspill .npgo{font-weight:500;border-left:1px solid oklch(.505 .132 28/.3);padding-left:9px}
+
+.appnav{display:flex;gap:2px;align-items:center;flex-wrap:wrap;min-width:0}
+.appnav a{color:var(--dim);text-decoration:none;font-size:var(--t-sm,14px);
+  font-weight:500;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.appnav a:hover{color:var(--ink);background:var(--surface)}
+.appnav a.on{color:var(--ink);background:var(--sunken,var(--surface))}
+@media (max-width:720px){
+  .appnav{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+}
+
+.apptop{position:sticky;top:0;z-index:20;display:flex;gap:14px;align-items:center;
+  padding:10px 20px;background:color-mix(in oklch,var(--paper) 86%,transparent);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+.apbrand{display:inline-flex;align-items:center;gap:9px;flex:none;
+  font:600 1.125rem/1 var(--serif);letter-spacing:-.01em;
+  white-space:nowrap;color:var(--ink);text-decoration:none}
+.apbrand b{font-weight:800}
+.apbrand .aplogo{flex:none}
+/* the links sit against the page's own controls, not against the wordmark */
+.apptop>.appnav{margin-left:auto;flex:0 1 auto;min-width:80px;flex-wrap:nowrap;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.apptop>.appnav::-webkit-scrollbar{display:none}
+.apright{display:flex;gap:8px;align-items:center;flex:none}
+@media(max-width:1000px){
+  .apbrand span{display:none}
+}
+@media(max-width:720px){
+  .apptop{padding:8px 12px;gap:8px}
+  /* the needs-an-answer pill truncates instead of pushing the page wide;
+     it keeps up to 62vw and the nav (already scrollable) gives way */
+  .apright{flex:none;min-width:0;max-width:min(56vw,calc(100vw - 190px))}
+  .needspill{flex:0 1 auto;min-width:0}
+  #needstext{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .needspill .npgo{display:none}
+}
+
+.askopen{font:inherit;font-size:var(--t-sm,13px);font-weight:600;cursor:pointer;
+  color:var(--ink);background:var(--surface);border:1px solid var(--line2);
+  border-radius:var(--r-btn,10px);padding:6px 12px;white-space:nowrap}
+.askopen:hover{border-color:var(--dim)}
+.askscrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.22);
+  opacity:0;transition:opacity .16s ease-out}
+.askscrim.on{opacity:1}
+.askscrim[hidden]{display:none}
+.askpanel{position:fixed;top:0;right:0;bottom:0;z-index:61;width:min(440px,100vw);
+  display:flex;flex-direction:column;background:var(--paper);
+  border-left:1px solid var(--line);box-shadow:-8px 0 34px rgba(0,0,0,.14);
+  transform:translateX(100%);transition:transform .2s cubic-bezier(.16,1,.3,1)}
+.askpanel.on{transform:none}
+.askpanel[hidden]{display:none}
+.askhead{display:flex;gap:10px;align-items:center;padding:13px 16px;
+  border-bottom:1px solid var(--line);flex:none}
+.askhead h2{margin:0;font:600 15px/1.2 var(--serif)}
+.askhead .asksub{font-size:11.5px;color:var(--faint)}
+.askx{margin-left:auto;border:0;background:none;color:var(--faint);cursor:pointer;
+  font-size:20px;line-height:1;padding:2px 4px}
+.askx:hover{color:var(--ink)}
+.askfull{font-size:11.5px;font-weight:600;color:var(--green,var(--ink));
+  text-decoration:none;white-space:nowrap}
+.askfull:hover{text-decoration:underline}
+.askthread{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;
+  gap:14px;font-size:14px;line-height:1.55}
+.askmsg{max-width:92%}
+.askmsg.her{align-self:flex-end;background:var(--sunken,var(--surface));
+  border-radius:12px 12px 4px 12px;padding:10px 13px;white-space:pre-wrap}
+.askmsg.claude .askwho{font-size:10.5px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.askmsg.claude .askbody p{margin:0 0 8px}
+.askmsg.claude .askbody p:last-child{margin:0}
+.askmsg.claude .askbody li{margin:0 0 3px}
+.askmsg.claude .askbody ul{margin:0 0 8px;padding-left:20px}
+.askmsg.claude .askbody code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;
+  background:var(--surface);padding:1px 4px;border-radius:4px}
+.askmsg.note{align-self:center;font-size:12px;color:var(--faint);text-align:center}
+.askempty{margin:auto 0;color:var(--faint);font-size:13.5px;text-align:center;
+  padding:0 10px}
+.askwork{display:flex;gap:8px;align-items:center;color:var(--faint);font-size:12.5px}
+.askwork i{width:7px;height:7px;border-radius:50%;background:var(--green,var(--ink));
+  animation:askpulse 1.3s ease-in-out infinite}
+@keyframes askpulse{0%,100%{opacity:1}50%{opacity:.3}}
+@media(prefers-reduced-motion:reduce){
+  .askwork i{animation:none}
+  .askpanel{transition:none}
+}
+.askfoot{flex:none;border-top:1px solid var(--line);padding:11px 13px;
+  display:flex;gap:8px;align-items:flex-end}
+.askfoot textarea{flex:1;font:inherit;font-size:14px;padding:9px 12px;resize:none;
+  min-height:40px;max-height:150px;border:1px solid var(--line);border-radius:10px;
+  background:var(--surface);color:var(--ink)}
+.askfoot textarea:focus{outline:2px solid var(--green,var(--ink));outline-offset:1px;
+  border-color:transparent}
+.asksend{flex:none;font:inherit;font-size:13px;font-weight:700;cursor:pointer;
+  border:0;border-radius:10px;padding:10px 15px;
+  background:var(--green,var(--ink));color:var(--paper)}
+.asksend:disabled{opacity:.45;cursor:default}
+/* Floating corner buttons — the capture FAB, the tour's "?", the agent pill —
+   live exactly where the panel's own send button lands. They step aside while
+   it is open rather than sitting on top of it. */
+body.asking .fab,body.asking .btour-btn,body.asking .agentbar{display:none}
+*{box-sizing:border-box}
+html{height:100%}
+/* The page is an app shell, not a document: the header, the rail, the
+   conversation and the preview each own their height, and only the thread
+   scrolls. A whole-page scroll is what let the composer float over the
+   conversation and the rail disappear off the top. */
+body{margin:0;height:100%;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--paper);font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{color:var(--ink)}
+button{font:inherit;background:none;border:none;padding:0;cursor:pointer;color:inherit;text-align:left}
+.eb{font:600 10.5px/1 var(--sans);letter-spacing:.17em;text-transform:uppercase;color:var(--accent)}
+.wav{display:block;height:5px;margin-top:5px;background:repeat-x left center url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='5'%3E%3Cpath d='M0 3.6 q3 -3.2 6 0 t6 0' fill='none' stroke='%236e3b64' stroke-width='1.3'/%3E%3C/svg%3E")}
+.quiet{font:600 10.5px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+.btn{padding:10px 16px;border-radius:8px;font:600 13.5px/1 var(--sans);cursor:pointer;border:1px solid transparent;white-space:nowrap;display:inline-block}
+.btn.p{background:var(--ink);color:var(--card)}
+.btn.s{border-color:var(--rule);color:var(--ink2);font-weight:500;background:var(--card)}
+.btn.s:hover{border-color:var(--ink3);color:var(--ink)}
+.hdrbtn{padding:7px 13px;border:1px solid var(--rule);border-radius:7px;font:500 12.5px/1 var(--sans);color:var(--ink2);cursor:pointer;white-space:nowrap;background:var(--card)}
+.hdrbtn:hover{border-color:var(--ink3);color:var(--ink)}
+.pick{padding:7px 13px;border-radius:20px;border:1px solid var(--rule);background:var(--card);font:500 12.5px/1 var(--sans);color:var(--ink2);cursor:pointer;white-space:nowrap}
+.pick.on{background:var(--ink);color:var(--card);border-color:var(--ink);font-weight:600}
+/* The model is the choice; what it is good for is the footnote. */
+.picksub{font-weight:400;font-size:11.5px;opacity:.62;margin-left:3px}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+.crow{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;border:1px solid transparent;width:100%}
+.crow:hover{background:var(--card)}
+.crow.on{background:var(--card);border-color:var(--rule);box-shadow:inset 3px 0 0 var(--accent)}
+.tab{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px 8px 0 0;border:1px solid var(--rule);border-bottom:none;background:var(--wash);font:500 13.5px/1 var(--sans);color:var(--ink2);cursor:pointer;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis;flex:none}
+.tab.on{background:var(--card);color:var(--ink);font-weight:600}
+.md{font:400 15px/1.65 var(--sans);color:var(--ink)}
+.md h1,.md h2,.md h3{font:700 19px/1.25 var(--serif);margin:14px 0 6px}
+.md ul{margin:6px 0;padding-left:22px}.md li{margin-top:4px}
+.md p{margin:0 0 9px}
+.md code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;background:var(--wash);padding:1px 4px;border-radius:4px}
+.coach{font:italic 400 14px/1.5 Petrona,Georgia,serif;color:var(--ink3)}
+.oneline{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+/* One reading column, whether or not the preview is open — a conversation
+   stretched across 1100px is a wall, not a thread. */
+.col{max-width:940px}
+/* Rail one-liners: three lines is a summary, ten is the message again. */
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+/* Quiet until you go looking for it — every reply carries this. */
+.tobrain{opacity:0;transition:opacity .12s}
+.md:hover + .tobrain, div:hover > .tobrain, .tobrain:focus{opacity:1}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.pulse{animation:pulse 1.6s ease-in-out infinite}
+.unread{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;display:inline-block}
+#toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%);padding:12px 22px;border-radius:24px;background:var(--ink);color:var(--card);font:500 14px/1 var(--sans);z-index:60;box-shadow:0 4px 16px oklch(.25 .04 330/.25);display:none}
+.overlay{position:fixed;inset:0;background:oklch(.25 .03 330/.28);z-index:50;display:grid;place-items:center}
+textarea#say{width:100%;border:none;outline:none;resize:vertical;min-height:56px;font:400 16px/1.55 var(--sans);color:var(--ink);background:transparent}
+iframe.web{width:100%;height:100%;border:1px solid var(--rule);border-radius:14px;background:#fff}
+
+/* ── smaller screens ─────────────────────────────────────────
+   The inline styles above set the desktop layout, so these overrides
+   carry !important on purpose — the media query must win. */
+@media(max-width:1180px){
+  #grid[data-pv="1"]{grid-template-columns:250px minmax(0,1fr) 330px !important}
+  #grid[data-pv="0"]{grid-template-columns:250px minmax(0,1fr) !important}
+}
+@media(max-width:960px){
+  /* Below this width the shell gives up and becomes a normal scrolling page:
+     one column is not worth three scroll regions. */
+  body{overflow:auto;height:auto;display:block}
+  #grid{display:block !important;height:auto !important}
+  #rail{max-height:38vh;border-right:none !important;
+    border-bottom:1px solid var(--rule);padding:16px 14px 18px !important}
+  #chead{padding:16px 14px 0 !important}
+  #scroller{overflow:visible !important;padding:16px 14px 0 !important}
+  #dock{padding:10px 14px 16px !important;position:sticky;bottom:0;
+    background:var(--paper);border-top:1px solid var(--rule)}
+  #topic{font-size:28px !important}
+  #hdrrow{padding:11px 14px !important;gap:10px !important}
+  #hdrrow > div:first-of-type{margin-left:0 !important;gap:14px !important}
+  /* The live preview is a desktop luxury; the conversation is the point. */
+  #pvcol{display:none !important}
+  #pvbtn{display:none !important}
+  #enddlg > div, #newdlg > div{width:min(520px,92vw) !important}
+}
+</style>
+</head>
+<body>
+
+<div class="sesshdr"><header class="apptop"><a class="apbrand" href="index.html#/today"><img class="aplogo" src="logo-96.png?v=5" alt="" width="24" height="24"><span>the owner's <b>brain</b></span></a><nav class="appnav"><a href="index.html#/today" data-nav="today">Today</a><a href="index.html#/plate" data-nav="plate">Plate</a><a href="index.html#/people" data-nav="people">People</a><a href="index.html#/season" data-nav="season">Season</a><a href="rooms.html" data-nav="rooms">Rooms</a><a href="map.html" data-nav="map">Map</a><a href="index.html#/claude" data-nav="claude" class="on" aria-current="page">Claude</a></nav><div class="apright"><button id="needspill" class="needspill"><span class="npd"></span><span id="needstext"></span><span class="npgo">take me there</span></button><button class="askopen" id="askopen" title="Ask the brain anything \u2014 ⌘K">✦ Ask</button></div></header>
+<div style="padding:10px 24px 0"><style>
+.clsub{display:inline-flex;gap:2px;align-items:center;margin:14px 0 16px;
+  padding:3px;border:1px solid var(--line);border-radius:999px;
+  background:var(--surface);position:relative;z-index:2}
+.clsub a{color:var(--dim);text-decoration:none;font-size:13px;font-weight:500;
+  padding:5px 14px;border-radius:999px;white-space:nowrap}
+.clsub a:hover{color:var(--ink)}
+.clsub a.on{color:var(--ink);background:var(--paper);font-weight:600;
+  box-shadow:0 1px 2px rgba(0,0,0,.10)}
+</style><nav class="clsub" aria-label="Claude pages"><a href="index.html#/claude">Jobs</a><a href="sessions.html" class="on" aria-current="page">Sessions</a><a href="usage.html">Usage</a></nav></div></div>
+
+<div id="grid" data-pv="1" style="flex:1;min-height:0;display:grid;grid-template-columns:320px minmax(0,1fr) 440px">
+
+<!-- RAIL -->
+<div id="rail" style="border-right:1px solid var(--rule);background:var(--wash);padding:26px 16px 40px;overflow-y:auto;min-height:0">
+<div style="display:flex;align-items:flex-end;gap:10px;padding:0 6px">
+<div><span class="eb">Conversations</span><span class="wav" style="width:118px"></span></div>
+<button id="addtop" title="Start a conversation" style="margin-left:auto;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font:300 18px/1 var(--sans);color:var(--ink3)">+</button>
+</div>
+<p id="railintro" class="coach" style="margin:12px 6px 0">Grouped by room. Whatever needs an answer sits above everything else.</p>
+<div id="needsbox" style="display:none;margin:16px 0 0;padding:12px;border:1px solid var(--red);border-radius:10px;background:var(--card)"></div>
+<div id="groups" style="margin:18px 0 0;display:flex;flex-direction:column;gap:14px"></div>
+<div style="margin:22px 6px 0;padding-top:16px;border-top:1px solid var(--rule)">
+<p style="margin:0;font:400 13.5px/1.55 var(--sans);color:var(--ink2)">Today, across every conversation: <span style="font-weight:600" id="daycost">$0.00</span>.</p>
+<p class="coach" style="margin:7px 0 0" id="modeline"></p>
+</div>
+</div>
+
+<!-- CENTER -->
+<div id="center" style="min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden">
+<div id="empty" style="display:none;max-width:560px;margin:60px auto;padding:0 30px">
+<p class="coach" style="font-size:17px">No conversations yet. Pick a project and say what you want worked on — it opens as a real Claude Code session in that folder, already knowing its room.</p>
+<button class="btn p" style="margin-top:16px" onclick="UI.newConvo()">Start a conversation</button>
+</div>
+<div id="convo" style="display:none;flex:1;min-height:0;flex-direction:column">
+
+<div id="chead" style="flex:none;padding:22px 30px 0">
+<div class="col">
+<div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+<div style="min-width:240px;flex:1">
+<div style="display:flex;align-items:baseline;gap:11px;min-width:0">
+<span class="oneline" style="font:800 24px/1.1 var(--serif);color:var(--ink3);flex:none" id="projname"></span>
+<span class="oneline" style="font:400 12.5px/1.2 var(--sans);color:var(--ink3);font-family:ui-monospace,Menlo,monospace" id="projpath"></span>
+</div>
+<div style="display:flex;align-items:center;gap:11px;margin-top:4px;min-width:0">
+<span class="dot" style="width:10px;height:10px" id="hdot"></span>
+<h1 id="topic" title="" class="oneline" style="margin:0;font:800 21px/1.25 var(--serif);letter-spacing:-.012em;min-width:0;flex:1"></h1>
+</div>
+<p class="clamp" style="margin:5px 0 0;font:400 15px/1.5 var(--sans);-webkit-line-clamp:2" id="headline"></p>
+</div>
+<div style="display:flex;gap:8px;flex:none">
+<button class="hdrbtn" id="pvbtn" onclick="UI.togglePreview()">Hide the preview</button>
+<button class="hdrbtn" id="stopbtn" style="color:var(--ink3)"></button>
+</div>
+</div>
+<div id="tabs" style="display:none;align-items:flex-end;gap:4px;margin:16px 0 0;border-bottom:1px solid var(--rule);overflow-x:auto"></div>
+<div id="roomknows" style="display:none;align-items:center;margin:14px 0 0;padding:10px 15px;border-radius:9px;background:var(--wash);flex-wrap:wrap;gap:0"></div>
+<div id="planbox" style="display:none;margin:14px 0 0;padding:11px 15px;border-radius:9px;background:var(--wash)"></div>
+</div>
+</div>
+
+<div id="scroller" style="flex:1;min-height:0;overflow-y:auto;padding:22px 30px 20px">
+<div class="col">
+<div id="thread" style="display:flex;flex-direction:column;gap:20px"></div>
+<div id="madewrap" style="display:none">
+<div style="margin:30px 0 0"><span class="eb">What it made</span><span class="wav" style="width:98px"></span></div>
+<div id="made" style="margin:14px 0 0;display:flex;flex-direction:column;gap:10px"></div>
+</div>
+<div id="teedwrap" style="display:none;margin:24px 0 0;padding:16px 17px;border-radius:11px;background:var(--wash)">
+<div style="display:flex;align-items:baseline;gap:12px">
+<span class="quiet">Teed up for you</span>
+<span class="coach">prepared, never sent — the send stays yours</span>
+</div>
+<div id="teed" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0"></div>
+</div>
+</div>
+</div>
+
+<div id="dock" style="flex:none;padding:12px 30px 14px;border-top:1px solid var(--rule2);background:var(--paper)">
+<div class="col">
+<div style="border:1px solid var(--ink3);border-radius:12px;background:var(--card);padding:14px 17px 12px">
+<textarea id="say" placeholder="Answer above, or say anything here. Paste a screenshot straight in."></textarea>
+<div id="attachrow" style="display:none;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px">
+<button class="hdrbtn" title="Attach a screenshot or document — or just paste an image into the box" onclick="document.getElementById('attachpick').click()">&#128206;</button>
+<input type="file" id="attachpick" multiple hidden accept=".png,.jpg,.jpeg,.webp,.gif,.pdf,.txt,.md,.csv,.docx,.xlsx,.ics,.json">
+<button class="hdrbtn" id="brainbtn" style="border-style:dashed;color:var(--accent);border-color:var(--accent)" onclick="UI.toggleBrain()">Pull from the brain</button>
+<button class="hdrbtn" style="border-style:dashed;color:var(--accent);border-color:var(--accent)" title="Put what you have typed into the brain's inbox instead of sending it here" onclick="UI.sendComposerToBrain()">Send to the brain</button>
+<div style="display:flex;gap:6px;margin-left:8px;flex-wrap:wrap" id="spendrow">
+<button class="pick" data-m="haiku" title="Haiku — the cheapest and quickest. Filing, tidying, simple asks.">Haiku <span class="picksub">fastest</span></button>
+<button class="pick" data-m="sonnet" title="Sonnet — the middle. Most things belong here.">Sonnet <span class="picksub">balanced</span></button>
+<button class="pick" data-m="opus" title="Opus — the strongest and the dearest. Hard thinking only.">Opus <span class="picksub">deepest</span></button>
+</div>
+<span style="font:400 12px/1.3 var(--sans);color:var(--ink3)">Enter sends · Shift-Enter for a new line · &#8984;V pastes a screenshot</span>
+<button class="btn p" style="margin-left:auto" onclick="UI.send()">Send</button>
+</div>
+<div id="brainpanel" style="display:none;margin:13px 0 0;padding-top:13px;border-top:1px solid var(--rule);max-height:42vh;overflow-y:auto">
+<p class="coach" style="margin:0;color:var(--ink2)">Hand it something the brain already knows, rather than typing it out.</p>
+<div id="brainitems" style="display:flex;flex-direction:column;gap:2px;margin:10px 0 0"></div>
+</div>
+</div>
+
+<div id="compactcard" style="display:none;align-items:center;gap:11px;margin:10px 0 0;padding:9px 13px;border:1px solid var(--terra);border-radius:9px;background:var(--card)">
+<span style="flex:1;height:6px;border-radius:4px;background:var(--rule2);overflow:hidden;display:flex"><span id="ctxbar" style="width:0;height:100%;background:var(--terra)"></span></span>
+<span style="font:500 12.5px/1 var(--sans);color:var(--ink3);flex:none" id="ctxlabel"></span>
+<span class="coach" style="flex:none">folding the older half keeps it light — nothing is lost</span>
+<button class="btn s" style="padding:7px 12px;font-size:12.5px;flex:none" onclick="UI.compact()">Compact</button>
+</div>
+
+<!-- The hands are one line, not a card: the rail already labels every
+     conversation, so the long explanation only earns its place when this
+     conversation is the one that cannot write. -->
+<div id="handsrow" style="display:flex;align-items:center;gap:10px;margin:11px 0 0;flex-wrap:wrap">
+<span class="dot" id="handsdot"></span>
+<span style="font:500 13.5px/1.4 var(--sans)" id="handstitle"></span>
+<div id="carefulrow" style="display:none;align-items:center;gap:9px;margin-left:14px">
+<button id="careswitch" style="width:38px;height:22px;border-radius:12px;position:relative;flex:none" onclick="UI.toggleCareful()"><span id="careknob" style="position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff"></span></button>
+<span style="font:400 13px/1.4 var(--sans);color:var(--ink2)" id="carelabel"></span>
+</div>
+<button class="btn s" id="handsbtn" style="display:none;margin-left:auto;padding:7px 12px;font-size:12.5px;flex:none" onclick="UI.takeHands()">Move the hands here</button>
+</div>
+<p id="handsline" style="display:none;margin:6px 0 0;font:400 13px/1.5 var(--sans);color:var(--ink3)"></p>
+
+<div style="display:flex;align-items:center;gap:14px;margin:10px 0 0;padding-top:10px;border-top:1px solid var(--rule2)">
+<span style="font:400 12.5px/1 var(--sans);color:var(--ink3)" id="ledger"></span>
+<button style="font:500 12.5px/1 var(--sans);color:var(--ink3)" id="histbtn" onclick="UI.toggleHistory()"></button>
+<span style="font:400 12.5px/1 var(--sans);color:var(--ink3)" id="cmdhint"></span>
+<span style="margin-left:auto;font:400 12.5px/1 var(--sans);color:var(--ink3)" id="daycost2"></span>
+</div>
+<div id="histlist" style="display:none;margin:10px 0 0;padding:4px 16px 12px;border-radius:10px;background:var(--wash);max-height:180px;overflow-y:auto"></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- PREVIEW -->
+<div id="pvcol" style="border-left:1px solid var(--rule);background:var(--wash);padding:26px 24px;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<span class="quiet">Preview</span>
+<span style="font:400 12.5px/1 var(--sans);color:var(--ink3)" id="pvnote"></span>
+<button id="pvwide" style="margin-left:auto;font:500 12.5px/1 var(--sans);color:var(--ink3)" onclick="UI.toggleWide()"></button>
+<button style="font:500 12.5px/1 var(--sans);color:var(--ink3)" onclick="UI.togglePreview()">close</button>
+</div>
+<div id="pvbody" style="flex:1;margin:14px 0 0;display:flex;flex-direction:column;min-height:0"></div>
+</div>
+
+</div>
+
+<!-- END DIALOG -->
+<div id="enddlg" class="overlay" style="display:none" onclick="if(event.target===this)UI.cancelEnd()">
+<div style="width:520px;background:var(--card);border-radius:12px;border:1px solid var(--rule);padding:24px 26px;box-shadow:0 12px 40px oklch(.25 .04 330/.24)">
+<div style="font:800 30px/1.05 var(--serif);letter-spacing:-.015em" id="endtitle"></div>
+<p style="margin:12px 0 0;font:400 15.5px/1.6 var(--sans);color:var(--ink2)" id="endbody"></p>
+<div id="endkeeps" style="display:none;margin:14px 0 0;padding:13px 15px;border-radius:9px;background:var(--wash)"></div>
+<div style="display:flex;gap:8px;margin:18px 0 0">
+<button class="btn s" onclick="UI.cancelEnd()">Keep it open</button>
+<button class="btn p" style="background:var(--red)" onclick="UI.reallyEnd()">End it</button>
+<span style="align-self:center;margin-left:auto;font:400 12.5px/1 var(--sans);color:var(--ink3)">Esc keeps it</span>
+</div>
+</div>
+</div>
+
+<!-- NEW CONVERSATION DIALOG -->
+<div id="newdlg" class="overlay" style="display:none" onclick="if(event.target===this)UI.cancelNew()">
+<div style="width:460px;background:var(--card);border-radius:12px;border:1px solid var(--rule);padding:24px 26px;box-shadow:0 12px 40px oklch(.25 .04 330/.24)">
+<div style="font:800 26px/1.05 var(--serif)">Where should it live?</div>
+<p class="coach" style="margin:8px 0 0">A conversation is a Claude Code session inside one project's folder.</p>
+<div id="newlist" style="display:flex;flex-direction:column;gap:2px;margin:14px 0 0;max-height:320px;overflow:auto"></div>
+</div>
+</div>
+
+<span id="toast"></span>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function get(u){ const r = await fetch(u); return r.json(); }
+async function post(u, b){ const r = await fetch(u, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b||{})}); return r.json(); }
+function toast(t){ const el=$("toast"); el.textContent=t; el.style.display="block"; clearTimeout(toast._t); toast._t=setTimeout(()=>el.style.display="none",2800); }
+function mmss(s){ return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+// tiny markdown: escape first, then headings, bold, lists, paragraphs
+function mini(md){
+  const lines = String(md||"").split("\n"); let out=[], inList=false;
+  for (const raw of lines){
+    const l = esc(raw);
+    const t = l.trim();
+    const li = t.match(/^[-*]\s+(.*)/) || t.match(/^\d+\.\s+(.*)/);
+    if (li){ if(!inList){out.push("<ul>");inList=true;} out.push("<li>"+inline(li[1])+"</li>"); continue; }
+    if (inList){ out.push("</ul>"); inList=false; }
+    const h = t.match(/^#{1,4}\s+(.*)/);
+    if (h){ out.push("<h3>"+inline(h[1])+"</h3>"); continue; }
+    if (t) out.push("<p>"+inline(t)+"</p>");
+  }
+  if (inList) out.push("</ul>");
+  return out.join("");
+}
+function inline(s){ return s.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`([^`]+)`/g,"<code>$1</code>"); }
+function dotColor(st){ return st==="ask"?"var(--red)":st==="working"?"var(--green)":"var(--ink3)"; }
+
+const UI = {
+  snap:null, sel:null, model:null, preview:true, wide:false, history:false, brain:false,
+  transcript:[], lastStamp:"", feedTimer:null, bits:{}, base:{}, docOpen:{}, workOpen:{},
+  liveSteps:[], liveElapsed:0, liveCount:0, running:false, endPending:false,
+
+  convo(){ if(!this.snap) return null;
+    for (const p of this.snap.projects) for (const c of p.convos) if (c.id===this.sel) return {p,c};
+    return null; },
+  needs(){ const out=[]; if(!this.snap) return out;
+    for (const p of this.snap.projects) for (const c of p.convos) if (c.state==="ask") out.push({p,c});
+    return out; },
+  flat(){ const out=[]; if(!this.snap) return out;
+    for (const p of this.snap.projects) for (const c of p.convos) out.push(c.id);
+    return out; },
+
+  async refresh(){
+    try { this.snap = await get("/api/sessions"); } catch(e){ return; }
+    // The done signal: a conversation that was running and now isn't gets a
+    // toast, and a hidden tab gets a title it can be found by.
+    const runmap = {};
+    for (const p of (this.snap.projects||[])) for (const x of (p.convos||[])){
+      runmap[x.id] = !!x.running;
+      if (this._runmap && this._runmap[x.id] && !x.running){
+        const msg = x.state === "ask"
+          ? "“" + x.topic + "” asked you a question"
+          : "“" + x.topic + "” finished";
+        toast(msg);
+        if (document.hidden) document.title = "✓ " + msg;
+      }
+    }
+    this._runmap = runmap;
+    // "open in Sessions" arrives as #<conversation id>: honour it once, then
+    // let the hash go, so a later refresh does not drag her back here.
+    if (!this._hashDone){
+      this._hashDone = true;
+      const want = decodeURIComponent((location.hash||"").replace(/^#/, ""));
+      if (want && this.flat().includes(want)) this.sel = want;
+    }
+    if (!this.sel && this.flat().length) this.sel = this.flat()[0];
+    if (this.sel && !this.convo()) this.sel = this.flat()[0] || null;
+    const cur = this.convo();
+    if (cur && cur.c.last !== this.lastStamp){
+      this.lastStamp = cur.c.last;
+      const t = await get("/api/sessions/transcript?id="+encodeURIComponent(this.sel));
+      this.transcript = t.events||[];
+      this._scrollPending = true;   // land on the newest message, not the oldest
+      if (cur.c.unread) post("/api/sessions/read", {id:this.sel}).then(()=>{cur.c.unread=false; this.paintRail();});
+    }
+    this.running = !!(cur && cur.c.running);
+    // repaint only when something actually changed — a 2.5s repaint of
+    // identical DOM kills text selection for no reason
+    const fp = JSON.stringify(this.snap) + "|" + this.lastStamp + "|" + this.sel
+             + "|" + this.history + "|" + this.running;
+    if (fp !== this._fp){ this._fp = fp; this.paint(); }
+    if (this._scrollPending){ this._scrollPending = false; this.toBottom(); }
+    this.pollFeed();
+  },
+  repaint(){ this._fp=""; this.paint(); },
+  // Only the thread scrolls, so "go to the newest" is one element, not the page.
+  // Twice on purpose: the web font lands after the first frame and grows the
+  // thread, which would otherwise leave the newest message half-hidden.
+  toBottom(){ const s=$("scroller"); if(!s) return;
+    const go=()=>{ s.scrollTop = s.scrollHeight; };
+    requestAnimationFrame(go); setTimeout(go, 300); },
+
+  async open(id){
+    this.sel = id; this.lastStamp=""; this.transcript=[]; this.history=false; this.brain=false;
+    this.docOpen={}; this.workOpen={};
+    await this.refresh();
+  },
+
+  pollFeed(){
+    clearTimeout(this.feedTimer);
+    if (!this.running || !this.sel) return;
+    this.feedTimer = setTimeout(async ()=>{
+      const f = await get("/api/sessions/feed?id="+encodeURIComponent(this.sel));
+      if (f.running){
+        this.liveSteps=f.steps||[]; this.liveElapsed=f.elapsed||0; this.liveCount=f.stepcount||0;
+        this.paintHead();
+        const lb=$("liveblock"); if (lb) lb.innerHTML=this.liveHTML();
+        this.pollFeed();
+      }
+      else { this.running=false; this.refresh(); }
+    }, 1200);
+  },
+
+  liveHTML(){
+    const steps=this.liveSteps.map(s=>`<div style="display:flex;gap:11px;font:400 13px/1.5 var(--sans);color:var(--ink2)"><span style="width:58px;flex:none;color:var(--ink3);font-family:ui-monospace,Menlo,monospace;font-size:11.5px">${esc(s.at)}</span><span>${esc(s.s)}</span></div>`).join("");
+    return `<div style="display:flex;align-items:center;gap:10px"><span style="flex:1;height:1px;background:var(--rule)"></span>
+      <span class="pulse" style="font:500 12.5px/1 var(--sans);color:var(--green);white-space:nowrap">still working · ${mmss(this.liveElapsed)} · ${this.liveCount} steps</span>
+      <span style="flex:1;height:1px;background:var(--rule)"></span></div>
+      <div style="margin:12px 0 0;padding:14px 16px;border-radius:9px;background:var(--wash);display:flex;flex-direction:column;gap:7px">${steps||'<span class="coach">getting started…</span>'}</div>`;
+  },
+
+  // ── painting ──────────────────────────────────────────────
+  paint(){ this.paintTitle(); this.paintRail(); this.paintConvo(); },
+
+  paintTitle(){
+    const n = this.needs().length;
+    document.title = (n?`(${n}) `:"") + "Sessions — the brain";
+    const pill=$("needspill");
+    if (n){ pill.style.display="flex";
+      $("needstext").textContent = n===1?"one conversation needs an answer":`${n} conversations need an answer`;
+      pill.onclick=()=>this.open(this.needs()[0].c.id);
+    } else pill.style.display="none";
+  },
+
+  paintRail(){
+    const s=this.snap; if(!s) return;
+    $("daycost").textContent = "$"+(s.dayCost||0).toFixed(2);
+    $("modeline").textContent = s.ai==="careful"
+      ? "Careful mode is on — nothing starts unless you start it, and Fastest is the default."
+      : "Careful mode is off, so the morning brief runs itself and these can work while you sleep.";
+    // needs box
+    const needs=this.needs(), nb=$("needsbox");
+    if (needs.length){
+      nb.style.display="block";
+      nb.innerHTML = `<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px"><span class="dot" style="background:var(--red)"></span><span class="quiet" style="color:var(--red)">Needs an answer</span></div>`
+        + needs.map(({p,c})=>`<button class="crow ${c.id===this.sel?"on":""}" style="padding:8px 10px" onclick="UI.open('${c.id}')">
+          <div style="min-width:0"><div style="font:600 15px/1.2 var(--sans)">${esc(c.topic)}</div>
+          <div style="font:400 12.5px/1.3 var(--sans);color:var(--ink3);margin-top:4px">in ${esc(p.name)}</div>
+          <div style="font:400 13.5px/1.45 var(--sans);color:var(--red);margin-top:5px">${esc(c.line||"")}</div></div></button>`).join("");
+    } else nb.style.display="none";
+    // groups
+    const gr=$("groups"); let shown=0;
+    gr.innerHTML = s.projects.filter(p=>p.convos.length||p.history.length).map(p=>{
+      const un = p.convos.filter(c=>c.unread).length;
+      shown++;
+      return `<div><div style="padding:0 6px 8px;border-bottom:1px solid var(--rule)">
+        <div style="display:flex;align-items:center;gap:9px;min-width:0">
+        <span class="dot ${p.convos.some(c=>c.state==="working")?"pulse":""}" style="background:${dotColor((p.convos.find(c=>c.state==="ask")&&"ask")||(p.convos.find(c=>c.state==="working")&&"working")||"quiet")}"></span>
+        <span class="oneline" style="font:800 21px/1.15 var(--serif)">${esc(p.name)}</span>
+        <button title="Another conversation in ${esc(p.name)}" style="margin-left:auto;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:300 17px/1 var(--sans);color:var(--ink3);flex:none" onclick="UI.newIn('${esc(p.src)}')">+</button></div>
+        <div style="display:flex;align-items:center;gap:8px;margin:1px 0 0;padding-left:17px">
+        <span style="font:400 12.5px/1.4 var(--sans);color:var(--ink3);white-space:nowrap">${p.convos.length===0?"nothing open":p.convos.length===1?"one conversation":p.convos.length+" conversations"}</span>
+        ${un?`<span style="padding:2px 7px;border-radius:10px;background:var(--atint);font:600 10.5px/1.6 var(--sans);color:var(--accent);white-space:nowrap;flex:none">${un} new</span>`:""}</div></div>
+        <div style="margin-top:5px;display:flex;flex-direction:column;gap:2px">${p.convos.map(c=>`
+          <button class="crow ${c.id===this.sel?"on":""}" onclick="UI.open('${c.id}')">
+          <span class="dot ${c.state==="working"?"pulse":""}" style="background:${dotColor(c.state)};margin-top:6px"></span>
+          <div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <span class="clamp" style="font:600 15px/1.25 var(--sans);-webkit-line-clamp:2">${esc(c.topic)}</span>
+            ${c.unread?'<span class="unread"></span>':""}
+            <span style="font:500 10px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:${c.hands?"var(--green)":"var(--ink3)"};margin-left:auto;white-space:nowrap;flex:none">${c.hands?"has the hands":"talk only"}</span></div>
+          <div class="clamp" style="font:400 13.5px/1.45 var(--sans);color:${c.state==="ask"?"var(--red)":"var(--ink2)"};margin-top:4px">${esc(c.line||"")}</div></div></button>`).join("")}
+        ${p.convos.length? "" : p.history.slice(0,3).map(h=>`
+          <button class="crow" style="padding:8px 11px" onclick="UI.reopen('${h.id}')">
+          <div style="min-width:0;flex:1"><div class="oneline" style="font:500 14px/1.3 var(--sans);color:var(--ink3)">${esc(h.topic)}</div>
+          <div style="font:400 12.5px/1.4 var(--sans);color:var(--accent);margin-top:3px">continue where this left off</div></div></button>`).join("")}</div></div>`;
+    }).join("");
+    $("empty").style.display = shown? "none":"block";
+    $("convo").style.display = this.convo()? "flex":"none";
+  },
+
+  paintHead(){
+    const cur=this.convo(); if(!cur) return;
+    const {p,c}=cur;
+    const st = this.running? "working" : c.state;
+    $("hdot").style.background = dotColor(st);
+    $("hdot").className = "dot"+(st==="working"?" pulse":"");
+    let line = c.line||"", color = st==="ask"?"var(--red)":"var(--ink2)";
+    if (this.running){
+      const step = this.liveSteps.length? this.liveSteps[this.liveSteps.length-1].s : "getting started";
+      line = `${step} — ${mmss(this.liveElapsed)} in · ${this.liveCount} steps. Nothing needed from you.`;
+      color = "var(--ink2)";
+    }
+    $("headline").textContent = line; $("headline").style.color=color;
+    $("headline").title = line;
+    $("ledger").textContent = (c.model? c.model+" · ":"")
+      + `$${(c.cost||0).toFixed(2)} this conversation`
+      + (this.running?` · working ${mmss(this.liveElapsed)}`:"");
+  },
+
+  paintConvo(){
+    const cur=this.convo(); if(!cur){ $("convo").style.display="none"; return; }
+    const {p,c}=cur;
+    $("convo").style.display="flex";
+    $("projname").textContent=p.name; $("projpath").textContent=p.path.replace(/^\/Users\/[^/]+/, "~");
+    // One line, always: the name ellipsizes rather than wrapping (full text
+    // on hover), and long names step down a size to fit more before the cut.
+    const tp=$("topic"); tp.textContent=c.topic; tp.title=c.topic;
+    tp.style.fontSize = c.topic.length>34 ? "19px"
+                      : c.topic.length>22 ? "21px" : "23px";
+    this.paintHead();
+    $("stopbtn").textContent = this.running? "Stop it here" : "End conversation";
+    $("stopbtn").onclick = ()=> this.running? this.stopRun() : this.askEnd();
+    // tabs
+    const tabs=$("tabs");
+    if (p.convos.length>1){
+      tabs.style.display="flex";
+      tabs.innerHTML = p.convos.map(x=>`<button class="tab ${x.id===c.id?"on":""}" title="${esc(x.topic)}" onclick="UI.open('${x.id}')">
+        <span class="dot ${x.state==="working"?"pulse":""}" style="background:${dotColor(x.state)}"></span><span class="oneline">${esc(x.topic)}</span>${x.unread?'<span class="unread"></span>':""}</button>`).join("")
+        + `<button style="padding:8px 12px;font:500 13.5px/1 var(--sans);color:var(--ink3)" onclick="UI.newIn('${esc(p.src)}')">+ another in ${esc(p.name)}</button>`;
+    } else tabs.style.display="none";
+    // room knows
+    this.paintRoomKnows(p);
+    // the plan, as Claude last wrote it — open steps are the loose ends —
+    // and the follow-ups its last reply declared it was leaving undone.
+    const pb=$("planbox"), todos=c.todos||[], fups=c.followups||[];
+    let pbh = "";
+    if (todos.length){
+      const open=todos.filter(t=>t.s!=="completed").length;
+      pbh += '<span class="quiet">Its checklist</span>'
+        + ' <span style="font:400 12.5px/1.3 var(--sans);color:var(--ink3)">'
+        + (open? open+" still open" : "all done") + "</span>"
+        + '<div style="margin:8px 0 0;display:flex;flex-direction:column;gap:4px">'
+        + todos.map(t=>'<span style="font:400 13.5px/1.45 var(--sans);color:'
+            + (t.s==="completed"?"var(--ink3)":"var(--ink)") + '">'
+            + (t.s==="completed"?"✓":t.s==="in_progress"?"◐":"○") + " "
+            + esc(t.t) + "</span>").join("")
+        + "</div>";
+    }
+    if (fups.length){
+      pbh += (pbh? '<div style="margin:12px 0 0;padding-top:10px;border-top:1px solid var(--rule2)">' : "<div>")
+        + '<span class="quiet">Suggested next</span>'
+        + ' <span style="font:400 12.5px/1.3 var(--sans);color:var(--ink3)">'
+        + "from its last reply — tap one to put it in the box</span>"
+        + '<div style="margin:8px 0 0;display:flex;flex-direction:column;gap:4px">'
+        + fups.map((f,i)=>'<button style="font:400 13.5px/1.45 var(--sans);'
+            + 'color:var(--ink);text-align:left" onclick="UI.pickNext('+i+')">'
+            + "&rarr; " + esc(f) + "</button>").join("")
+        + "</div></div>";
+    }
+    pb.style.display = pbh ? "block" : "none";
+    pb.innerHTML = pbh;
+    // thread
+    const th=$("thread");
+    th.innerHTML = this.transcript.map((t,i)=>this.renderEvent(t,i,c)).join("")
+      + (c.outbox||[]).map((m,i)=>
+        '<div style="align-self:flex-end;max-width:78%;padding:10px 14px;'
+        + 'border-radius:11px;background:var(--wash);border:1px dashed var(--rule);'
+        + 'font:400 14px/1.5 var(--sans);color:var(--ink3)">' + esc(m.t)
+        + '<div style="margin-top:6px;font:500 11.5px/1 var(--sans)">queued — '
+        + 'sends when this turn finishes &nbsp;<button style="color:var(--red)" '
+        + 'onclick="UI.unqueue(' + i + ')">remove</button></div></div>').join("");
+    if (!this.transcript.length && !this.running){
+      th.innerHTML = `<p class="coach" style="font-size:16px;margin:10px 0 0">Nothing said yet. Say what you want worked on — it runs inside ${esc(p.path.replace(/^\/Users\/[^/]+/,"~"))}, and reads this room's notes before anything else.</p>`;
+    }
+    if (c.state==="ask" && c.question && !this.running){
+      // The question is almost always the tail of the reply just above, so
+      // reprinting it in full would be the same sentence three times on one
+      // screen. Repeat it only when it is not already on show.
+      const last=this.transcript[this.transcript.length-1];
+      const echoed = last && last.k==="claude"
+        && String(last.t||"").includes(c.question.slice(0,60));
+      th.innerHTML += echoed
+        ? `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid var(--red);border-radius:10px;background:var(--card);max-width:82%">
+           <span class="dot" style="background:var(--red)"></span>
+           <span style="font:500 14px/1.4 var(--sans);color:var(--red)">It needs an answer</span>
+           <span style="font:400 13.5px/1.4 var(--sans);color:var(--ink2)">— answer in the box below and the run picks up from there.</span></div>`
+        : `<div style="border:1px solid var(--red);border-radius:12px;background:var(--card);padding:19px 20px;max-width:82%">
+           <div style="display:flex;align-items:center;gap:9px"><span class="dot" style="background:var(--red)"></span>
+           <span class="quiet" style="color:var(--red)">It needs an answer</span></div>
+           <p style="margin:12px 0 0;font:400 17px/1.5 var(--sans)">${esc(c.question)}</p>
+           <p style="margin:10px 0 0;font:400 12px/1.4 var(--sans);color:var(--ink3)">Answer in the box below — the run picks up from there.</p></div>`;
+    }
+    if (this.running){
+      th.innerHTML += `<div id="liveblock">${this.liveHTML()}</div>`;
+    }
+    // what it made
+    const made=(c.mdfiles||[]);
+    $("madewrap").style.display = made.length? "block":"none";
+    $("made").innerHTML = made.map(m=>{
+      const key=m.file, open=this.docOpen[key];
+      return `<div style="border:1px solid var(--rule);border-radius:11px;background:var(--card);overflow:hidden">
+        <button style="display:flex;align-items:center;gap:12px;padding:15px 17px;width:100%" onclick="UI.toggleDoc('${esc(key)}')">
+        <div style="min-width:0;text-align:left"><div style="font:600 15.5px/1.25 var(--sans)">${esc(key.split("/").pop())}</div>
+        <div style="font:400 12.5px/1.3 var(--sans);color:var(--ink3);margin-top:4px;font-family:ui-monospace,Menlo,monospace">${esc(key)} · ${esc((m.when||"").slice(11,16)||m.when)}</div></div>
+        <span style="margin-left:auto;font:500 12.5px/1 var(--sans);color:var(--ink3);flex:none">${open?"▾":"▸"} read</span></button>
+        ${open?`<div style="padding:0 17px 17px"><div style="height:1px;background:var(--rule2);margin-bottom:14px"></div><div class="md" id="doc-${key.replace(/[^a-zA-Z0-9]/g,"_")}">loading…</div></div>`:""}</div>`;
+    }).join("");
+    made.forEach(m=>{ if(this.docOpen[m.file]) this.loadDoc(m.file); });
+    // teed up
+    const teed=(this.snap.teed||[]).filter(t=>{
+      const hay=(t.task+" "+t.person).toLowerCase();
+      return hay.includes(p.name.toLowerCase());
+    });
+    $("teedwrap").style.display = teed.length? "block":"none";
+    $("teed").innerHTML = teed.map(t=>`<a href="index.html#/claude" style="display:inline-flex;align-items:center;gap:9px;padding:7px 13px 7px 7px;border-radius:20px;background:var(--card);border:1px solid var(--rule);font:500 13.5px/1 var(--sans);color:var(--ink)">
+      <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font:600 11px/1 var(--sans)">${esc((t.person||"?")[0]||"?")}</span>
+      ${esc(t.kind)} ${t.person?("to "+esc(t.person)):""}<span style="color:var(--ink3);font-weight:400">→ ready for you</span></a>`).join("");
+    // compact card
+    const pct=c.ctx_pct||0;
+    $("compactcard").style.display = pct>=60? "flex":"none";
+    $("ctxbar").style.width=pct+"%"; $("ctxlabel").textContent=pct+"% full";
+    // hands — one line when this conversation holds them, plus the reason
+    // when it does not, because that is when she needs to know why
+    const holder = p.convos.find(x=>x.hands);
+    if (c.hands){
+      $("handsdot").style.background="var(--green)";
+      $("handstitle").textContent=`This one has ${p.name}'s hands`;
+      $("handsline").style.display="none";
+      $("handsbtn").style.display="none";
+      $("carefulrow").style.display="flex";
+      const careful=!!c.careful;
+      $("careswitch").style.background = careful? "var(--rule)":"var(--green)";
+      $("careknob").style.left = careful? "3px":"19px";
+      $("carelabel").textContent = careful
+        ? "Careful hands — it may edit files here, but not run commands"
+        : "Free hands — acts in this folder without asking";
+    } else {
+      $("handsdot").style.background="var(--ink3)";
+      $("handstitle").textContent=`Talk only — ${p.name}'s hands are with “${holder?holder.topic:"nobody"}”`;
+      $("handsline").style.display="block";
+      $("handsline").textContent=`It can read the folder, plan and answer questions. To let it write, move the hands here — “${holder?holder.topic:""}” drops to talk only, and says so.`;
+      $("handsbtn").style.display="inline-block";
+      $("carefulrow").style.display="none";
+    }
+    // ledger row
+    const idx=this.flat().indexOf(c.id)+1;
+    $("cmdhint").textContent = idx>=1&&idx<=9? `⌘${idx} jumps here`:"";
+    $("daycost2").textContent = `Today, all conversations: $${(this.snap.dayCost||0).toFixed(2)}`;
+    $("histbtn").textContent = `${this.history?"▾":"▸"} earlier in ${p.name}`;
+    $("histbtn").style.display = p.history.length? "inline":"none";
+    $("histlist").style.display = this.history&&p.history.length? "block":"none";
+    if (this.history) $("histlist").innerHTML = p.history.map(h=>`<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--rule)">
+      <span style="font:400 14px/1.45 var(--sans);color:var(--ink2)">${esc(h.topic)}</span>
+      <span style="font:400 12.5px/1 var(--sans);color:var(--ink3)">$${(h.cost||0).toFixed(2)}</span>
+      <button style="margin-left:auto;font:500 12.5px/1 var(--sans);color:var(--accent);flex:none" onclick="UI.reopen('${h.id}')">continue where this left off</button></div>`).join("");
+    // preview
+    this.paintPreview(p);
+    // spend picker default
+    if (!this.model) this.model = this.snap.ai==="careful"? "haiku":"sonnet";
+    document.querySelectorAll("#spendrow .pick").forEach(b=>{
+      b.classList.toggle("on", b.dataset.m===this.model);
+      b.onclick=()=>{ UI.model=b.dataset.m; UI.paintConvo(); };
+    });
+  },
+
+  renderEvent(t,i,c){
+    if (t.k==="her") return `<div style="display:flex;justify-content:flex-end"><div style="max-width:78%;padding:14px 17px;border-radius:12px 12px 4px 12px;background:var(--atint)">
+      <div style="font:400 15px/1.6 var(--sans);white-space:pre-wrap">${esc(t.t)}</div>
+      <div style="font:400 11.5px/1 var(--sans);color:var(--accent);margin-top:8px;opacity:.75">${esc(t.at||"")}</div></div></div>`;
+    if (t.k==="work"){
+      const open=this.workOpen[i];
+      const steps=(t.steps||[]).map(s=>`<div style="display:flex;gap:11px;font:400 13px/1.5 var(--sans);color:var(--ink2)"><span style="width:58px;flex:none;color:var(--ink3);font-family:ui-monospace,Menlo,monospace;font-size:11.5px">${esc(s.at)}</span><span>${esc(s.s)}</span></div>`).join("");
+      return `<div><button style="display:flex;align-items:center;gap:10px;width:100%" onclick="UI.toggleWork(${i})">
+        <span style="flex:1;height:1px;background:var(--rule)"></span>
+        <span style="font:500 12.5px/1 var(--sans);color:var(--ink3);white-space:nowrap">${esc(t.label)} · ${open?"hide the steps":"see the steps"}</span>
+        <span style="flex:1;height:1px;background:var(--rule)"></span></button>
+        ${open?`<div style="margin:12px 0 0;padding:14px 16px;border-radius:9px;background:var(--wash);display:flex;flex-direction:column;gap:7px">${steps}</div>`:""}</div>`;
+    }
+    if (t.k==="claude") return `<div style="max-width:82%">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="color:var(--accent);font-size:13px">✦</span><span class="quiet">Claude</span><span style="font:400 12px/1 var(--sans);color:var(--ink3)">${esc(t.at||"")}</span>
+      <button class="tobrain" style="margin-left:12px;font:500 12px/1 var(--sans);color:var(--accent)" onclick="UI.msgToBrain(${i})">send this to the brain</button></div>
+      <div class="md">${mini(t.t)}</div></div>`;
+    if (t.k==="note") return `<div style="display:flex;align-items:center;gap:11px;padding:13px 16px;border-radius:10px;background:var(--wash);max-width:82%">
+      <span style="font:400 14px/1.5 var(--sans);color:var(--ink2)">${esc(t.t)}</span>
+      <span style="margin-left:auto;font:400 12.5px/1 var(--sans);color:var(--ink3);flex:none">${esc(t.at||"")}</span></div>`;
+    return "";
+  },
+
+  async paintRoomKnows(p){
+    const rk=$("roomknows");
+    if (!this.bits[p.src]){
+      try { const r = await get("/api/sessions/brainbits?src="+encodeURIComponent(p.src));
+            this.bits[p.src] = r.bits||[]; this.base[p.src] = r.base||""; }
+      catch(e){ this.bits[p.src]=[]; }
+    }
+    const bits=this.bits[p.src];
+    const next=bits.find(b=>b.label==="The workstream's next move");
+    if (next){
+      rk.style.display="flex";
+      rk.innerHTML=`<span class="quiet" style="margin-right:14px">The room knows</span>
+        <span style="font:400 14px/1.45 var(--sans);color:var(--ink2)">Next move: ${esc(next.text)}</span>`;
+    } else rk.style.display="none";
+    // brain panel items
+    $("brainitems").innerHTML = (bits.map((b,i)=>`<div style="display:flex;align-items:baseline;gap:11px;padding:10px 11px;border-radius:8px;width:100%;cursor:pointer" onmouseover="this.style.background='var(--wash)'" onmouseout="this.style.background=''" onclick="UI.pull('${esc(p.src)}',${i})">
+      <span style="font:500 14.5px/1.4 var(--sans);flex:none">${esc(b.label)}</span>
+      <span style="font:400 13px/1.4 var(--sans);color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0${b.where?";font-family:ui-monospace,Menlo,monospace;font-size:12px":""}">${esc(b.where || b.text.split("\n")[0])}</span>
+      ${b.star?`<span title="Unstar ${esc(b.star)}" style="font:500 12.5px/1 var(--sans);color:var(--ink3);flex:none" onclick="event.stopPropagation();UI.unstar('${esc(p.src)}','${esc(b.star)}')">unstar</span>`:""}
+      <span style="font:500 12.5px/1 var(--sans);color:var(--accent);flex:none">hand it over</span></div>`).join("")
+      || `<p class="coach" style="margin:6px 0 0">The brain has nothing filed for this project yet.</p>`)
+      + `<div style="display:flex;align-items:center;gap:8px;margin:10px 0 0;padding-top:11px;border-top:1px solid var(--rule2)">
+      <input id="starpath" placeholder="Star a file — TODO.md, about-me.md, or a full path" style="flex:1;min-width:0;padding:8px 11px;border:1px solid var(--rule);border-radius:7px;background:var(--card);font:400 13.5px/1.3 var(--sans);color:var(--ink);outline:none">
+      <button class="hdrbtn" onclick="UI.star('${esc(p.src)}')">Star it</button></div>
+      <p class="coach" style="margin:7px 0 0;font-size:13px">A bare name is looked for in this project first, then in the brain. Starred files stay in this list until you unstar them.</p>`;
+  },
+
+  // ── actions ───────────────────────────────────────────────
+  // pending attachments: {name, data} until the next send carries them
+  files: [],
+  addFile(name, dataurl){
+    if (this.files.length >= 8){ toast("8 attachments max per message"); return; }
+    this.files.push({name, data:dataurl});
+    this.paintAttach();
+  },
+  removeFile(i){ this.files.splice(i,1); this.paintAttach(); },
+  paintAttach(){
+    const row=$("attachrow");
+    row.style.display=this.files.length?"flex":"none";
+    row.innerHTML=this.files.map((f,i)=>
+      '<span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;'
+      + 'border:1px solid var(--rule);border-radius:14px;background:var(--wash);'
+      + 'font:500 12px/1.3 var(--sans)">&#128206; ' + esc(f.name)
+      + ' <button style="color:var(--ink3)" aria-label="Remove" '
+      + 'onclick="UI.removeFile(' + i + ')">&times;</button></span>').join("");
+  },
+  async send(){
+    const box=$("say"), text=box.value.trim();
+    if (!text && !this.files.length){ toast("Say something first"); return; }
+    const sent = text || "Have a look at what I attached.";
+    const r = await post("/api/sessions/say",
+      {id:this.sel, text:sent, model:this.model||"", files:this.files});
+    if (r.error){ toast(r.error); return; }
+    box.value=""; this.files=[]; this.paintAttach();
+    if (r.queued){
+      toast("Queued — sends itself when this turn finishes");
+      this.refresh(); return;
+    }
+    const shown = sent + (this.files.length
+      ? "  \u{1F4CE} " + this.files.map(f=>f.name).join(", ") : "");
+    this.running=true; this.liveSteps=[]; this.liveElapsed=0; this.liveCount=0;
+    this.transcript.push({k:"her", t:shown, at:new Date().toTimeString().slice(0,5)});
+    this.paintConvo(); this._scrollPending=true; this.pollFeed();
+  },
+  async unqueue(i){
+    await post("/api/sessions/unqueue", {id:this.sel, i});
+    toast("Removed from the queue");
+    this.refresh();
+  },
+  pickNext(i){
+    const cur=this.convo(); if(!cur) return;
+    const f=(cur.c.followups||[])[i]; if(!f) return;
+    const box=$("say");
+    box.value = (box.value.trim()? box.value.trim()+"\n" : "") + "Do this: " + f;
+    box.focus();
+  },
+  async compact(){
+    if (this.running){ toast("Wait for the current turn"); return; }
+    const r = await post("/api/sessions/compact", {id:this.sel});
+    if (r.error){ toast(r.error); return; }
+    this.running=true; toast("Folding the older half…"); this.pollFeed();
+  },
+  async stopRun(){
+    await post("/api/sessions/stop", {id:this.sel});
+    toast("Stopped — nothing was lost");
+    this.running=false; setTimeout(()=>this.refresh(), 800);
+  },
+  askEnd(){
+    const cur=this.convo(); if(!cur) return;
+    const {p,c}=cur;
+    $("endtitle").textContent=`End “${c.topic}”?`;
+    const n=(c.allfiles||[]).length;
+    $("endbody").textContent = n
+      ? `The ${n===1?"file it wrote stays":"files it wrote stay"} in ${p.name}, and anything you sent to the brain stays on the plate. The conversation itself goes — what it worked out but never wrote down goes with it.`
+      : `Nothing was written to disk in this conversation, so ending it lets go of everything it worked out. The transcript stays in the brain's history.`;
+    $("endkeeps").style.display = n? "block":"none";
+    $("endkeeps").innerHTML = n? `<div class="quiet" style="margin-bottom:8px">Stays behind</div>`
+      + (c.allfiles||[]).map(f=>`<div style="font:400 12.5px/1.6 var(--sans);color:var(--ink2);font-family:ui-monospace,Menlo,monospace">${esc(f)}</div>`).join(""):"";
+    $("enddlg").style.display="grid"; this.endPending=true;
+  },
+  cancelEnd(){ $("enddlg").style.display="none"; this.endPending=false; },
+  async reallyEnd(){
+    const cur=this.convo();
+    const r = await post("/api/sessions/end", {id:this.sel});
+    this.cancelEnd();
+    if (r.error){ toast(r.error); return; }
+    toast(cur&&(cur.c.allfiles||[]).length? "Ended — the files stayed ✓":"Ended ✓");
+    this.sel=null; await this.refresh();
+  },
+  async reopen(id){
+    await post("/api/sessions/reopen", {id});
+    toast("Picked back up — it remembers everything ✓");
+    this.open(id);
+  },
+  async takeHands(){
+    const r = await post("/api/sessions/hands", {id:this.sel});
+    if (r.error){ toast(r.error); return; }
+    const cur=this.convo();
+    toast(`The hands moved to “${cur?cur.c.topic:"this one"}” ✓`);
+    this.refresh();
+  },
+  async toggleCareful(){
+    const cur=this.convo(); if(!cur) return;
+    const next=!cur.c.careful;
+    await post("/api/sessions/mode", {id:this.sel, careful:next});
+    toast(next? "Careful hands — edits only, no commands ✓":"Free hands, in this folder only ✓");
+    this.refresh();
+  },
+  toggleHistory(){ this.history=!this.history; this.paintConvo(); },
+  toggleBrain(){ this.brain=!this.brain; $("brainpanel").style.display=this.brain?"block":"none"; },
+  toggleWork(i){ this.workOpen[i]=!this.workOpen[i]; this.paintConvo(); },
+  toggleDoc(f){ this.docOpen[f]=!this.docOpen[f]; this.paintConvo(); },
+  async loadDoc(f){
+    const el=document.getElementById("doc-"+f.replace(/[^a-zA-Z0-9]/g,"_")); if(!el||el.dataset.done) return;
+    const r = await get("/api/sessions/doc?id="+encodeURIComponent(this.sel)+"&file="+encodeURIComponent(f));
+    if (el){ el.innerHTML = r.error? `<span class="coach">${esc(r.error)}</span>` : r.html; el.dataset.done="1"; }
+  },
+  pull(src,i){
+    const b=(this.bits[src]||[])[i]; if(!b) return;
+    const box=$("say");
+    const label = b.label.replace(/^★ /,"");
+    box.value = (box.value? box.value+"\n\n":"") + label+":\n"+b.text;
+    this.toggleBrain(); box.focus();
+    toast(`Handed it “${label.toLowerCase()}” ✓`);
+  },
+  async star(src){
+    const el=$("starpath"), path=(el?el.value:"").trim();
+    if (!path){ toast("Type a file name first"); return; }
+    const r = await post("/api/sessions/star", {path, base:this.base[src]||""});
+    if (r.error){ toast(r.error); return; }
+    delete this.bits[src]; toast("Starred ✓"); this.repaint();
+  },
+  async unstar(src,path){
+    const r = await post("/api/sessions/unstar", {path});
+    if (r.error){ toast(r.error); return; }
+    delete this.bits[src]; toast("Unstarred ✓"); this.repaint();
+  },
+  // The one way something goes from a conversation back into the brain: it
+  // lands in the inbox, where /brief triages it. Nothing is filed silently.
+  async toBrain(text){
+    text = (text||"").trim();
+    if (!text){ toast("Nothing to send"); return; }
+    const r = await post("/api/sessions/tobrain", {id:this.sel, text});
+    if (r.error){ toast(r.error); return; }
+    toast("Sent to the brain's inbox ✓");
+  },
+  sendComposerToBrain(){
+    const box=$("say"), t=box.value.trim();
+    if (!t){ toast("Write it in the box first"); return; }
+    this.toBrain(t).then(()=>{ box.value=""; });
+  },
+  msgToBrain(i){ const t=this.transcript[i]; if(t) this.toBrain(t.t); },
+
+  // ── new conversations ─────────────────────────────────────
+  newConvo(){
+    $("newlist").innerHTML = (this.snap?this.snap.projects:[]).map(p=>`
+      <button style="display:flex;align-items:baseline;gap:11px;padding:11px 12px;border-radius:8px;width:100%" onmouseover="this.style.background='var(--wash)'" onmouseout="this.style.background=''" onclick="UI.newIn('${esc(p.src)}')">
+      <span style="font:600 15px/1.3 var(--sans)">${esc(p.name)}</span>
+      <span style="font:400 12.5px/1.3 var(--sans);color:var(--ink3);font-family:ui-monospace,Menlo,monospace">${esc(p.path.replace(/^\/Users\/[^/]+/,"~"))}</span></button>`).join("");
+    $("newdlg").style.display="grid";
+  },
+  cancelNew(){ $("newdlg").style.display="none"; },
+  async newIn(src){
+    this.cancelNew();
+    const r = await post("/api/sessions/new", {src, text:""});
+    if (r.error){ toast(r.error); return; }
+    await this.open(r.id);
+    toast("Opened — say what it should do");
+    $("say").focus();
+  },
+
+  // ── preview ───────────────────────────────────────────────
+  togglePreview(){ this.preview=!this.preview; this.paintConvo(); },
+  toggleWide(){ this.wide=!this.wide; this.paintConvo(); },
+  // A project with nothing to preview gets no column at all — 440px of
+  // "no preview for this project" is 440px the conversation could have had.
+  applyPreview(p){
+    const has = !!(p && p.previewKind), on = has && this.preview;
+    $("pvcol").style.display = on? "flex":"none";
+    $("grid").dataset.pv = on? "1":"0";
+    $("grid").style.gridTemplateColumns = on
+      ? (this.wide? "240px minmax(440px,0.9fr) minmax(0,1.3fr)"
+                  : "320px minmax(0,1fr) 440px")
+      : "320px minmax(0,1fr)";
+    $("pvbtn").style.display = has? "inline-block":"none";
+    $("pvbtn").textContent = this.preview? "Hide the preview":"Show the preview";
+    $("pvwide").textContent = this.wide? "make it smaller":"make it bigger";
+    return on;
+  },
+  paintPreview(p){
+    if (!this.applyPreview(p)) return;
+    const body=$("pvbody");
+    if (p.previewKind==="web"){
+      $("pvnote").textContent="the local site, live";
+      if (p.devRunning && !p.frameable){
+        // Blank white boxes are how this normally fails, and a blank box
+        // reads as "the brain is broken" rather than "the site said no".
+        if (body.dataset.mode!=="noframe:"+p.previewUrl){
+          body.dataset.mode="noframe:"+p.previewUrl;
+          body.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px">
+            <p style="margin:0;font:400 15px/1.55 var(--sans);color:var(--ink2)">It is running, but ${esc(p.name)} refuses to be shown inside another page — its own security header says so. It opens in a tab instead.</p>
+            <button class="btn p" style="text-align:center" onclick="window.open('${esc(p.previewUrl)}','_blank')">Open ${esc(p.previewUrl)}</button>
+            <p class="coach" style="margin:0">Drag that tab out and it becomes a window you can keep beside this one.</p></div>`;
+        }
+      }
+      else if (p.devRunning){
+        if (body.dataset.mode!=="web:"+p.previewUrl){
+          body.dataset.mode="web:"+p.previewUrl;
+          body.innerHTML=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+            <span style="font:400 12px/1 var(--sans);color:var(--ink3);font-family:ui-monospace,Menlo,monospace">${esc(p.previewUrl)}</span>
+            <span class="dot" style="background:var(--green);margin-left:auto"></span>
+            <button class="hdrbtn" onclick="UI.devReload()">Reload</button>
+            <button class="hdrbtn" onclick="window.open('${esc(p.previewUrl)}','_blank')">Open in its own tab</button></div>
+          <iframe class="web" id="pviframe" src="${esc(p.previewUrl)}"></iframe>`;
+        }
+      } else {
+        if (body.dataset.mode!=="dead:"+p.src){
+          body.dataset.mode="dead:"+p.src;
+          body.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px">
+            <p class="coach" style="margin:0;font-size:16px;color:var(--ink2)">Not running. Nothing is wrong — the dev server is simply off.</p>
+            ${p.devKnown?`<button class="btn p" style="text-align:center" onclick="UI.devStart('${esc(p.src)}')">Start it</button>`:`<p class="coach" style="margin:0">No dev command configured for this project.</p>`}</div>`;
+        }
+      }
+    } else if (p.previewKind==="emu"){
+      $("pvnote").textContent="emulator mirror";
+      if (body.dataset.mode!=="emu:"+this.wide){
+        body.dataset.mode="emu:"+this.wide;
+        body.innerHTML=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:12px;flex-wrap:wrap">
+          <span style="font:500 12.5px/1.4 var(--sans);color:var(--ink2)" id="emustamp">Mirror</span>
+          <button class="hdrbtn" style="margin-left:auto" onclick="UI.emuRefresh()">Refresh</button>
+          <button class="hdrbtn" onclick="UI.emuOpen()">Open the screen full size</button></div>
+        <div style="flex:1;display:grid;place-items:start center;overflow:auto">
+        <img id="emuimg" alt="" title="Click to open this screen full size" onclick="UI.emuOpen()" style="max-width:min(100%,${this.wide?"420px":"260px"});cursor:zoom-in;border:8px solid var(--ink);border-radius:26px;background:var(--card);display:none">
+        <p class="coach" id="emumsg" style="margin-top:30px">Fetching the emulator's screen…</p></div>`;
+        this.emuRefresh();
+      }
+    } else {
+      $("pvnote").textContent="";
+      if (body.dataset.mode!=="none"){
+        body.dataset.mode="none";
+        body.innerHTML=`<p class="coach" style="margin-top:20px">No preview for this project — the conversation is the whole view.</p>`;
+      }
+    }
+  },
+  devReload(){ const f=$("pviframe"); if(f) f.src=f.src; },
+  emuOpen(){ window.open("/api/sessions/emu?t="+Date.now(), "_blank"); },
+  async devStart(src){
+    const r=await post("/api/sessions/dev",{src,action:"start"});
+    if (r.error){ toast(r.error); return; }
+    toast("Starting the dev server — give it a few seconds");
+    const tryAgain=(n)=>setTimeout(async()=>{ await this.refresh(); const cur=this.convo();
+      if (cur && !cur.p.devRunning && n<10) tryAgain(n+1); }, 2000);
+    tryAgain(0);
+  },
+  async emuRefresh(){
+    const img=$("emuimg"), msg=$("emumsg"); if(!img) return;
+    try{
+      const r=await fetch("/api/sessions/emu?t="+Date.now());
+      if (!r.ok){ const e=await r.json(); msg.textContent=e.error||"No emulator running."; msg.style.display="block"; img.style.display="none"; return; }
+      const blob=await r.blob();
+      img.src=URL.createObjectURL(blob); img.style.display="block"; msg.style.display="none";
+      $("emustamp").textContent="Mirror · refreshed just now";
+      clearTimeout(this._emuT); this._emuT=setTimeout(()=>{ if($("emuimg")) UI.emuRefresh(); }, 20000);
+    }catch(e){ msg.textContent="No emulator running."; }
+  },
+};
+
+// keyboard
+window.addEventListener("keydown", e=>{
+  if ((e.metaKey||e.ctrlKey) && e.key>="1" && e.key<="9"){
+    const flat=UI.flat(), id=flat[Number(e.key)-1];
+    if (id){ e.preventDefault(); UI.open(id); }
+    return;
+  }
+  if (e.key==="Escape"){
+    if (UI.endPending){ UI.cancelEnd(); return; }
+    if ($("newdlg").style.display!=="none"){ UI.cancelNew(); return; }
+    if (UI.brain){ UI.toggleBrain(); return; }
+  }
+});
+// A hidden tab that earned a "✓ done" title gets its normal name back the
+// moment she looks at it.
+document.addEventListener("visibilitychange", ()=>{
+  if (!document.hidden) document.title = "Sessions — the brain";
+});
+
+// Screenshots paste straight into the box; documents come via the clip.
+$("say").addEventListener("paste", e=>{
+  const items = (e.clipboardData || {}).items || [];
+  let n = 0;
+  for (const it of items){
+    if (it.kind === "file" && /^image\//.test(it.type)){
+      const f = it.getAsFile(); if (!f) continue;
+      n++;
+      const rd = new FileReader();
+      const name = "pasted-" + new Date().toISOString().slice(0,19).replace(/[:T]/g,"-")
+                 + (n > 1 ? "-" + n : "") + ".png";
+      rd.onload = () => UI.addFile(name, rd.result);
+      rd.readAsDataURL(f);
+    }
+  }
+  if (n) e.preventDefault();
+});
+$("attachpick").addEventListener("change", e=>{
+  for (const f of e.target.files){
+    const rd = new FileReader();
+    rd.onload = () => UI.addFile(f.name, rd.result);
+    rd.readAsDataURL(f);
+  }
+  e.target.value = "";
+});
+$("say").addEventListener("keydown", e=>{
+  if (e.key==="Enter" && !e.shiftKey){ e.preventDefault(); UI.send(); }
+});
+$("addtop").onclick=()=>UI.newConvo();
+
+// sessions.html#<id> opens straight onto that conversation, which is what
+// makes a room able to link at one. An id that no longer exists falls back
+// to the first open conversation, the same as arriving with no hash.
+function fromHash(){
+  const id = decodeURIComponent((location.hash||"").replace(/^#/,"")).trim();
+  if (id && id !== UI.sel){ UI.sel = id; UI.lastStamp = ""; UI.refresh(); }
+}
+fromHash();
+addEventListener("hashchange", fromHash);
+
+UI.refresh();
+setInterval(()=>UI.refresh(), 2500);
+</script>
+
+
+<div class="askscrim" id="askscrim" hidden></div>
+<aside class="askpanel" id="askpanel" hidden aria-label="Ask the brain">
+  <div class="askhead">
+    <div><h2>Ask the brain</h2>
+      <div class="asksub" id="asksub">anything &mdash; it reads your whole brain</div></div>
+    <a class="askfull" id="askfull" href="sessions.html">open in Sessions</a>
+    <button class="askx" id="askx" aria-label="Close">&times;</button>
+  </div>
+  <div class="askthread" id="askthread"></div>
+  <div class="askfoot">
+    <textarea id="asktext" data-mic="1" rows="1"
+      placeholder="What should I do first today?"></textarea>
+    <button class="asksend" id="asksend">Ask</button>
+  </div>
+</aside>
+<script>
+(function(){
+var SRC = "The brain";
+var panel = document.getElementById('askpanel');
+if(!panel) return;
+var scrim = document.getElementById('askscrim'), thread = document.getElementById('askthread'),
+    ta = document.getElementById('asktext'), send = document.getElementById('asksend'),
+    sub = document.getElementById('asksub'), full = document.getElementById('askfull');
+var CID = null, TIMER = null, WORKING = false, STAMP = '';
+
+function esc(s){ return String(s == null ? '' : s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// Just enough markdown for an answer to be readable — bold, code, bullets,
+// paragraphs. Anything richer belongs on the Sessions page, which is one
+// click away in the header.
+function mini(t){
+  var out = [], list = false;
+  (t || '').split('\n').forEach(function(line){
+    var s = line.trim();
+    var m = s.match(/^[-*]\s+(.*)/);
+    if(m){ if(!list){ out.push('<ul>'); list = true; } out.push('<li>' + inl(m[1]) + '</li>'); return; }
+    if(list){ out.push('</ul>'); list = false; }
+    if(s) out.push('<p>' + inl(s) + '</p>');
+  });
+  if(list) out.push('</ul>');
+  return out.join('');
+}
+function inl(s){ return esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+  .replace(/`([^`]+)`/g, '<code>$1</code>'); }
+
+function paint(events){
+  thread.innerHTML = '';
+  var shown = 0;
+  (events || []).forEach(function(ev){
+    var d = document.createElement('div');
+    if(ev.k === 'her'){ d.className = 'askmsg her'; d.textContent = ev.t; }
+    else if(ev.k === 'claude'){
+      d.className = 'askmsg claude';
+      d.innerHTML = '<div class="askwho">Claude</div><div class="askbody">'
+                    + mini(ev.t) + '</div>';
+    }
+    else if(ev.k === 'note'){ d.className = 'askmsg note'; d.textContent = ev.t; }
+    else return;                       // tool steps stay on the Sessions page
+    thread.appendChild(d); shown++;
+  });
+  if(WORKING){
+    var w = document.createElement('div');
+    w.className = 'askwork'; w.innerHTML = '<i></i> thinking…';
+    thread.appendChild(w); shown++;
+  }
+  if(!shown){
+    var e2 = document.createElement('p');
+    e2.className = 'askempty';
+    e2.textContent = 'Ask anything about your brain — what is on your plate, '
+      + 'who you owe a reply, what to do first. It answers here; it never sends anything.';
+    thread.appendChild(e2);
+  }
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function setLink(){ full.href = CID ? ('sessions.html#' + encodeURIComponent(CID)) : 'sessions.html'; }
+
+function pull(){
+  if(!CID) return Promise.resolve();
+  return fetch('/api/sessions/transcript?id=' + encodeURIComponent(CID))
+    .then(function(r){ return r.json(); })
+    .then(function(j){ paint(j.events || []); });
+}
+
+// Which conversation this is: the newest live one in the brain's own folder,
+// so the panel and the Sessions page are looking at the same record rather
+// than each keeping a private thread.
+function attach(){
+  return fetch('/api/sessions/room?src=' + encodeURIComponent(SRC))
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      var live = (j.convos || []);
+      if(live.length){
+        CID = live[live.length - 1].id;
+        WORKING = live.some(function(c){ return c.id === CID && c.state === 'working'; });
+      }
+      setLink();
+      return CID ? pull() : paint([]);
+    })
+    .catch(function(){ paint([]); });
+}
+
+function poll(){
+  if(TIMER) clearInterval(TIMER);
+  TIMER = setInterval(function(){
+    if(document.hidden || panel.hidden) return;
+    fetch('/api/sessions/room?src=' + encodeURIComponent(SRC))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        var me = (j.convos || []).filter(function(c){ return c.id === CID; })[0];
+        var was = WORKING;
+        WORKING = !!(me && me.state === 'working');
+        if(me && me.last === STAMP && was === WORKING) return;
+        if(me) STAMP = me.last;
+        pull();
+      })
+      .catch(function(){});
+  }, 2200);
+}
+
+function open(){
+  panel.hidden = false; scrim.hidden = false;
+  document.body.classList.add('asking');
+  requestAnimationFrame(function(){ panel.classList.add('on'); scrim.classList.add('on'); });
+  ta.focus();
+  attach().then(poll);
+}
+function close(){
+  panel.classList.remove('on'); scrim.classList.remove('on');
+  document.body.classList.remove('asking');
+  if(TIMER){ clearInterval(TIMER); TIMER = null; }
+  setTimeout(function(){ panel.hidden = true; scrim.hidden = true; }, 190);
+}
+
+function ask(){
+  var t = ta.value.trim();
+  if(!t || WORKING) return;
+  send.disabled = true;
+  var body = JSON.stringify(CID ? {id: CID, text: t, model: 'haiku'}
+                                : {src: SRC, text: t, model: 'haiku'});
+  fetch(CID ? '/api/sessions/say' : '/api/sessions/new',
+        {method: 'POST', headers: {'Content-Type': 'application/json'}, body: body})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      send.disabled = false;
+      if(j.error){
+        paint([{k: 'note', t: j.error}]);
+        return;
+      }
+      if(j.id) CID = j.id;
+      setLink();
+      ta.value = ''; ta.style.height = '';
+      WORKING = true; pull(); poll();
+    })
+    .catch(function(e){ send.disabled = false; paint([{k: 'note', t: e.message}]); });
+}
+
+var btn = document.getElementById('askopen');
+if(btn) btn.onclick = open;
+document.getElementById('askx').onclick = close;
+scrim.onclick = close;
+send.onclick = ask;
+ta.addEventListener('input', function(){
+  ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 150) + 'px';
+});
+ta.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); ask(); }
+});
+addEventListener('keydown', function(e){
+  if((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')){
+    e.preventDefault(); panel.hidden ? open() : close();
+  }
+  if(e.key === 'Escape' && !panel.hidden) close();
+});
+})();
+</script>
+</body>
+</html>

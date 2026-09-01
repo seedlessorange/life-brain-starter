@@ -1,0 +1,885 @@
+/* ============================================================ BAUHAUS LEDGER
+   Full skin — baked only when "bauhaus" is active, emitted after the token
+   and theme blocks. Spec: design/skins/SPECS.md §5; ground truth: the
+   "Today - bauhaus ledger" mockup. Faces, state dots and the + FAB stay
+   round; state colors keep their meanings. */
+
+:root[data-style="bauhaus"]{
+  --paper:oklch(.975 .012 92);
+  --surface:oklch(.994 .006 92);
+  --sunken:oklch(.955 .020 92);
+  --ink:oklch(.205 .008 60);
+  --dim:oklch(.46 .012 60);
+  --faint:oklch(.56 .012 60);
+  --line:oklch(.875 .014 88);
+  --line2:var(--ink);
+
+  /* the three primaries + green, flat and unmixed */
+  --bh-red:oklch(.495 .135 32);
+  --bh-yellow:oklch(.740 .130 78);
+  --bh-blue:oklch(.430 .105 255);
+  --bh-green:oklch(.520 .080 145);
+
+  /* states: red=urgent/overdue · yellow=they-quiet · blue=you-quiet/Claude ·
+     green=moving/done. --wait darkened from the yellow so it reads as text. */
+  --bad:var(--bh-red);        --badbg:oklch(.930 .048 32);
+  --wait:oklch(.575 .120 78); --waitbg:oklch(.945 .065 85);
+  --cold:var(--bh-blue);      --coldbg:oklch(.930 .035 252);
+  --green:var(--bh-green);    --greenbg:oklch(.935 .045 145);
+  --terra:oklch(.560 .130 45);
+
+  --r-xl:0px;--r-lg:0px;--r-card:0px;--r-md:0px;--r-btn:0px;--r-sm:0px;
+  --shadow:none;--shadow-lift:none;
+
+  --serif:'Jost',sans-serif;
+  --sans:'Public Sans',system-ui,sans-serif;
+  --coach:'Newsreader',Georgia,serif;
+
+  --bh-bleed:var(--s5);       /* left bleed = main's side padding */
+  --bh-bleedr:var(--s7);      /* right bleed = the column gap */
+}
+
+/* dark twins — every pinned token, restated (attribute + media forms) */
+:root[data-style="bauhaus"][data-theme="dark"]{
+  --paper:oklch(.200 .010 65);--surface:oklch(.235 .012 65);
+  --sunken:oklch(.170 .010 65);--ink:oklch(.930 .012 85);
+  --dim:oklch(.710 .015 80);--faint:oklch(.600 .014 80);
+  --line:oklch(.340 .014 65);
+  --bh-red:oklch(.630 .145 32);--bh-yellow:oklch(.760 .125 80);
+  --bh-blue:oklch(.610 .110 255);--bh-green:oklch(.630 .090 145);
+  --badbg:oklch(.300 .060 30);--wait:oklch(.780 .120 85);
+  --waitbg:oklch(.320 .055 88);--coldbg:oklch(.300 .045 252);
+  --greenbg:oklch(.300 .050 145);--terra:oklch(.730 .110 55);
+}
+@media (prefers-color-scheme:dark){
+  :root[data-style="bauhaus"]:not([data-theme="light"]){
+    --paper:oklch(.200 .010 65);--surface:oklch(.235 .012 65);
+    --sunken:oklch(.170 .010 65);--ink:oklch(.930 .012 85);
+    --dim:oklch(.710 .015 80);--faint:oklch(.600 .014 80);
+    --line:oklch(.340 .014 65);
+    --bh-red:oklch(.630 .145 32);--bh-yellow:oklch(.760 .125 80);
+    --bh-blue:oklch(.610 .110 255);--bh-green:oklch(.630 .090 145);
+    --badbg:oklch(.300 .060 30);--wait:oklch(.780 .120 85);
+    --waitbg:oklch(.320 .055 88);--coldbg:oklch(.300 .045 252);
+    --greenbg:oklch(.300 .050 145);--terra:oklch(.730 .110 55);
+  }
+}
+
+/* ---------------------------------------------------------------- base */
+[data-style="bauhaus"] body{overflow-x:hidden}
+[data-style="bauhaus"] a{color:var(--cold)}
+[data-style="bauhaus"] a:hover{color:var(--bad)}
+
+/* the coaching voice stays an italic serif even though --serif is now Jost */
+[data-style="bauhaus"] .hero-why,
+[data-style="bauhaus"] .hero-matters,
+[data-style="bauhaus"] .tiernote,
+[data-style="bauhaus"] .hznone{font-family:var(--coach)}
+
+/* kill the squiggles */
+[data-style="bauhaus"] .wav{display:none}
+[data-style="bauhaus"] h3.area::after,[data-style="bauhaus"] .qcard .eyebrow::after,
+[data-style="bauhaus"] .offercard .eyebrow::after,[data-style="bauhaus"] #queue>h2::after,
+[data-style="bauhaus"] #drafts>h2::after,[data-style="bauhaus"] #connections>h2::after,
+[data-style="bauhaus"] #recordings>h2::after,[data-style="bauhaus"] #newfiles>h2::after,
+[data-style="bauhaus"] #people>h2::after,[data-style="bauhaus"] #attention>h2::after,
+[data-style="bauhaus"] #all>h2::after,[data-style="bauhaus"] .doc h2::after,
+[data-style="bauhaus"] .todaydoc h2::after{display:none}
+
+/* --------------------------------------------------------------- labels
+   shape-coded marks: square = default, triangle = warning, circle = people */
+[data-style="bauhaus"] .eyebrow,[data-style="bauhaus"] h3.area{
+  font:600 var(--t-xs)/1 var(--serif);letter-spacing:.2em;
+  text-transform:uppercase;color:var(--dim)}
+[data-style="bauhaus"] .eyebrow::before,[data-style="bauhaus"] h3.area::before{
+  content:"";display:inline-block;width:10px;height:10px;background:var(--ink);
+  margin-right:9px;vertical-align:-1px;border:0}
+[data-style="bauhaus"] .offercard .eyebrow::before{background:var(--bh-blue)}
+[data-style="bauhaus"] .hzcard .eyebrow::before{
+  background:var(--bh-yellow);border-radius:50%}
+[data-style="bauhaus"] .railcard:has(.drow) h3.area::before{
+  background:var(--bh-yellow);border-radius:50%}
+[data-style="bauhaus"] .qcard .eyebrow::before{
+  width:0;height:0;background:none;
+  border-left:6px solid transparent;border-right:6px solid transparent;
+  border-bottom:11px solid var(--bad)}
+[data-style="bauhaus"] .evwrap h3.area::before{
+  width:0;height:0;background:none;
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-bottom:12px solid var(--bad)}
+
+[data-style="bauhaus"] .meta{
+  font:500 var(--t-xs)/1.6 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+
+/* --------------------------------------------------------------- header */
+[data-style="bauhaus"] header.top{border-bottom:3px solid var(--ink)}
+[data-style="bauhaus"] .brand{font:600 1.125rem/1 var(--serif);letter-spacing:.02em}
+/* ●■▲ triad beside the wordmark — the logo image itself is untouched */
+[data-style="bauhaus"] .brand::after{
+  content:"";width:43px;height:11px;flex:none;
+  background:
+    radial-gradient(circle closest-side at 50% 50%,var(--bh-red) 98%,transparent) 0 0/11px 11px no-repeat,
+    linear-gradient(var(--bh-yellow),var(--bh-yellow)) 16px 0/11px 11px no-repeat,
+    conic-gradient(from 135deg at 50% 0,var(--bh-blue) 0 90deg,transparent 0) 32px 0/11px 11px no-repeat}
+
+/* the stamp rides inside the sync pill — same type, one notch bolder */
+[data-style="bauhaus"] .skinx-stamp{display:inline;font-weight:600}
+[data-style="bauhaus"] .syncstate{
+  font:500 10.5px/1 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+
+[data-style="bauhaus"] .topnav a{
+  font:500 var(--t-xs)/1 var(--serif);letter-spacing:.08em;text-transform:uppercase;
+  border-radius:0;padding:8px 10px}
+[data-style="bauhaus"] .topnav a.on{
+  background:none;color:var(--ink);font-weight:600;
+  box-shadow:0 4px 0 var(--bh-red)}
+[data-style="bauhaus"] .topnav a:hover{background:var(--sunken)}
+
+[data-style="bauhaus"] .ghostbtn{
+  border:2px solid var(--ink);border-radius:0;
+  font:600 var(--t-xs)/1 var(--serif);letter-spacing:.1em;text-transform:uppercase;
+  padding:9px 13px}
+[data-style="bauhaus"] .ghostbtn:hover{background:var(--sunken)}
+[data-style="bauhaus"] .askopen{
+  border-color:var(--bh-blue);background:var(--bh-blue);color:oklch(.98 .01 92)}
+[data-style="bauhaus"] .askopen:hover{background:var(--bh-blue);filter:brightness(1.08)}
+[data-style="bauhaus"] .banner{border-bottom:2px solid var(--ink)}
+
+/* ------------------------------------------------------------ hero field
+   the full-bleed yellow ground; text pinned dark because the field is
+   yellow in both themes */
+[data-style="bauhaus"] .hero{
+  position:relative;background:var(--bh-yellow);
+  border-bottom:3px solid var(--ink);border-radius:0;
+  margin:var(--s4) calc(-1*var(--bh-bleedr)) var(--s5) calc(-1*var(--bh-bleed));
+  padding:var(--s6) var(--s6) var(--s5) var(--bh-bleed)}
+[data-style="bauhaus"] .hero .eyebrow{color:oklch(.28 .030 70)}
+[data-style="bauhaus"] .hero .eyebrow::before{background:oklch(.205 .008 60)}
+[data-style="bauhaus"] .hero h1{
+  font:600 3rem/1 var(--serif);letter-spacing:-.01em;color:oklch(.205 .008 60)}
+[data-style="bauhaus"] .hero-why{color:oklch(.30 .035 70)}
+[data-style="bauhaus"] .hero.sev-bad .hero-why{color:oklch(.40 .130 32)}
+[data-style="bauhaus"] .hero.sev-wait .hero-why{color:oklch(.34 .060 78)}
+[data-style="bauhaus"] .hero.sev-cold .hero-why{color:oklch(.34 .080 255)}
+[data-style="bauhaus"] .hero.sev-soon .hero-why{color:oklch(.38 .110 45)}
+
+/* the one diagonal — the provenance line as a rotated corner tag */
+[data-style="bauhaus"] .skinx-prov{
+  display:block;position:absolute;top:20px;right:24px;margin:0;
+  transform:rotate(-8deg);padding:6px 13px;
+  background:oklch(.205 .008 60);color:oklch(.975 .012 92);
+  font:600 11px/1 var(--serif);letter-spacing:.18em;text-transform:uppercase;
+  white-space:nowrap}
+
+/* the "Do this" spec box — white, 2px ink, inside the yellow field */
+[data-style="bauhaus"] .hero-next{
+  display:block;background:oklch(.975 .012 92);border:2px solid oklch(.205 .008 60);
+  padding:14px 17px;max-width:640px;color:oklch(.205 .008 60);
+  font:500 1.25rem/1.32 var(--serif)}
+[data-style="bauhaus"] .hero-next span{
+  display:block;margin:0 0 10px;font:600 var(--t-xs)/1 var(--serif);
+  letter-spacing:.2em;text-transform:uppercase;color:oklch(.46 .012 60)}
+[data-style="bauhaus"] .hero-next span::before{
+  content:"";display:inline-block;width:10px;height:10px;
+  background:oklch(.495 .135 32);margin-right:9px;vertical-align:-1px}
+
+[data-style="bauhaus"] .hero-matters{color:oklch(.32 .030 70)}
+[data-style="bauhaus"] .hero-matters::before{color:oklch(.36 .040 78)}
+[data-style="bauhaus"] .heroplan{
+  border:2px solid oklch(.205 .008 60);border-radius:0;
+  background:oklch(.975 .012 92);color:oklch(.205 .008 60);
+  font:600 var(--t-xs)/1 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+
+/* decay bar: 2px ink frame, red fill */
+[data-style="bauhaus"] .hero .bar{
+  height:12px;border:2px solid oklch(.205 .008 60);border-radius:0;
+  background:oklch(.975 .012 92)}
+[data-style="bauhaus"] .hero .bar i{border-radius:0;background:oklch(.495 .135 32)}
+[data-style="bauhaus"] main .bar,[data-style="bauhaus"] main .bar i{border-radius:0}
+
+/* hero action row — white-on-yellow ink-framed blocks, pinned light */
+[data-style="bauhaus"] .hero .act,[data-style="bauhaus"] .hero .ball{
+  border:2px solid oklch(.205 .008 60);border-radius:0;
+  background:oklch(.975 .012 92);color:oklch(.205 .008 60);
+  font:600 11px/1 var(--serif);letter-spacing:.08em;text-transform:uppercase;
+  padding:10px 14px}
+[data-style="bauhaus"] .hero .act[data-addtask]{
+  background:oklch(.205 .008 60);color:oklch(.975 .012 92)}
+[data-style="bauhaus"] .hero .act[data-addtask] b{color:oklch(.740 .130 78)}
+[data-style="bauhaus"] .hero .ball.on{
+  background:oklch(.205 .008 60);color:oklch(.975 .012 92)}
+[data-style="bauhaus"] .hero .act:hover,[data-style="bauhaus"] .hero .ball:hover{
+  background:oklch(.955 .020 92);color:oklch(.205 .008 60)}
+[data-style="bauhaus"] .hero .act[data-addtask]:hover{
+  background:oklch(.205 .008 60);color:oklch(.975 .012 92);filter:brightness(1.15)}
+[data-style="bauhaus"] .hero .actsfor,[data-style="bauhaus"] .hero .balllabel{
+  font:600 10px/1 var(--serif);letter-spacing:.14em;text-transform:uppercase;
+  color:oklch(.32 .030 70)}
+
+/* ------------------------------------------------------------- buttons */
+[data-style="bauhaus"] .act,[data-style="bauhaus"] .mini{
+  border:2px solid var(--line);border-radius:0;color:var(--dim);
+  font:600 10.5px/1 var(--serif);letter-spacing:.08em;text-transform:uppercase;
+  padding:8px 12px}
+[data-style="bauhaus"] .act:hover,[data-style="bauhaus"] .mini:hover{
+  border-color:var(--ink);color:var(--ink);background:transparent}
+[data-style="bauhaus"] .act.send{
+  background:var(--bh-blue);border-color:var(--bh-blue);color:oklch(.98 .01 92)}
+[data-style="bauhaus"] .act.send:hover{background:var(--bh-blue)}
+[data-style="bauhaus"] .tstart{color:var(--bh-blue)}
+[data-style="bauhaus"] .act b{color:var(--bh-green)}
+
+/* the ball chip: inverted ink, square, colored round dot */
+[data-style="bauhaus"] .ballpill{
+  border-radius:0;background:var(--ink);color:var(--paper);
+  font:600 11px/1.5 var(--serif);letter-spacing:.12em;text-transform:uppercase;
+  padding:6px 12px}
+[data-style="bauhaus"] .ballpill::before{
+  content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+  margin-right:8px;vertical-align:0;background:var(--paper)}
+[data-style="bauhaus"] .ballpill.mine{background:var(--ink);color:var(--paper)}
+[data-style="bauhaus"] .ballpill.mine::before{background:var(--bh-yellow)}
+[data-style="bauhaus"] .ballpill.theirs{background:var(--ink);color:var(--paper)}
+[data-style="bauhaus"] .ballpill.theirs::before{background:var(--bh-blue)}
+[data-style="bauhaus"] .ballpill.none{background:var(--ink);color:var(--paper);opacity:.6}
+
+/* ---------------------------------------------------------------- bands
+   the main column is a ledger: full-width bands, 3px ink rules, a 3px
+   column rule against the rail */
+[data-style="bauhaus"] .todaygrid>.todaymain{border-right:3px solid var(--ink)}
+[data-style="bauhaus"] .wxline{
+  font:500 1.05rem/1.45 var(--serif);color:var(--ink);
+  margin:0 0 0 calc(-1*var(--bh-bleed));
+  padding:14px var(--s5) 14px var(--bh-bleed);
+  border-bottom:2px solid var(--line)}
+
+[data-style="bauhaus"] .todaywrap{
+  background:transparent;border:0;border-radius:0;
+  border-bottom:3px solid var(--ink);
+  margin-left:calc(-1*var(--bh-bleed));
+  padding:var(--s5) var(--s5) var(--s6) var(--bh-bleed)}
+[data-style="bauhaus"] .qwins,[data-style="bauhaus"] .hzcard,
+[data-style="bauhaus"] .offercard,[data-style="bauhaus"] .bscard{
+  background:transparent;border:0;border-radius:0;box-shadow:none;
+  border-bottom:2px solid var(--line);
+  margin:0 0 0 calc(-1*var(--bh-bleed));
+  padding:var(--s5) var(--s5) var(--s5) var(--bh-bleed)}
+[data-style="bauhaus"] .bscard{border-bottom:0}
+
+/* quadrant-style light cross-rules inside the band stack */
+[data-style="bauhaus"] .hzrow{border-top:2px solid var(--line)}
+[data-style="bauhaus"] .hzrow:first-of-type{border-top:0}
+
+[data-style="bauhaus"] .skinx-planstamp{
+  display:inline-block;font:600 11px/1 var(--serif);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);margin:0 var(--s3) var(--s3) 0}
+
+[data-style="bauhaus"] .todaywrap .doc h1{
+  font:600 var(--t-xl)/1.15 var(--serif);letter-spacing:0}
+[data-style="bauhaus"] .doc h2,[data-style="bauhaus"] .todaydoc h2{
+  font:600 var(--t-xs)/1 var(--serif);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim)}
+[data-style="bauhaus"] .todaydoc h2::before{
+  content:"";display:inline-block;width:10px;height:10px;background:var(--ink);
+  margin-right:9px;vertical-align:-1px}
+
+/* task rows: square 2px ink checkboxes, ink top rules */
+[data-style="bauhaus"] .box{border:2px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] ul.tasks li{
+  border-top:2px solid var(--line);padding:11px 0}
+[data-style="bauhaus"] ul.tasks li:first-child{border-top:2px solid var(--ink)}
+[data-style="bauhaus"] .test{
+  font:600 10.5px/1 var(--serif);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--faint)}
+
+[data-style="bauhaus"] .updnudge{
+  background:var(--sunken);border:2px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] .evwrap{
+  background:var(--sunken);border:2px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] .weekstrip>summary{
+  font:600 var(--t-xs)/1 var(--serif);letter-spacing:.14em;text-transform:uppercase}
+
+/* NOW / PUSH / SLOW as solid primary label blocks */
+[data-style="bauhaus"] .hzcard .hzkind{
+  justify-self:start;padding:4px 9px;
+  font:600 10.5px/1.4 var(--serif);letter-spacing:.14em;text-transform:uppercase;
+  background:var(--bh-yellow);color:oklch(.24 .030 70)}
+[data-style="bauhaus"] .hzrow.hz-now .hzkind{
+  background:var(--bh-red);color:oklch(.98 .01 92)}
+[data-style="bauhaus"] .hzrow.hz-push .hzkind{
+  background:var(--bh-yellow);color:oklch(.24 .030 70)}
+[data-style="bauhaus"] .hzrow.hz-slow .hzkind{
+  background:var(--bh-green);color:oklch(.98 .01 92)}
+[data-style="bauhaus"] .hzsince{
+  font:500 10px/1.6 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+
+/* ----------------------------------------------------------------- rail */
+[data-style="bauhaus"] .todayrail{gap:0}
+[data-style="bauhaus"] .railcard{
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  border-bottom:2px solid var(--line);padding:18px 4px 16px}
+[data-style="bauhaus"] .todayrail>section:last-child{border-bottom:0}
+[data-style="bauhaus"] .qcard,[data-style="bauhaus"] .daycard,
+[data-style="bauhaus"] .forecast,[data-style="bauhaus"] .dupcard{
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  border-top:2px solid var(--line);padding-top:var(--s4)}
+
+/* countdown tiles: filled squares — red, yellow, then outlined */
+[data-style="bauhaus"] .cdcard .cdrow{align-items:center;gap:12px;margin:0 0 11px}
+[data-style="bauhaus"] .cdcard .cdn{
+  order:-1;display:inline-flex;align-items:center;justify-content:center;
+  min-width:36px;height:36px;padding:0 8px;flex:none;
+  border:2px solid var(--ink);color:var(--ink);
+  font:600 .82rem/1 var(--serif);letter-spacing:.04em;text-transform:uppercase;
+  white-space:nowrap}
+[data-style="bauhaus"] .cdcard .cdrow:nth-of-type(1) .cdn{
+  background:var(--bh-red);border-color:var(--bh-red);color:oklch(.98 .01 92)}
+[data-style="bauhaus"] .cdcard .cdrow:nth-of-type(2) .cdn{
+  background:var(--bh-yellow);border-color:var(--bh-yellow);color:oklch(.24 .030 70)}
+[data-style="bauhaus"] .cdcard .cddate{
+  font:500 10px/1 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+
+/* answer-them ledger rows */
+[data-style="bauhaus"] .drow{
+  border-radius:0;border-top:1.5px solid var(--line);padding:9px 0}
+[data-style="bauhaus"] .drow:first-of-type{border-top:0}
+[data-style="bauhaus"] .drow .dname{font:600 var(--t-sm)/1.3 var(--serif)}
+[data-style="bauhaus"] .drow:hover{background:var(--sunken)}
+
+/* habits — and "the floor" as a flat yellow panel */
+[data-style="bauhaus"] .habit2{
+  border-radius:0;border:2px solid var(--line);background:transparent}
+[data-style="bauhaus"] .habit2.done{background:var(--greenbg);border-color:transparent}
+[data-style="bauhaus"] .h2tick{border:2px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] .habit2.done .h2tick{
+  background:var(--bh-green);border-color:var(--bh-green)}
+[data-style="bauhaus"] .h2count{font:600 var(--t-xs)/1 var(--serif);letter-spacing:.06em}
+[data-style="bauhaus"] .h2steps.floor{
+  background:var(--bh-yellow);color:oklch(.26 .030 70);
+  padding:12px 14px;margin:8px 0 0;
+  font-style:italic;font-family:var(--coach)}
+
+/* flat primary bar charts wherever a bar rides the rail or the plan */
+[data-style="bauhaus"] main .bar.pbar{height:10px;background:var(--sunken)}
+[data-style="bauhaus"] main .bar.pbar i{background:var(--bh-blue)}
+[data-style="bauhaus"] .railcard .bar i{background:var(--bh-red)}
+
+/* -------------------------------------------------------- shared chrome */
+[data-style="bauhaus"] .panel{border:2px solid var(--ink);border-radius:0;box-shadow:none}
+[data-style="bauhaus"] .appanel{
+  border:2px solid var(--ink);border-radius:0;box-shadow:none;background:var(--surface)}
+[data-style="bauhaus"] .draftcard{
+  border:2px solid var(--ink);border-radius:0;box-shadow:none}
+[data-style="bauhaus"] .actdrawer{
+  border:2px solid var(--ink);border-radius:0;box-shadow:none}
+[data-style="bauhaus"] .runbar{
+  border:2px solid var(--ink);border-radius:0;box-shadow:none;
+  font-family:var(--serif);letter-spacing:.08em;text-transform:uppercase}
+[data-style="bauhaus"] .fab{background:var(--bh-red);box-shadow:none}
+[data-style="bauhaus"] .ramblefab{
+  border:2px solid var(--ink);border-radius:0;background:var(--surface);
+  color:var(--ink);box-shadow:none;
+  font:600 var(--t-xs)/1 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+[data-style="bauhaus"] .stchip,[data-style="bauhaus"] .aopt{border-radius:0}
+
+/* ------------------------------------------------------------ Plate */
+[data-style="bauhaus"] .platehead .triage{font:600 1.35rem/1.3 var(--serif)}
+[data-style="bauhaus"] .stackrow{
+  border:0;border-radius:0;background:transparent;box-shadow:none;
+  border-bottom:2px solid var(--line)}
+[data-style="bauhaus"] .calmrow{border-radius:0;border-bottom:1.5px solid var(--line)}
+[data-style="bauhaus"] #attention>h2,[data-style="bauhaus"] #all>h2{
+  font:600 var(--t-base)/1.2 var(--serif);letter-spacing:.14em;text-transform:uppercase;
+  border-bottom:3px solid var(--ink);padding-bottom:10px}
+
+/* ------------------------------------------------------------ People */
+[data-style="bauhaus"] .psub{font:600 1.35rem/1.3 var(--serif)}
+[data-style="bauhaus"] .csection>summary.circlehead{
+  font-family:var(--serif);font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;border-top:2px solid var(--ink);padding-top:var(--s3)}
+/* state-coded rings; the faces themselves stay round */
+[data-style="bauhaus"] .shface .pav{
+  box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--line)}
+[data-style="bauhaus"] .shface.sh-ok .pav{
+  box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--bh-green)}
+[data-style="bauhaus"] .shface.sh-owed .pav{
+  box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--bh-blue)}
+[data-style="bauhaus"] .shface.sh-late .pav{
+  box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--bh-yellow)}
+
+/* ------------------------------------------------------------ News */
+[data-style="bauhaus"] .nwsec h3{
+  font-family:var(--serif);font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+[data-style="bauhaus"] .nwsec h3::after{height:3px;background:var(--ink)}
+[data-style="bauhaus"] .nwhead{font:600 1.1rem/1.3 var(--serif);letter-spacing:0}
+
+/* ------------------------------------------------------------ Season */
+[data-style="bauhaus"] .szbar{
+  border-bottom:3px solid var(--ink);padding-bottom:var(--s3)}
+[data-style="bauhaus"] .szwd,[data-style="bauhaus"] .szwecell{
+  border-radius:0;border:1.5px solid var(--line)}
+[data-style="bauhaus"] .szwd{
+  font-family:var(--serif);font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+
+/* ------------------------------------------------------------ Claude */
+[data-style="bauhaus"] #queue>h2,[data-style="bauhaus"] #drafts>h2,
+[data-style="bauhaus"] #connections>h2,[data-style="bauhaus"] #recordings>h2,
+[data-style="bauhaus"] #newfiles>h2{
+  font:600 var(--t-base)/1.2 var(--serif);letter-spacing:.14em;text-transform:uppercase;
+  border-bottom:3px solid var(--ink);padding-bottom:10px}
+
+/* ------------------------------------------------------- narrow screens */
+@media (max-width:1180px){
+  /* single column: no column rule, symmetric bleed */
+  :root[data-style="bauhaus"]{--bh-bleedr:var(--s5)}
+  [data-style="bauhaus"] .todaygrid>.todaymain{border-right:0}
+  [data-style="bauhaus"] .todayrail{border-top:3px solid var(--ink);padding-top:var(--s4)}
+}
+@media (max-width:760px){
+  :root[data-style="bauhaus"]{--bh-bleed:var(--s4);--bh-bleedr:var(--s4)}
+  [data-style="bauhaus"] .hero{padding:var(--s5) var(--s4) var(--s4)}
+  [data-style="bauhaus"] .skinx-prov{
+    position:static;transform:none;display:inline-block;margin:0 0 12px}
+  [data-style="bauhaus"] .hero h1{font-size:1.875rem}
+  [data-style="bauhaus"] .topnav a.on{box-shadow:none}
+  [data-style="bauhaus"] .hzcard .hzkind{margin-bottom:4px}
+}
+
+/* Uppercase chrome is wider than the header budget at 1440 — compact early. */
+@media (max-width:1560px){
+  [data-style="bauhaus"] .hacts .ghostbtn{padding:8px 10px;font-size:.68rem;letter-spacing:.05em}
+  [data-style="bauhaus"] .topnav a{letter-spacing:.04em}
+  [data-style="bauhaus"] .skinx-stamp,[data-style="bauhaus"] .syncstate{font-size:.66rem}
+}
+
+/* ================================================== NON-HOME VIEWS
+   Plate / People / Claude / News / Season brought onto the ledger.
+   On-yellow text is pinned dark (hero pattern) — the field stays
+   yellow in both themes, so no dark twins are needed here. */
+
+/* ------------------------------------------------------------ Plate */
+/* triage head as a color field band, like the hero */
+[data-style="bauhaus"] .platehead{
+  background:var(--bh-yellow);border-bottom:3px solid var(--ink);
+  margin:var(--s5) 0;padding:var(--s5) var(--s5) var(--s4)}
+[data-style="bauhaus"] .platehead .eyebrow{color:oklch(.28 .030 70)}
+[data-style="bauhaus"] .platehead .eyebrow::before{background:oklch(.205 .008 60)}
+[data-style="bauhaus"] .platehead .triage{color:oklch(.205 .008 60)}
+[data-style="bauhaus"] .platehead .coach{
+  color:oklch(.30 .035 70);font-family:var(--coach);font-style:italic}
+
+/* rows as ledger bands, 2px ink rules */
+[data-style="bauhaus"] .stack>details.row{
+  border-bottom:2px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] .row summary{border-radius:0}
+
+/* rank numbers as filled ink tiles */
+[data-style="bauhaus"] .rank{
+  display:inline-flex;align-items:center;justify-content:center;flex:none;
+  min-width:28px;height:28px;background:var(--ink);
+  font:600 .85rem/1 var(--serif);text-align:center}
+[data-style="bauhaus"] .rank,
+[data-style="bauhaus"] .sev-bad .rank,
+[data-style="bauhaus"] .sev-cold .rank{color:var(--paper)}
+
+/* 11px shape mark per severity before the name:
+   ▲ vermilion = bad/soon · ● yellow = waiting/quiet · ■ blue = neutral ·
+   ■ green = ticking over */
+[data-style="bauhaus"] #attention .row .rowname::before,
+[data-style="bauhaus"] #all .row .rowname::before{
+  content:"";display:inline-block;width:11px;height:11px;flex:none;
+  background:var(--bh-blue);margin-right:9px;vertical-align:-1px}
+[data-style="bauhaus"] #all .row.calm .rowname::before{background:var(--bh-green)}
+[data-style="bauhaus"] #attention .row.sev-wait .rowname::before,
+[data-style="bauhaus"] #attention .row.sev-cold .rowname::before{
+  background:var(--bh-yellow);border-radius:50%}
+[data-style="bauhaus"] #attention .row.sev-bad .rowname::before,
+[data-style="bauhaus"] #attention .row.sev-soon .rowname::before{
+  width:0;height:11px;background:none;border-radius:0;
+  border-left:6px solid transparent;border-right:6px solid transparent;
+  border-bottom:11px solid var(--bh-red)}
+
+/* ------------------------------------------------------------ People */
+/* circle heads carry the 2px rules (set above); add the round people mark */
+[data-style="bauhaus"] .csection>summary.circlehead::before{
+  content:"";display:inline-block;width:11px;height:11px;flex:none;
+  border-radius:50%;background:var(--bh-red);align-self:center}
+[data-style="bauhaus"] .shelf{border-bottom:2px solid var(--line)}
+[data-style="bauhaus"] .pledger{
+  font-family:var(--coach);font-style:italic;font-size:var(--t-base)}
+
+/* ------------------------------------------------------------ Claude */
+[data-style="bauhaus"] .jobrow2 .jobbtn{
+  border:2px solid var(--ink);border-radius:0;background:transparent;
+  font:600 var(--t-sm)/1.3 var(--serif);letter-spacing:.1em;
+  text-transform:uppercase}
+[data-style="bauhaus"] .jobrow2 .jobbtn span{
+  font:400 var(--t-xs)/1.4 var(--sans);letter-spacing:0;text-transform:none}
+[data-style="bauhaus"] .jobrow2 .jobbtn:hover{border-color:var(--bh-blue)}
+/* the one to press sits on the yellow field */
+[data-style="bauhaus"] .jobrow2 .jobbtn.jobqueue{
+  background:var(--bh-yellow);color:oklch(.205 .008 60)}
+[data-style="bauhaus"] .jobrow2 .jobbtn.jobqueue span{color:oklch(.32 .030 70)}
+/* primary action: blue */
+[data-style="bauhaus"] .mini#act-run{
+  background:var(--bh-blue);border-color:var(--bh-blue);color:oklch(.98 .01 92)}
+[data-style="bauhaus"] .mini#act-run:hover{
+  background:var(--bh-blue);color:oklch(.98 .01 92);filter:brightness(1.08)}
+
+/* drafts as bands with 2px rules; TO SEND head as a solid ink label */
+[data-style="bauhaus"] .draft{
+  background:transparent;border:0;border-radius:0;
+  border-top:2px solid var(--ink);padding:14px 2px}
+[data-style="bauhaus"] .draft .acts{border-top:1.5px solid var(--line)}
+[data-style="bauhaus"] .draftsub{
+  display:inline-block;background:var(--ink);color:var(--paper);
+  padding:5px 10px;font:600 var(--t-xs)/1.4 var(--serif);
+  letter-spacing:.16em;text-transform:uppercase}
+
+/* ------------------------------------------------------------ News */
+/* sections as bands, 3px ink rules between */
+[data-style="bauhaus"] .newsmain .nwsec{border-top:3px solid var(--ink);padding-top:16px}
+[data-style="bauhaus"] .newsmain .nwsec:first-child{border-top:0;padding-top:0}
+/* the one accent: the front-page head on a yellow label block */
+[data-style="bauhaus"] .newsmain .nwsec:first-child h3{
+  display:inline-block;background:var(--bh-yellow);color:oklch(.24 .030 70);
+  padding:6px 12px;margin-bottom:6px}
+[data-style="bauhaus"] .newsmain .nwsec:first-child h3::after{display:none}
+/* outlet stamps: the global .meta rule uppercases them; track the buttons too */
+[data-style="bauhaus"] .nwacts button{
+  font-family:var(--serif);letter-spacing:.06em;text-transform:uppercase}
+[data-style="bauhaus"] .newsrail .nrbox{border-radius:0}
+
+/* ------------------------------------------------------------ Season */
+/* the tray as the flat yellow floor — no border, pinned dark text */
+[data-style="bauhaus"] .sztray{
+  border:0;border-radius:0;background:var(--bh-yellow);padding:16px 18px}
+[data-style="bauhaus"] .sztray .eyebrow{color:oklch(.28 .030 70)}
+[data-style="bauhaus"] .sztray .eyebrow::before{background:oklch(.205 .008 60)}
+[data-style="bauhaus"] .sztray .meta{color:oklch(.32 .030 70)}
+[data-style="bauhaus"] .szglabel{
+  font:600 10.5px/1.6 var(--serif);letter-spacing:.14em;
+  text-transform:uppercase;color:oklch(.32 .030 70)}
+[data-style="bauhaus"] .sztray .szchip{
+  border:2px solid oklch(.205 .008 60);border-radius:0;
+  background:oklch(.975 .012 92);color:oklch(.205 .008 60)}
+[data-style="bauhaus"] .sztray .szchip .szwho,
+[data-style="bauhaus"] .sztray .szchip .szspan,
+[data-style="bauhaus"] .sztray .szchip .szrep{color:oklch(.46 .012 60)}
+
+/* day grid sharp, 1.5px hairlines; planned items as bordered blocks */
+[data-style="bauhaus"] .szday{border:1.5px solid var(--line);border-radius:0}
+[data-style="bauhaus"] .szdow{
+  font:600 11px/1.4 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+[data-style="bauhaus"] .szev{
+  border:1.5px solid var(--ink);padding:1px 5px;margin-top:3px;opacity:1}
+[data-style="bauhaus"] .szev.szmore{border:0;padding-left:0}
+
+/* Same blanket as manual: no squiggle survives on any view. */
+html[data-style="bauhaus"] .eyebrow::after,html[data-style="bauhaus"] .area::after,
+html[data-style="bauhaus"] h3::after,html[data-style="bauhaus"] .newsv h2::after,
+html[data-style="bauhaus"] .wav{display:none;
+  -webkit-mask:none;mask:none;background:none;height:0;content:none}
+
+/* ================================================== ROOMS + MAP
+   rooms.html and map.html on the ledger. Both pages load their own CSS
+   AFTER the skin, so every rule carries the [data-style] prefix to win.
+   Untouched on purpose: .barart (the mascot), the map canvas, .dot /
+   .gitdot / .cdot / .tl i and every face — dots and faces stay round. */
+
+/* ---- rooms: the head strip is this page's one yellow field.
+   :has(>.barart) picks the rooms strip; the map toolbar holds .barkey.
+   Background + type only — the strip keeps its height (the ink band
+   underneath is a box-shadow, which adds no layout height). */
+[data-style="bauhaus"] .bar:has(>.barart){
+  background:var(--bh-yellow);
+  box-shadow:0 3px 0 oklch(.205 .008 60)}
+[data-style="bauhaus"] .bar:has(>.barart) b{
+  font:600 20px/1.2 var(--serif);letter-spacing:.01em;color:oklch(.205 .008 60)}
+[data-style="bauhaus"] .bar:has(>.barart) .n{
+  font:600 10.5px/1.6 var(--serif);letter-spacing:.14em;text-transform:uppercase;
+  color:oklch(.32 .030 70)}
+
+/* wings: 3px ink rules instead of boxes; Jost heads with a square mark */
+[data-style="bauhaus"] .wing{
+  border:0;border-radius:0;background:transparent;overflow:visible;
+  border-top:3px solid var(--ink);margin:0 0 18px}
+[data-style="bauhaus"] .wing>header{padding:13px 0}
+[data-style="bauhaus"] .wing h2{font:600 17px/1.2 var(--serif);letter-spacing:.01em}
+[data-style="bauhaus"] .wing h2::before{
+  content:"";display:inline-block;width:10px;height:10px;background:var(--ink);
+  margin-right:9px}
+[data-style="bauhaus"] .whealth{
+  font:500 10.5px/1.6 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+[data-style="bauhaus"] .whealth.worry::before{
+  content:"";display:inline-block;width:0;height:0;margin-right:6px;
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-bottom:9px solid var(--bh-red)}
+[data-style="bauhaus"] .waudit{
+  border:2px solid var(--line);border-radius:0;background:transparent;
+  font:600 10.5px/1 var(--serif);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim)}
+[data-style="bauhaus"] .waudit:hover{border-color:var(--ink);color:var(--ink)}
+[data-style="bauhaus"] .roomgrid{padding:0 0 16px}
+
+/* room cards: sharp 1.5px ink boxes; the dots on them stay round */
+[data-style="bauhaus"] .room{
+  border:1.5px solid var(--ink);border-radius:0;background:var(--surface)}
+[data-style="bauhaus"] .room:hover{border-color:var(--ink);background:var(--sunken)}
+[data-style="bauhaus"] .room h3{font-family:var(--serif);font-weight:600}
+
+/* goal chips as bordered blocks */
+[data-style="bauhaus"] .gchip{
+  border:2px solid var(--ink);border-radius:0;background:var(--surface);
+  color:var(--ink);font:600 10.5px/1.4 var(--serif);letter-spacing:.08em;
+  text-transform:uppercase}
+[data-style="bauhaus"] .gchip:hover{background:var(--sunken);color:var(--ink)}
+[data-style="bauhaus"] .gchip.bad{color:var(--bad);border-color:var(--bad)}
+
+/* inside a room: the name in Jost, zones as 2px-ink bands, square marks */
+[data-style="bauhaus"] .rhead .wingtag{
+  font:600 10.5px/1 var(--serif);letter-spacing:.16em;color:var(--dim)}
+[data-style="bauhaus"] .rhead h1{font:600 27px/1.15 var(--serif);letter-spacing:0}
+[data-style="bauhaus"] .zone{
+  background:transparent;border:0;border-radius:0;box-shadow:none;
+  border-top:2px solid var(--ink);padding:14px 0 6px;margin:0 0 16px}
+[data-style="bauhaus"] .zone h2{
+  font:600 11px/1.2 var(--serif);letter-spacing:.18em;color:var(--dim)}
+[data-style="bauhaus"] .zone>h2::before{
+  content:"";display:inline-block;width:10px;height:10px;background:var(--ink);
+  margin-right:9px;vertical-align:-1px}
+/* people are the round mark */
+[data-style="bauhaus"] .zone.z-people>h2::before{
+  border-radius:50%;background:var(--bh-red)}
+/* the one accent: the first zone's label on a solid ink block */
+[data-style="bauhaus"] .zone.z-next{border-top:0;padding-top:0}
+[data-style="bauhaus"] .zone.z-next>h2{
+  background:var(--ink);color:var(--paper);padding:8px 10px}
+[data-style="bauhaus"] .zone.z-next>h2::before{background:var(--bh-yellow)}
+[data-style="bauhaus"] .zone.z-next>h2::after{color:var(--paper)}
+
+/* square 2px checkboxes; ticked markdown boxes go green */
+[data-style="bauhaus"] .ptick{border:2px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] .mdbox{border:1.5px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] .mdbox.on{background:var(--bh-green);border-color:var(--bh-green)}
+
+/* micro-meta in tracked Jost caps */
+[data-style="bauhaus"] .tws,[data-style="bauhaus"] .docmeta,
+[data-style="bauhaus"] .cd,[data-style="bauhaus"] .gprog,
+[data-style="bauhaus"] .cwhen,[data-style="bauhaus"] .chands{
+  font-family:var(--serif);font-weight:500;letter-spacing:.08em;
+  text-transform:uppercase}
+
+/* docs: links go primary-blue; the opened doc is a 2px ink box */
+[data-style="bauhaus"] .doclink:hover{color:var(--cold)}
+[data-style="bauhaus"] .docmore:hover,
+[data-style="bauhaus"] .docreveal:hover{color:var(--cold)}
+[data-style="bauhaus"] .docbody{
+  border:2px solid var(--ink);border-radius:0;background:var(--surface)}
+[data-style="bauhaus"] .docbody pre{border-radius:0}
+
+/* forms and rows: square, 2px rules; the go button wears the blue */
+[data-style="bauhaus"] .addrow input,[data-style="bauhaus"] .addrow button,
+[data-style="bauhaus"] .addrow select,[data-style="bauhaus"] .askrow textarea,
+[data-style="bauhaus"] .askrow select,[data-style="bauhaus"] .askrow button,
+[data-style="bauhaus"] .noterow button,[data-style="bauhaus"] .tract button,
+[data-style="bauhaus"] #notes{border:2px solid var(--line);border-radius:0}
+[data-style="bauhaus"] .addrow input:focus,
+[data-style="bauhaus"] #search:focus{
+  outline:2px solid var(--bh-blue);outline-offset:1px;border-color:var(--line)}
+[data-style="bauhaus"] button.go,
+[data-style="bauhaus"] .tract button.go,
+[data-style="bauhaus"] .addrow button.go{
+  background:var(--bh-blue);border-color:var(--bh-blue);color:oklch(.98 .01 92);
+  font:600 12px/1.3 var(--serif);letter-spacing:.08em;text-transform:uppercase;
+  border-radius:0}
+[data-style="bauhaus"] .hoff{
+  border:2px solid var(--ink);border-left:3px solid var(--bh-blue);
+  border-radius:0;background:var(--surface)}
+[data-style="bauhaus"] .hoffopen{
+  border:2px solid var(--ink);border-radius:0;background:transparent;
+  font:600 11px/1 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+[data-style="bauhaus"] .pchip{
+  border:1.5px solid var(--ink);border-radius:0;color:var(--ink);
+  font-family:var(--serif);font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase}
+[data-style="bauhaus"] .pchip:hover{border-color:var(--cold);color:var(--cold)}
+[data-style="bauhaus"] #search{
+  border:2px solid var(--line);border-radius:0;background:var(--surface)}
+[data-style="bauhaus"] .toast,[data-style="bauhaus"] .mtoast{
+  border-radius:0;font-family:var(--serif);letter-spacing:.06em;
+  text-transform:uppercase}
+[data-style="bauhaus"] .agentbar,[data-style="bauhaus"] .mapbar{
+  border:2px solid var(--ink);border-radius:0;box-shadow:none}
+[data-style="bauhaus"] .agentbar button,[data-style="bauhaus"] .mapbar button{
+  border-radius:0;font-family:var(--serif);letter-spacing:.08em;
+  text-transform:uppercase}
+
+/* ---- map chrome (the canvas itself is never touched) */
+[data-style="bauhaus"] .bar:has(>.barkey){border-bottom:3px solid var(--ink)}
+[data-style="bauhaus"] .bartitle b{font:600 15px/1.2 var(--serif)}
+[data-style="bauhaus"] a.back,[data-style="bauhaus"] button.tool{
+  border:2px solid var(--line);border-radius:0;color:var(--ink);
+  font:600 11px/1.3 var(--serif);letter-spacing:.08em;text-transform:uppercase}
+[data-style="bauhaus"] button.tool:hover{border-color:var(--ink)}
+[data-style="bauhaus"] .zgrp .tool{font-size:15px;letter-spacing:0}
+[data-style="bauhaus"] .zgrp .tool:first-child,
+[data-style="bauhaus"] .zgrp .tool:last-child{border-radius:0}
+[data-style="bauhaus"] .modes{
+  border:2px solid var(--ink);border-radius:0;background:var(--surface);
+  padding:0;gap:0}
+[data-style="bauhaus"] .modes button{
+  border-radius:0;font:600 11.5px/1.3 var(--serif);letter-spacing:.06em;
+  text-transform:uppercase;padding:7px 12px}
+[data-style="bauhaus"] .modes button.on{background:var(--ink);color:var(--paper)}
+
+/* the key/filter: squared buttons, the state color as an 8px square swatch */
+[data-style="bauhaus"] .keylab{font:600 10px/1 var(--serif);letter-spacing:.16em}
+[data-style="bauhaus"] .lg{
+  border:1.5px solid transparent;border-radius:0;
+  font:500 11px/1.4 var(--serif);letter-spacing:.05em;text-transform:uppercase}
+[data-style="bauhaus"] .lg:hover{border-color:var(--ink);background:var(--surface)}
+[data-style="bauhaus"] .lg i{width:8px;height:8px;border-radius:0}
+[data-style="bauhaus"] .lg .c{font:600 10.5px/1 var(--serif)}
+[data-style="bauhaus"] .lgclear{
+  font-family:var(--serif);font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase}
+[data-style="bauhaus"] .lgclear.on{border-radius:0}
+
+/* detail panel: the 2px ink box comes from the shared .panel rule above;
+   here the Jost head plus square-marked spec rows */
+[data-style="bauhaus"] .panel h2{font:600 16px/1.25 var(--serif)}
+[data-style="bauhaus"] .panel .area{
+  font:600 10.5px/1.4 var(--serif);letter-spacing:.16em}
+[data-style="bauhaus"] .panel dt{
+  font:500 11px/1.7 var(--serif);letter-spacing:.08em;text-transform:uppercase}
+[data-style="bauhaus"] .panel dt::before{
+  content:"";display:inline-block;width:6px;height:6px;background:var(--ink);
+  margin-right:7px;vertical-align:1px}
+[data-style="bauhaus"] .pprog,[data-style="bauhaus"] .pprog i{border-radius:0}
+
+/* floating map furniture, squared */
+[data-style="bauhaus"] .keycard{
+  border:2px solid var(--ink);border-radius:0;box-shadow:none}
+[data-style="bauhaus"] .keycard summary{
+  font-family:var(--serif);letter-spacing:.04em}
+[data-style="bauhaus"] .mdlg{border:2px solid var(--ink);border-radius:0;box-shadow:none}
+[data-style="bauhaus"] .md-title{font:600 16px/1.3 var(--serif)}
+[data-style="bauhaus"] .md-field label{
+  font:600 10.5px/1 var(--serif);letter-spacing:.14em}
+[data-style="bauhaus"] .md-field input{border:2px solid var(--line);border-radius:0}
+[data-style="bauhaus"] .md-field input:focus{
+  outline:2px solid var(--bh-blue);outline-offset:1px;border-color:var(--line)}
+[data-style="bauhaus"] .md-go{
+  border-radius:0;font:600 12px/1.3 var(--serif);letter-spacing:.08em;
+  text-transform:uppercase}
+[data-style="bauhaus"] .focuschip{
+  border-radius:0;box-shadow:none;
+  font:600 11px/1.3 var(--serif);letter-spacing:.1em;text-transform:uppercase}
+[data-style="bauhaus"] .scrub{border:2px solid var(--ink);border-radius:0}
+[data-style="bauhaus"] .sc-lab{font-family:var(--serif);letter-spacing:.14em}
+
+/* the ask drawer's context chips (shared chrome on both pages) */
+[data-style="bauhaus"] .ctxchip{
+  border:1.5px solid var(--line2);border-radius:0;
+  font:600 11px/1.4 var(--serif);letter-spacing:.05em;text-transform:uppercase}
+[data-style="bauhaus"] .ctxchip.on{
+  background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* phones: uppercase Jost runs wider — pull the tracking in, keep one line */
+@media (max-width:720px){
+  [data-style="bauhaus"] .modes button{
+    letter-spacing:.02em;font-size:11px;padding:7px 9px}
+  [data-style="bauhaus"] .lg{letter-spacing:.02em}
+  [data-style="bauhaus"] a.back,[data-style="bauhaus"] button.tool{
+    letter-spacing:.03em}
+}
+
+/* ================== her review pass, 2026-08-28 ==================== */
+
+/* The countdown tiles must stay TILES — at wide viewports the flex row
+   let them grow into full-width slabs. */
+[data-style="bauhaus"] .cdrow{display:flex;align-items:center;flex-wrap:nowrap;gap:10px}
+[data-style="bauhaus"] .cdrow .cdn{flex:0 0 auto;width:max-content;min-width:36px;
+  height:32px;padding:0 10px;display:inline-grid;place-items:center}
+[data-style="bauhaus"] .cdrow .cdlab{flex:1 1 auto;min-width:0}
+[data-style="bauhaus"] .cdrow .cddate{flex:0 0 auto}
+
+/* The hero field carried too much empty yellow: tighten its vertical
+   rhythm and let content set the height. */
+[data-style="bauhaus"] .hero{min-height:0;padding-top:20px;padding-bottom:18px}
+[data-style="bauhaus"] .hero h1{margin:6px 0 10px}
+[data-style="bauhaus"] .hero .hero-meta{margin:8px 0}
+[data-style="bauhaus"] .hero .bar{margin:10px 0}
+
+/* ============== the briefing at poster pitch, 2026-08-28 ===============
+   Deepens the News block above: primary squares on the topic heads, the
+   lead story at poster scale, blue text-link actions, the explainer on
+   the yellow field, yellow-flagged glossary terms. */
+
+/* head: Jost masthead, tracked caps dateline */
+[data-style="bauhaus"] .nwtop h2{font:600 1.9rem/1.05 var(--serif);
+  letter-spacing:0}
+[data-style="bauhaus"] .nwdate{font:500 11px/1.8 var(--serif);
+  font-style:normal;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim)}
+
+/* topic heads: an 11px primary square each, cycling red / yellow / blue
+   (the flex gap spaces it; the inline yellow front-page block needs its
+   own margin) */
+[data-style="bauhaus"] .newsmain .nwsec h3::before{content:"";
+  display:inline-block;width:11px;height:11px;flex:none;align-self:center;
+  background:var(--bh-red);vertical-align:-1px}
+[data-style="bauhaus"] .newsmain .nwsec:nth-of-type(3n+2) h3::before{
+  background:var(--bh-yellow)}
+[data-style="bauhaus"] .newsmain .nwsec:nth-of-type(3n) h3::before{
+  background:var(--bh-blue)}
+[data-style="bauhaus"] .newsmain .nwsec:first-child h3::before{
+  margin-right:10px}
+
+/* the lead story at poster scale; the reading measure is untouched */
+[data-style="bauhaus"] .newsmain .nwsec:first-child .nwitem:first-of-type .nwhead{
+  font:600 1.6rem/1.15 var(--serif);letter-spacing:-.01em}
+
+/* actions: uppercase tracked text links in the primary blue */
+[data-style="bauhaus"] .nwread{font-family:var(--serif);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--bh-blue);
+  text-decoration:none;padding:4px 0}
+[data-style="bauhaus"] .nwread:hover{color:var(--bh-red);
+  text-decoration:underline;text-underline-offset:3px}
+
+/* the explainer on the yellow field — text pinned dark in both themes,
+   like the hero */
+[data-style="bauhaus"] .nwexplain{background:var(--bh-yellow);border:0;
+  border-radius:0;padding:14px 16px;color:oklch(.26 .030 70)}
+[data-style="bauhaus"] .nwexplain p{color:oklch(.26 .030 70)}
+[data-style="bauhaus"] .nwexplain .eyebrow{color:oklch(.28 .030 70)}
+[data-style="bauhaus"] .nwexplain .eyebrow::before{
+  background:oklch(.205 .008 60)}
+[data-style="bauhaus"] .nwexpact{color:oklch(.32 .030 70)}
+[data-style="bauhaus"] .nwexplain .nwread{color:oklch(.24 .030 70)}
+[data-style="bauhaus"] .nwexplain .nwread:hover{color:oklch(.205 .008 60)}
+
+/* glossary terms flagged with small yellow squares; the rail chips square */
+[data-style="bauhaus"] .nwgloss dt{font:600 var(--t-sm)/1.4 var(--serif);
+  letter-spacing:.04em}
+[data-style="bauhaus"] .nwgloss dt::before{content:"";display:inline-block;
+  width:8px;height:8px;background:var(--bh-yellow);margin-right:8px;
+  vertical-align:0}
+[data-style="bauhaus"] .nwchip,[data-style="bauhaus"] #nwaddin{
+  border-radius:0;border:1.5px solid var(--line);background:transparent}
+
+/* More poster in the plan and the week: the day's three sections carry
+   ink label blocks with a primary square each; the week strip gets its
+   grid discipline and today's column the yellow ground. */
+[data-style="bauhaus"] .todaydoc h2{
+  display:inline-block;padding:6px 11px;background:var(--ink);color:var(--paper);
+  font:600 .68rem/1 var(--serif);letter-spacing:.16em;text-transform:uppercase}
+[data-style="bauhaus"] .todaydoc h2::before{content:"";display:inline-block;
+  width:8px;height:8px;margin-right:8px;background:var(--bh-yellow)}
+[data-style="bauhaus"] .todaydoc h2:nth-of-type(2)::before{background:oklch(.495 .135 32)}
+[data-style="bauhaus"] .todaydoc h2:nth-of-type(3)::before{background:oklch(.430 .105 255)}
+[data-style="bauhaus"] .weekstrip .wkday,[data-style="bauhaus"] .wkcol{border-radius:0}
+[data-style="bauhaus"] .weekstrip summary{font:600 .7rem/1 var(--serif);
+  letter-spacing:.14em;text-transform:uppercase}
+[data-style="bauhaus"] .habits li,[data-style="bauhaus"] .habitpill{border-radius:0}

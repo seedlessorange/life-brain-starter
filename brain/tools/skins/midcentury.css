@@ -1,0 +1,724 @@
+/* MID-CENTURY STUDY — full skin. Baked only when data-style="midcentury".
+   Emitted after the token/theme blocks; equal specificity wins by order.
+   Spec: design/skins/SPECS.md §3; ground truth: the v2 mockup. */
+
+/* ---------------------------------------------------------- tokens */
+:root[data-style="midcentury"]{
+  --paper:oklch(96.4% .022 90);
+  --surface:oklch(98.8% .01 90);
+  --sunken:oklch(93.6% .033 90);
+  --ink:oklch(26.5% .02 62);
+  --dim:oklch(50% .022 62);
+  --faint:oklch(62% .02 62);
+  --line:color-mix(in oklab,var(--ink) 12%,var(--paper));
+  --line2:color-mix(in oklab,var(--ink) 17%,var(--paper));
+  --green:oklch(51.5% .072 125);
+  --greenbg:color-mix(in oklab,var(--green) 14%,var(--paper));
+  --terra:oklch(57.5% .12 40);
+  --bad:oklch(48% .12 30);
+  --badbg:color-mix(in oklab,var(--bad) 13%,var(--paper));
+  --wait:oklch(62% .11 80);
+  --waitbg:color-mix(in oklab,var(--wait) 15%,var(--paper));
+  --cold:oklch(56% .052 245);
+  --coldbg:color-mix(in oklab,var(--cold) 13%,var(--paper));
+  --ok:oklch(51.5% .072 125);
+  --okt:color-mix(in oklab,var(--ok) 14%,var(--paper));
+  --card:var(--paper);
+  --mc-teal:oklch(50% .065 200);
+  --mc-mustard:oklch(76% .125 80);
+  --mc-slate:oklch(56% .052 245);
+  --mc-olive:oklch(51.5% .072 125);
+  --shadow:none;
+  --shadow-lift:none;
+  --r-xl:20px;--r-lg:18px;--r-card:0px;--r-md:18px;--r-btn:22px;--r-sm:14px;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Karla',-apple-system,sans-serif;
+  --coach:'Newsreader',Georgia,serif;
+}
+:root[data-style="midcentury"][data-theme="dark"]{
+  --paper:oklch(21.5% .018 78);
+  --surface:oklch(25% .02 80);
+  --sunken:oklch(18.5% .016 78);
+  --ink:oklch(93% .02 85);
+  --dim:oklch(70% .022 82);
+  --faint:oklch(56.5% .02 80);
+  --green:oklch(70% .085 125);--ok:oklch(70% .085 125);
+  --terra:oklch(72% .1 45);
+  --bad:oklch(69% .11 30);
+  --wait:oklch(76% .1 82);
+  --cold:oklch(71.5% .05 245);
+  --mc-teal:oklch(70% .07 200);
+  --mc-mustard:oklch(78% .11 82);
+  --mc-slate:oklch(70% .05 245);
+  --mc-olive:oklch(70% .085 125);
+}
+@media (prefers-color-scheme:dark){
+  :root[data-style="midcentury"]:not([data-theme="light"]){
+    --paper:oklch(21.5% .018 78);
+    --surface:oklch(25% .02 80);
+    --sunken:oklch(18.5% .016 78);
+    --ink:oklch(93% .02 85);
+    --dim:oklch(70% .022 82);
+    --faint:oklch(56.5% .02 80);
+    --green:oklch(70% .085 125);--ok:oklch(70% .085 125);
+    --terra:oklch(72% .1 45);
+    --bad:oklch(69% .11 30);
+    --wait:oklch(76% .1 82);
+    --cold:oklch(71.5% .05 245);
+    --mc-teal:oklch(70% .07 200);
+    --mc-mustard:oklch(78% .11 82);
+    --mc-slate:oklch(70% .05 245);
+    --mc-olive:oklch(70% .085 125);
+  }
+}
+
+/* ---------------------------------------------------------- type */
+[data-style="midcentury"] body{font-family:var(--sans)}
+/* Instrument Serif ships 400 only — every serif display sits at 400, big, tight. */
+[data-style="midcentury"] .hero h1{
+  font:400 clamp(4.2rem,6.8vw,6.5rem)/.92 var(--serif);
+  letter-spacing:-.025em;max-width:14ch}
+[data-style="midcentury"] .brand{font:400 1.45rem/1 var(--serif);letter-spacing:0}
+[data-style="midcentury"] .brand b{font-weight:400}
+[data-style="midcentury"] .doc:not(.todaydoc) h2{font:400 1.6rem/1.2 var(--serif);letter-spacing:0}
+[data-style="midcentury"] .doc h1,
+[data-style="midcentury"] .todaywrap .doc h1{font:400 1.9rem/1.2 var(--serif);letter-spacing:-.01em}
+[data-style="midcentury"] #queue>h2,[data-style="midcentury"] #drafts>h2,
+[data-style="midcentury"] #connections>h2,[data-style="midcentury"] #recordings>h2,
+[data-style="midcentury"] #newfiles>h2,[data-style="midcentury"] #people>h2,
+[data-style="midcentury"] #attention>h2,[data-style="midcentury"] #all>h2{
+  font:400 1.9rem/1.15 var(--serif);letter-spacing:0}
+[data-style="midcentury"] .platehead .triage,
+[data-style="midcentury"] .psub{font:400 1.7rem/1.3 var(--serif);letter-spacing:0}
+[data-style="midcentury"] .money .mo-total{font:400 2rem/1 var(--serif)}
+[data-style="midcentury"] .rowname{font:400 1.25rem/1.2 var(--serif)}
+
+/* eyebrows: tiny tracked Karla against the huge serif — the scale contrast IS the style */
+[data-style="midcentury"] .eyebrow,[data-style="midcentury"] .area{
+  font:700 .68rem/1.5 var(--sans);letter-spacing:.2em;color:var(--dim)}
+[data-style="midcentury"] .dupcard .eyebrow{color:var(--wait)}
+[data-style="midcentury"] .todaywrap .doc h2,
+[data-style="midcentury"] .weekstrip>summary,
+[data-style="midcentury"] .aplabel{letter-spacing:.2em;color:var(--dim)}
+
+/* the coaching voice, at scale */
+[data-style="midcentury"] .coach{font-size:1.12em;line-height:1.55}
+[data-style="midcentury"] .hero-why{font:italic 400 1.45rem/1.45 var(--coach)}
+[data-style="midcentury"] .hero-matters,[data-style="midcentury"] .matters{
+  font:italic 400 1rem/1.5 var(--coach)}
+[data-style="midcentury"] .todaydoc>p{font:italic 400 1.02rem/1.65 var(--coach);
+  color:var(--dim);max-width:56ch}
+[data-style="midcentury"] .todaydoc>h1+p{font-size:1.4rem;line-height:1.5;color:var(--ink)}
+[data-style="midcentury"] .updnudge>span{font:italic 400 1.1rem/1.5 var(--coach)}
+
+/* ---------------------------------------------------------- links */
+[data-style="midcentury"] main a{color:var(--mc-teal)}
+[data-style="midcentury"] main a.plink,[data-style="midcentury"] main a.drow{color:inherit}
+[data-style="midcentury"] main p a:not(.plink),
+[data-style="midcentury"] main li a:not(.plink){
+  text-decoration:none;
+  border-bottom:1px solid color-mix(in oklab,currentColor 50%,transparent)}
+[data-style="midcentury"] .plink:hover{color:var(--mc-teal);text-decoration-color:var(--mc-teal)}
+
+/* ---------------------------------------------------------- header */
+[data-style="midcentury"] .top{border-bottom:1px solid var(--line2)}
+[data-style="midcentury"] .topnav a.on{background:transparent;color:var(--ink);
+  font-weight:700;text-decoration:underline;text-underline-offset:7px;
+  text-decoration-thickness:2px;text-decoration-color:var(--terra)}
+[data-style="midcentury"] .askopen{background:var(--ink);color:var(--paper);
+  border:1px solid var(--ink);border-radius:24px;padding:8px 15px}
+[data-style="midcentury"] .askopen:hover{border-color:var(--ink);filter:brightness(1.1)}
+[data-style="midcentury"] .ghostbtn{border-radius:22px;padding:7px 13px}
+
+/* ------------------------------------------------ cards flatten to rules */
+/* No boxes: the big-card set loses borders and fills; hierarchy is rules —
+   2px ink for majors, hairline for the rest. No box-shadow anywhere. */
+[data-style="midcentury"] .railcard,[data-style="midcentury"] .panel,
+[data-style="midcentury"] .todaywrap,[data-style="midcentury"] .hzcard,
+[data-style="midcentury"] .offercard,[data-style="midcentury"] .bscard,
+[data-style="midcentury"] .qcard,[data-style="midcentury"] .daycard,
+[data-style="midcentury"] .forecast,[data-style="midcentury"] .draftcard,
+[data-style="midcentury"] .stackrow{
+  background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-style="midcentury"] .todaywrap{
+  border-top:2px solid var(--ink);padding:var(--s6) 0 var(--s5)}
+[data-style="midcentury"] .hero{border-top:2px solid var(--ink);
+  padding-top:var(--s6);margin-top:var(--s5)}
+[data-style="midcentury"] .qwins,[data-style="midcentury"] .hzcard,
+[data-style="midcentury"] .offercard,[data-style="midcentury"] .bscard,
+[data-style="midcentury"] .qcard{
+  border-top:1px solid var(--line2);padding:var(--s5) 0 var(--s4);margin-top:var(--s5)}
+[data-style="midcentury"] .draftcard,[data-style="midcentury"] .stackrow{
+  border-top:1px solid var(--line2);padding:var(--s4) 0}
+/* floating chrome keeps a paper ground and one ink hairline (popovers, drawers) */
+[data-style="midcentury"] .appanel,[data-style="midcentury"] .actdrawer{
+  background:var(--surface);border:1px solid var(--ink);border-radius:0;box-shadow:none}
+[data-style="midcentury"] .dupcard{background:var(--waitbg);border:0;border-radius:0}
+[data-style="midcentury"] .runbar{border:1px solid var(--ink);border-radius:24px;box-shadow:none}
+[data-style="midcentury"] .fab{background:var(--terra);color:var(--paper);box-shadow:none}
+[data-style="midcentury"] .ramblefab{border:1px solid var(--ink);box-shadow:none}
+[data-style="midcentury"] .evwrap{background:var(--sunken);border:0;border-radius:0;
+  padding:var(--s4)}
+
+/* ---------------------------------------------------------- hero */
+[data-style="midcentury"] .skinx-prov{display:block;margin:2px 0 var(--s3);
+  font:500 .72rem/1.6 var(--sans);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="midcentury"] .hero .bar{height:5px;border-radius:0;max-width:340px;
+  background:color-mix(in oklab,var(--ink) 13%,var(--paper))}
+[data-style="midcentury"] .hero .bar i{border-radius:0;background:var(--mc-mustard)}
+[data-style="midcentury"] .ballpill{border-radius:20px;padding:5px 13px}
+[data-style="midcentury"] .ballpill.mine{
+  background:color-mix(in oklab,var(--terra) 15%,var(--paper));
+  color:color-mix(in oklab,var(--terra) 80%,var(--ink))}
+[data-style="midcentury"] .hero-next span{letter-spacing:.2em;color:var(--terra)}
+
+/* weather: a serif sentence with tracked-caps sub-stats under it */
+[data-style="midcentury"] .wxline{font:400 1.25rem/1.5 var(--serif);
+  color:var(--ink);max-width:44ch}
+[data-style="midcentury"] .skinx-wx{display:block;margin-top:5px;
+  font:500 .7rem/1.9 var(--sans);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint)}
+
+/* ---------------------------------------------------------- the plan */
+[data-style="midcentury"] .skinx-planstamp{display:inline-block;
+  font:500 .72rem/1.6 var(--sans);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint)}
+[data-style="midcentury"] .todaydoc>ul.tasks>li{
+  border-top:1px solid var(--line2);padding:13px 0;margin:0}
+[data-style="midcentury"] .todaydoc>ul.tasks{margin-bottom:var(--s4)}
+[data-style="midcentury"] .todaydoc .ttext{font-size:1.05rem;line-height:1.5}
+[data-style="midcentury"] .weekstrip{border-top:1px solid var(--line2)}
+
+/* round checkboxes, ink-rimmed */
+[data-style="midcentury"] .box{width:21px;height:21px;min-width:21px;
+  border:1.5px solid var(--ink);border-radius:50%;line-height:18px}
+[data-style="midcentury"] button.box:hover{border-color:var(--green)}
+[data-style="midcentury"] ul.tasks li.parked .box{border-style:dashed}
+
+/* horizons keep the mid-century primaries */
+[data-style="midcentury"] .hzkind{letter-spacing:.16em}
+[data-style="midcentury"] .hz-now .hzkind{color:var(--terra)}
+[data-style="midcentury"] .hz-push .hzkind{color:var(--wait)}
+[data-style="midcentury"] .hz-slow .hzkind{color:var(--mc-olive)}
+
+/* ---------------------------------------------------------- the rail */
+/* one continuous vertical rule, never a boxed sidebar */
+[data-style="midcentury"] .todayrail{border-left:1px solid var(--line2);
+  padding-left:28px}
+[data-style="midcentury"] .todayrail>*+*{border-top:1px solid var(--line);
+  padding-top:var(--s5)}
+[data-style="midcentury"] .railcard{padding:0}
+/* the evening "today so far" card is the one tint band in the rail */
+[data-style="midcentury"] .railcard.daycard{background:var(--sunken);
+  padding:var(--s5) var(--s4);margin-left:-16px;margin-right:-8px}
+
+/* countdown numerals: oversized serif, deep red */
+[data-style="midcentury"] .cdrow{display:flex;align-items:baseline;gap:12px}
+[data-style="midcentury"] .cdrow .cdn{font:400 1.7rem/1 var(--serif);
+  letter-spacing:-.01em;color:var(--bad)}
+[data-style="midcentury"] .cdrow .cddate{color:var(--faint)}
+
+/* habits are pills; "the floor" is a left-bordered quote */
+[data-style="midcentury"] .habit2{border-radius:20px}
+[data-style="midcentury"] .habit2:has(.h2steps){border-radius:20px}
+[data-style="midcentury"] .h2steps.floor{margin-top:10px;padding-left:16px;
+  border-left:2px solid var(--terra);
+  font:italic 400 1rem/1.6 var(--coach);color:var(--dim)}
+
+/* ------------------------------------------------ geometric marks (§5.1) */
+/* An abstract shape per section label — asymmetric border-radius on a small
+   block, cycling shape+color. Default: mustard half-dome / olive leaf. */
+[data-style="midcentury"] .eyebrow::before,
+[data-style="midcentury"] h3.area::before{content:"";display:inline-block;
+  width:18px;height:9px;margin-right:11px;vertical-align:1px;
+  background:var(--mc-mustard);border-radius:18px 18px 0 0}
+[data-style="midcentury"] h3.area::before{width:15px;height:15px;
+  vertical-align:-2px;background:var(--mc-olive);border-radius:15px 0 15px 0}
+[data-style="midcentury"] .qwins :is(.eyebrow,h3.area)::before{
+  width:15px;height:15px;vertical-align:-2px;background:var(--mc-olive);
+  border-radius:15px 0 15px 0}
+[data-style="midcentury"] .hzcard .eyebrow::before{width:15px;height:15px;
+  vertical-align:-2px;background:var(--mc-slate);border-radius:15px 0 0 0}
+[data-style="midcentury"] .offercard .eyebrow::before{width:14px;height:14px;
+  vertical-align:-2px;background:var(--mc-teal);border-radius:50%}
+[data-style="midcentury"] .bscard .eyebrow::before{width:15px;height:15px;
+  vertical-align:-2px;background:var(--bad);border-radius:0 15px 15px 15px}
+[data-style="midcentury"] .qcard .eyebrow::before{width:14px;height:14px;
+  vertical-align:-2px;background:var(--mc-teal);border-radius:50% 50% 50% 0}
+[data-style="midcentury"] .forecast .eyebrow::before{width:14px;height:14px;
+  vertical-align:-2px;background:var(--mc-mustard);border-radius:50% 50% 50% 0}
+[data-style="midcentury"] .evwrap :is(.eyebrow,h3.area)::before{
+  width:18px;height:9px;vertical-align:1px;background:var(--terra);
+  border-radius:0 0 18px 18px}
+[data-style="midcentury"] .dupcard .eyebrow::before{width:14px;height:14px;
+  vertical-align:-2px;background:var(--wait);border-radius:50%}
+/* rail: rotate the vocabulary down the stack */
+[data-style="midcentury"] .todayrail>:nth-child(4n+2) :is(.eyebrow,h3.area)::before{
+  width:15px;height:15px;vertical-align:-2px;background:var(--mc-slate);
+  border-radius:15px 0 0 0}
+[data-style="midcentury"] .todayrail>:nth-child(4n+3) :is(.eyebrow,h3.area)::before{
+  width:14px;height:14px;vertical-align:-2px;background:var(--mc-teal);
+  border-radius:50%}
+[data-style="midcentury"] .todayrail>:nth-child(4n) :is(.eyebrow,h3.area)::before{
+  width:14px;height:14px;vertical-align:-2px;background:var(--terra);
+  border-radius:50% 50% 50% 0}
+
+/* squiggles stay, tinted terracotta */
+[data-style="midcentury"] .wav{background:var(--terra);opacity:.5}
+[data-style="midcentury"] h3.area::after,
+[data-style="midcentury"] .qcard .eyebrow::after,
+[data-style="midcentury"] .offercard .eyebrow::after,
+[data-style="midcentury"] #queue>h2::after,
+[data-style="midcentury"] #drafts>h2::after,
+[data-style="midcentury"] #connections>h2::after,
+[data-style="midcentury"] #recordings>h2::after,
+[data-style="midcentury"] #newfiles>h2::after,
+[data-style="midcentury"] #people>h2::after,
+[data-style="midcentury"] #attention>h2::after,
+[data-style="midcentury"] #all>h2::after{background:var(--terra);opacity:.5}
+
+/* ---------------------------------------------------------- buttons */
+/* §7: primary = ink pill; secondary = ink-rimmed pill; ghost = hairline pill;
+   ✦ AI actions and text-actions = teal. */
+[data-style="midcentury"] .act,[data-style="midcentury"] .mini{
+  border-radius:22px;padding:8px 13px}
+[data-style="midcentury"] .act.send{border-radius:22px}
+[data-style="midcentury"] .tstart,[data-style="midcentury"] .ttalk,
+[data-style="midcentury"] .qinline,[data-style="midcentury"] .prepask,
+[data-style="midcentury"] .mini.offerbtn,[data-style="midcentury"] .mini.hzstart,
+[data-style="midcentury"] .mini.bsgo,[data-style="midcentury"] .mini.prepgo{
+  color:var(--mc-teal);
+  border-color:color-mix(in oklab,var(--mc-teal) 45%,transparent)}
+[data-style="midcentury"] .act b{color:var(--mc-teal)}
+[data-style="midcentury"] .tws{border-radius:20px}
+[data-style="midcentury"] .heroplan{border-radius:20px}
+
+/* ---------------------------------------------------------- plate */
+/* rows as ruled editorial lines, not cards */
+[data-style="midcentury"] .tile{border-radius:20px;background:transparent}
+[data-style="midcentury"] .tile.active{border-radius:20px}
+[data-style="midcentury"] #attention .stackrow{margin-top:0}
+[data-style="midcentury"] .row,[data-style="midcentury"] .calmrow{border-radius:0}
+[data-style="midcentury"] .platehead .coach{font-size:1.08em}
+
+/* ---------------------------------------------------------- people */
+[data-style="midcentury"] .shelf{border-top:1px solid var(--line)}
+[data-style="midcentury"] #people .dupcard{border-radius:0}
+
+/* ---------------------------------------------------------- news */
+/* reads like a magazine: serif heads, tracked-caps section labels, calm measure */
+[data-style="midcentury"] .newsmain{max-width:680px}
+[data-style="midcentury"] .nwsec h3{font:700 .68rem/1.5 var(--sans);
+  letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+[data-style="midcentury"] .newsmain p{line-height:1.65}
+
+/* ---------------------------------------------------------- season */
+[data-style="midcentury"] .szbar{border-radius:0;border-top:1px solid var(--line2)}
+
+/* ---------------------------------------------------------- phone */
+@media (max-width:760px){
+  [data-style="midcentury"] .hero h1{font-size:clamp(2.5rem,10vw,3.4rem)}
+  [data-style="midcentury"] .brand{font-size:1.2rem}
+  [data-style="midcentury"] .hero{padding-top:var(--s5)}
+  [data-style="midcentury"] .todayrail{border-left:0;padding-left:0}
+  [data-style="midcentury"] .railcard.daycard{margin-left:0;margin-right:0}
+  [data-style="midcentury"] .todaywrap{padding:var(--s5) 0 var(--s4)}
+  [data-style="midcentury"] .hero-why{font-size:1.2rem}
+  [data-style="midcentury"] .todaydoc>h1+p{font-size:1.2rem}
+  [data-style="midcentury"] .eyebrow::before,
+  [data-style="midcentury"] h3.area::before{transform:scale(.85);transform-origin:left center}
+}
+
+/* ================= the non-home pages ================================ */
+
+/* ---- Plate: ruled editorial entries, never boxes ---- */
+[data-style="midcentury"] #attention .stack,
+[data-style="midcentury"] #all .stack{border-top:2px solid var(--ink)}
+[data-style="midcentury"] .stack details.row{border-bottom:1px solid var(--line2)}
+[data-style="midcentury"] .row summary{border-radius:0;padding:15px var(--s1)}
+[data-style="midcentury"] .row summary:hover{background:transparent}
+[data-style="midcentury"] .row[open]{background:transparent;border-radius:0;
+  border-bottom-color:var(--line2)}
+[data-style="midcentury"] #attention .rowname{font:400 1.6rem/1.15 var(--serif)}
+[data-style="midcentury"] #all .rowname{font:400 1.35rem/1.2 var(--serif)}
+/* rank numerals: oversized serif in deep red, like the countdowns */
+[data-style="midcentury"] .rank{font:400 1.6rem/1 var(--serif);
+  letter-spacing:-.01em;color:var(--bad);min-width:34px}
+[data-style="midcentury"] .sev-wait .rank,
+[data-style="midcentury"] .sev-cold .rank{color:var(--bad)}
+[data-style="midcentury"] .row .bar,
+[data-style="midcentury"] .row .bar i{border-radius:0}
+[data-style="midcentury"] .platehead .triage{
+  font:italic 400 1.5rem/1.4 var(--coach);letter-spacing:0;max-width:34ch}
+
+/* section-head marks: one shape+color per view head */
+[data-style="midcentury"] #attention>h2::before,
+[data-style="midcentury"] #all>h2::before,
+[data-style="midcentury"] #people>h2::before,
+[data-style="midcentury"] #queue>h2::before,
+[data-style="midcentury"] #drafts>h2::before{content:"";display:inline-block;
+  width:18px;height:9px;margin-right:12px;vertical-align:3px;
+  background:var(--mc-mustard);border-radius:18px 18px 0 0}
+[data-style="midcentury"] #all>h2::before{width:15px;height:15px;
+  vertical-align:-1px;background:var(--mc-olive);border-radius:15px 0 15px 0}
+[data-style="midcentury"] #people>h2::before{width:15px;height:15px;
+  vertical-align:-1px;background:var(--mc-slate);border-radius:15px 0 0 0}
+[data-style="midcentury"] #queue>h2::before{width:14px;height:14px;
+  vertical-align:-1px;background:var(--mc-teal);border-radius:50%}
+[data-style="midcentury"] #drafts>h2::before{width:14px;height:14px;
+  vertical-align:-1px;background:var(--terra);border-radius:50% 50% 50% 0}
+
+/* ---- People: airy ruled shelves ---- */
+[data-style="midcentury"] details.csection,
+[data-style="midcentury"] details.shelf{border-top:1px solid var(--line2)}
+[data-style="midcentury"] .csection>summary.circlehead{
+  font:400 1.45rem/1.2 var(--serif);letter-spacing:0;text-transform:none;
+  color:var(--ink);padding:var(--s4) 0 var(--s2)}
+[data-style="midcentury"] .circlehead .csub{
+  font:600 .72rem/1 var(--sans);letter-spacing:0}
+[data-style="midcentury"] .circlehead .crhythm{
+  background:color-mix(in oklab,var(--mc-mustard) 16%,var(--paper));
+  border-color:transparent;
+  color:color-mix(in oklab,var(--ink) 78%,var(--paper))}
+[data-style="midcentury"] .circlehead .crename{font-family:var(--sans)}
+/* alternating marks down the shelves (circlehead is flex; the mark is an item) */
+[data-style="midcentury"] summary.circlehead::before{content:"";flex:none;
+  align-self:center;width:16px;height:8px;margin-right:2px;
+  background:var(--mc-mustard);border-radius:16px 16px 0 0}
+[data-style="midcentury"] details.csection:nth-of-type(4n+2) summary.circlehead::before{
+  width:14px;height:14px;background:var(--mc-slate);border-radius:14px 0 0 0}
+[data-style="midcentury"] details.csection:nth-of-type(4n+3) summary.circlehead::before{
+  width:13px;height:13px;background:var(--mc-teal);border-radius:50%}
+[data-style="midcentury"] details.csection:nth-of-type(4n) summary.circlehead::before{
+  width:14px;height:14px;background:var(--terra);border-radius:50% 50% 50% 0}
+
+/* ---- Claude: job verbs as calm teal text-actions on a hairline ---- */
+[data-style="midcentury"] .jobbtn{border:0;border-radius:0;background:transparent;
+  border-bottom:1px solid var(--line);padding:10px 4px 12px;text-align:left;
+  font:600 .8rem/1.3 var(--sans);color:var(--mc-teal)}
+[data-style="midcentury"] .jobbtn:hover{color:var(--mc-teal);
+  border-bottom-color:color-mix(in oklab,var(--mc-teal) 55%,transparent)}
+[data-style="midcentury"] .jobbtn span{color:var(--dim)}
+[data-style="midcentury"] .jobbtn .jobwhen{color:var(--faint)}
+/* drafts flatten to ruled entries; the body sits on the warm tint */
+[data-style="midcentury"] .draft{background:transparent;border:0;border-radius:0;
+  border-top:1px solid var(--line2);padding:13px 0}
+[data-style="midcentury"] .dhead{font:400 1.15rem/1.3 var(--serif)}
+[data-style="midcentury"] .dkind{border-radius:50%}
+[data-style="midcentury"] .dbody{background:var(--sunken);border:0;border-radius:0;
+  padding:var(--s4)}
+
+/* ---- News: polish only ---- */
+[data-style="midcentury"] .nwhead{font:400 1.3rem/1.3 var(--serif)}
+[data-style="midcentury"] .nwitem .meta{font:500 .68rem/1.8 var(--sans);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+[data-style="midcentury"] .nwsum{line-height:1.65}
+/* section marks cycle the shape vocabulary down the column */
+[data-style="midcentury"] .nwsec h3::before{content:"";flex:none;
+  width:16px;height:8px;background:var(--mc-mustard);border-radius:16px 16px 0 0}
+[data-style="midcentury"] .newsmain .nwsec:nth-of-type(4n+2) h3::before{
+  width:13px;height:13px;background:var(--mc-slate);border-radius:13px 0 0 0}
+[data-style="midcentury"] .newsmain .nwsec:nth-of-type(4n+3) h3::before{
+  width:12px;height:12px;background:var(--mc-teal);border-radius:50%}
+[data-style="midcentury"] .newsmain .nwsec:nth-of-type(4n) h3::before{
+  width:13px;height:13px;background:var(--terra);border-radius:13px 0 13px 0}
+
+/* ---- Season: the tray is the warm tint band; items are pill chips ---- */
+[data-style="midcentury"] .sztray{border:0;border-radius:0;background:var(--sunken);
+  padding:var(--s5) 24px;margin:0 -24px 4px}
+[data-style="midcentury"] .szchip{border-radius:20px;border:1px solid var(--line2);
+  background:var(--surface);padding:5px 13px}
+[data-style="midcentury"] .szglabel{font:700 .68rem/1.5 var(--sans);
+  letter-spacing:.2em;color:var(--dim)}
+
+@media (max-width:760px){
+  [data-style="midcentury"] .sztray{margin:0 0 4px;padding:var(--s4) 16px}
+  [data-style="midcentury"] #attention .rowname{font-size:1.35rem}
+  [data-style="midcentury"] .rank{font-size:1.4rem;min-width:28px}
+}
+
+/* ================= rooms.html ======================================== */
+/* The rooms page under this skin: a warm editorial floor plan. Wings are
+   serif headlines over ruled room lists; zones flatten to ruled sections
+   with a geometric mark per label; chips and inputs go pill. The mascot
+   (.barart) is never resized or hidden — typography only up here. */
+
+/* masthead: serif title over a 2px ink rule */
+[data-style="midcentury"] body>.bar:has(.barart){
+  border-bottom:2px solid var(--ink);padding-bottom:12px}
+[data-style="midcentury"] #bartitle{font:400 1.9rem/1 var(--serif);
+  letter-spacing:-.01em}
+[data-style="midcentury"] body>.bar:has(.barart) .n{
+  font:500 .68rem/1.9 var(--sans);letter-spacing:.12em;text-transform:uppercase}
+[data-style="midcentury"] a.back{border-radius:999px}
+[data-style="midcentury"] #search{background:var(--surface)}
+
+/* finish lines: a tracked-caps label with the half-dome, soft mustard pills */
+[data-style="midcentury"] .goalstrip b{
+  font:700 .68rem/1.5 var(--sans);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim)}
+[data-style="midcentury"] .goalstrip b::before{content:"";display:inline-block;
+  width:16px;height:8px;margin-right:9px;background:var(--mc-mustard);
+  border-radius:16px 16px 0 0}
+[data-style="midcentury"] .gchip{border-radius:999px;border-color:transparent;
+  background:color-mix(in oklab,var(--mc-mustard) 16%,var(--paper));
+  color:color-mix(in oklab,var(--ink) 80%,var(--paper))}
+[data-style="midcentury"] .gchip:hover{border-color:var(--ink);color:var(--ink)}
+[data-style="midcentury"] .gchip.bad{background:var(--badbg);color:var(--bad);
+  border-color:transparent}
+[data-style="midcentury"] .gchip.bad:hover{border-color:var(--bad)}
+[data-style="midcentury"] .gline{color:var(--dim)}
+
+/* wings: serif headline on a 2px ink rule; the card box goes away */
+[data-style="midcentury"] #floor .wing{background:transparent;border:0;
+  border-radius:0;overflow:visible;margin:0 0 28px}
+[data-style="midcentury"] #floor .wing>header{border-top:2px solid var(--ink);
+  padding:14px 2px 10px}
+[data-style="midcentury"] #floor .wing h2{font:400 1.55rem/1.1 var(--serif)}
+[data-style="midcentury"] .whealth{font:500 .66rem/2 var(--sans);
+  letter-spacing:.12em;text-transform:uppercase}
+[data-style="midcentury"] .whealth.worry{color:var(--terra)}
+[data-style="midcentury"] .waudit{font:700 .66rem/1 var(--sans);
+  letter-spacing:.12em;text-transform:uppercase;background:transparent;
+  padding:8px 13px}
+[data-style="midcentury"] .waudit:hover{border-color:var(--ink)}
+
+/* rooms: ruled entries, serif names — no boxes inside the wing */
+[data-style="midcentury"] .roomgrid{gap:2px 28px;padding:0 2px 8px}
+[data-style="midcentury"] #floor .room{background:transparent;border:0;
+  border-top:1px solid var(--line2);border-radius:0;padding:12px 24px 14px 2px}
+[data-style="midcentury"] #floor .room:hover{border-top-color:var(--ink)}
+[data-style="midcentury"] #floor .room h3{font:400 1.3rem/1.15 var(--serif);
+  margin:0 0 4px}
+[data-style="midcentury"] #floor .room .line{color:var(--faint)}
+[data-style="midcentury"] .gitdot{top:16px;right:4px}
+[data-style="midcentury"] .strip{border-top:1px solid var(--line);
+  padding-top:12px}
+
+/* inside a room: eyebrow with its mark, serif title, coach-voice state line */
+[data-style="midcentury"] .rhead .wingtag{font:700 .68rem/1.5 var(--sans);
+  letter-spacing:.2em;color:var(--dim)}
+[data-style="midcentury"] .rhead .wingtag::before{content:"";display:inline-block;
+  width:18px;height:9px;margin-right:11px;vertical-align:1px;
+  background:var(--mc-mustard);border-radius:18px 18px 0 0}
+[data-style="midcentury"] .rhead h1{font:400 2.3rem/1.1 var(--serif);
+  letter-spacing:-.015em}
+[data-style="midcentury"] .rline{font:italic 400 1.05rem/1.5 var(--coach);
+  color:var(--dim)}
+[data-style="midcentury"] .rml:hover{color:var(--mc-teal)}
+
+/* zones flatten to ruled sections; the first in each column gets the 2px ink
+   major rule, the rest a hairline. Labels are tracked caps with a cycling
+   geometric mark. The big-questions room keeps its own paper treatment. */
+[data-style="midcentury"] #roomview .zone{background:transparent;border:0;
+  border-radius:0;border-top:1px solid var(--line2);padding:16px 0 14px;
+  margin:0 0 10px}
+[data-style="midcentury"] #roomview .rcol>.zone:first-child{
+  border-top:2px solid var(--ink)}
+[data-style="midcentury"] #roomview .zone>h2{font:700 .68rem/1.5 var(--sans);
+  letter-spacing:.2em;color:var(--dim)}
+[data-style="midcentury"] #roomview .zone>h2::before{content:"";
+  display:inline-block;width:16px;height:8px;margin-right:10px;
+  vertical-align:1px;background:var(--mc-mustard);border-radius:16px 16px 0 0}
+[data-style="midcentury"] #roomview .rcol>.zone:nth-of-type(4n+2)>h2::before{
+  width:14px;height:14px;vertical-align:-2px;background:var(--mc-slate);
+  border-radius:14px 0 0 0}
+[data-style="midcentury"] #roomview .rcol>.zone:nth-of-type(4n+3)>h2::before{
+  width:13px;height:13px;vertical-align:-2px;background:var(--mc-teal);
+  border-radius:50%}
+[data-style="midcentury"] #roomview .rcol>.zone:nth-of-type(4n)>h2::before{
+  width:14px;height:14px;vertical-align:-2px;background:var(--terra);
+  border-radius:50% 50% 50% 0}
+[data-style="midcentury"] #roomview.bigq .zone>h2::before{content:none}
+
+/* tasks and goals: ruled lines, round ink-rimmed ticks */
+[data-style="midcentury"] #roomview .tasks li{border-top:1px solid var(--line);
+  padding:8px 0}
+[data-style="midcentury"] #roomview .tasks li:first-child{border-top:0}
+[data-style="midcentury"] .ptick{border-radius:50%;border-color:var(--ink)}
+[data-style="midcentury"] .ptick:hover{border-color:var(--green)}
+[data-style="midcentury"] .prep summary{color:var(--mc-teal)}
+
+/* add rows: pill inputs, ink primary */
+[data-style="midcentury"] .addrow input,
+[data-style="midcentury"] .addrow select,
+[data-style="midcentury"] .askrow select{border-radius:999px}
+[data-style="midcentury"] .addrow input{padding:8px 14px}
+[data-style="midcentury"] .askrow textarea{border-radius:18px;padding:9px 14px}
+[data-style="midcentury"] .addrow button,[data-style="midcentury"] .askrow button,
+[data-style="midcentury"] .tract button,
+[data-style="midcentury"] .noterow button{border-radius:22px}
+[data-style="midcentury"] .addrow button.go,
+[data-style="midcentury"] .askrow button.go,
+[data-style="midcentury"] .tract button.go,
+[data-style="midcentury"] .agentbar button,
+[data-style="midcentury"] .mapbar button{
+  background:var(--ink);color:var(--paper);border-color:transparent}
+[data-style="midcentury"] #roomview .hint{font:italic 400 .85rem/1.55 var(--coach);
+  color:var(--faint)}
+
+/* the room's shelf of documents: airy ruled list, teal on touch */
+[data-style="midcentury"] .docs li{border-top:1px solid var(--line);padding:8px 0}
+[data-style="midcentury"] .docs li:first-child{border-top:0}
+[data-style="midcentury"] .doclink:hover,
+[data-style="midcentury"] .docmore:hover,
+[data-style="midcentury"] .docreveal:hover{color:var(--mc-teal)}
+[data-style="midcentury"] .docmeta{font:500 .64rem/1.9 var(--sans);
+  letter-spacing:.1em;text-transform:uppercase}
+[data-style="midcentury"] .docbody{background:var(--sunken);border:0;
+  border-radius:0;padding:14px 16px}
+[data-style="midcentury"] .hoff{background:transparent;border:0;border-radius:0;
+  border-left:2px solid var(--terra);padding:2px 0 2px 16px}
+[data-style="midcentury"] .memread a{color:var(--mc-teal)}
+[data-style="midcentury"] .flink{color:var(--mc-teal)}
+[data-style="midcentury"] .pulse .cd{font:500 .64rem/2.1 var(--sans);
+  letter-spacing:.1em;text-transform:uppercase}
+[data-style="midcentury"] .pchip:hover{color:var(--mc-teal);
+  border-color:var(--mc-teal)}
+[data-style="midcentury"] .agentbar{border:1px solid var(--ink);box-shadow:none}
+[data-style="midcentury"] .ctxchip.on{background:var(--ink);color:var(--paper)}
+
+/* ================= map.html ========================================== */
+/* Map chrome only — canvas, dots and mascot untouched. The panel becomes
+   flat paper with a 2px ink top rule and a serif name; toolbar and legend
+   go quiet-pill; dialogs and the key card lose their shadows. */
+[data-style="midcentury"] .bartitle b{font:400 1.35rem/1 var(--serif)}
+[data-style="midcentury"] .keylab{letter-spacing:.18em}
+[data-style="midcentury"] .lg{border-radius:999px;
+  border-color:color-mix(in oklab,var(--ink) 10%,transparent)}
+[data-style="midcentury"] .lg:hover{border-color:var(--line2)}
+[data-style="midcentury"] .lgclear{color:var(--mc-teal)}
+[data-style="midcentury"] .lgclear.on{background:var(--ink);color:var(--paper)}
+[data-style="midcentury"] .modes{border-radius:999px}
+[data-style="midcentury"] .modes button{border-radius:999px}
+[data-style="midcentury"] button.tool{border-radius:999px}
+[data-style="midcentury"] .zgrp .tool{border-radius:0}
+[data-style="midcentury"] .zgrp .tool:first-child{border-radius:999px 0 0 999px}
+[data-style="midcentury"] .zgrp .tool:last-child{border-radius:0 999px 999px 0}
+[data-style="midcentury"] .pacts .tool.primary{background:var(--ink);
+  color:var(--paper)}
+
+/* the detail panel: flat paper, 2px ink top rule, serif name, marked area */
+[data-style="midcentury"] #panel{background:var(--paper);
+  border:1px solid var(--ink);border-top:2px solid var(--ink);border-radius:0;
+  box-shadow:none;padding:18px 20px}
+[data-style="midcentury"] #panel h2{font:400 1.6rem/1.15 var(--serif);
+  margin:2px 0 4px}
+[data-style="midcentury"] #panel .area{font:700 .66rem/1.5 var(--sans);
+  letter-spacing:.2em;color:var(--dim)}
+[data-style="midcentury"] #panel .area::before{content:"";display:inline-block;
+  width:16px;height:8px;margin-right:9px;vertical-align:1px;
+  background:var(--mc-mustard);border-radius:16px 16px 0 0}
+[data-style="midcentury"] #panel .area:empty::before{content:none}
+
+/* the key card and dialogs: flat paper, no shadows */
+[data-style="midcentury"] .keycard{background:var(--paper);border-radius:0;
+  box-shadow:none;border:1px solid var(--line2);border-top:2px solid var(--ink)}
+[data-style="midcentury"] .keysec{letter-spacing:.14em}
+[data-style="midcentury"] .mdlg{background:var(--paper);border-radius:0;
+  border:1px solid var(--ink);box-shadow:none}
+[data-style="midcentury"] .md-title{font:400 1.45rem/1.2 var(--serif)}
+[data-style="midcentury"] .md-field label{letter-spacing:.16em;
+  font-family:var(--sans)}
+[data-style="midcentury"] .md-field input{border-radius:999px;
+  font-family:var(--sans)}
+[data-style="midcentury"] .md-go{background:var(--ink);color:var(--paper);
+  border-radius:22px;font-family:var(--sans)}
+[data-style="midcentury"] .mapbar{border:1px solid var(--ink);box-shadow:none;
+  font-family:var(--sans)}
+[data-style="midcentury"] .mapbar button,
+[data-style="midcentury"] .agentbar button{border-radius:999px;
+  font-family:var(--sans)}
+[data-style="midcentury"] .focuschip{background:var(--ink);color:var(--paper);
+  box-shadow:none;font-family:var(--sans)}
+
+/* phone: the serif steps down, nothing hides */
+@media (max-width:760px){
+  [data-style="midcentury"] #bartitle{font-size:1.5rem}
+  [data-style="midcentury"] .rhead h1{font-size:1.8rem}
+  [data-style="midcentury"] #floor .wing h2{font-size:1.35rem}
+  [data-style="midcentury"] #floor .room{padding:10px 16px 12px 2px}
+  [data-style="midcentury"] #floor .room h3{font-size:1.15rem}
+  [data-style="midcentury"] #panel h2{font-size:1.35rem}
+  [data-style="midcentury"] .roomgrid{gap:2px 18px}
+}
+
+/* ================= the News page, deepened (2026-08-28) ============== */
+
+/* the masthead: "Your briefing" at poster scale, wearing the half-dome;
+   the eyebrow's own mark stands down so the page carries one. */
+[data-style="midcentury"] .newsv>.eyebrow::before{content:none}
+[data-style="midcentury"] .nwtop h2{
+  font:400 clamp(2.7rem,4.8vw,4.2rem)/1 var(--serif);letter-spacing:-.02em}
+[data-style="midcentury"] .nwtop h2::before{content:"";display:inline-block;
+  width:30px;height:15px;margin-right:16px;vertical-align:8px;
+  background:var(--mc-mustard);border-radius:30px 30px 0 0}
+[data-style="midcentury"] .nwdate{margin:10px 0 0;
+  font:500 .7rem/1.9 var(--sans);letter-spacing:.12em;
+  text-transform:uppercase;font-style:normal;color:var(--faint)}
+
+/* topic heads sit on their hairline with generous air above */
+[data-style="midcentury"] .newsmain .nwsec{margin-top:52px}
+[data-style="midcentury"] .newsmain .nwsec:first-of-type{margin-top:8px}
+[data-style="midcentury"] .nwsec h3{gap:16px;margin-bottom:12px}
+[data-style="midcentury"] .nwsec h3::after{background:var(--line2)}
+
+/* the lead story carries the big serif; every story is a ruled entry */
+[data-style="midcentury"] .newsmain .nwsec:first-of-type .nwitem:first-of-type .nwhead{
+  font:400 1.9rem/1.15 var(--serif);letter-spacing:-.015em}
+[data-style="midcentury"] .nwitem{padding:18px 0}
+[data-style="midcentury"] .nwacts .nwread{color:var(--mc-teal)}
+
+/* "In plain terms": a warm tint band with a terracotta rule, the body in
+   the reading voice */
+[data-style="midcentury"] .nwexplain{background:var(--sunken);
+  border-left:2px solid var(--terra);border-radius:0;padding:16px 20px;
+  margin:14px 0 10px}
+[data-style="midcentury"] .nwexplain p:not(.eyebrow){
+  font:italic 400 1.05rem/1.65 var(--coach)}
+[data-style="midcentury"] .nwexplain .eyebrow::before{background:var(--terra);
+  width:14px;height:7px;border-radius:14px 14px 0 0}
+[data-style="midcentury"] .nwexpact{font:500 .68rem/1.8 var(--sans);
+  letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+[data-style="midcentury"] .nwexpact .nwread{color:var(--mc-teal)}
+
+/* the Sunday recap reads as a written column, not a labelled list */
+[data-style="midcentury"] .newsmain .nwsec:not(:has(article.nwitem)) h3{
+  font:italic 400 1.45rem/1.3 var(--coach);letter-spacing:0;
+  text-transform:none;color:var(--ink)}
+[data-style="midcentury"] .newsmain .nwsec:not(:has(article.nwitem)) h3::before{
+  content:none}
+
+/* the rail hangs off one continuous rule; its boxes flatten to ruled
+   sections, per the skin */
+[data-style="midcentury"] .newsrail{border-left:1px solid var(--line2);
+  padding-left:28px}
+[data-style="midcentury"] .nrbox{background:transparent;border:0;
+  border-radius:0;padding:0 0 6px;margin-bottom:26px}
+[data-style="midcentury"] .nrbox+.nrbox{border-top:1px solid var(--line);
+  padding-top:22px}
+[data-style="midcentury"] .nwchip{border-radius:999px;background:var(--surface);
+  border:1px solid var(--line2);padding:4px 12px}
+
+/* glossary: serif headwords over hairline separators */
+[data-style="midcentury"] .nwgloss dt{font:400 1.2rem/1.25 var(--serif);
+  font-weight:400;border-top:1px solid var(--line);padding-top:12px;
+  margin-top:12px}
+[data-style="midcentury"] .nwgloss dt:first-of-type{border-top:0;
+  padding-top:4px;margin-top:6px}
+[data-style="midcentury"] .nwgloss dd{color:var(--dim)}
+[data-style="midcentury"] .nwgloss>.meta{font:italic 400 .85rem/1.6 var(--coach);
+  color:var(--faint)}
+
+@media (max-width:1180px){
+  [data-style="midcentury"] .newsrail{border-left:0;padding-left:0}
+}
+@media (max-width:760px){
+  [data-style="midcentury"] .nwtop h2{font-size:2.1rem}
+  [data-style="midcentury"] .nwtop h2::before{width:22px;height:11px;
+    margin-right:11px;vertical-align:5px;border-radius:22px 22px 0 0}
+  [data-style="midcentury"] .newsmain .nwsec{margin-top:38px}
+  [data-style="midcentury"] .newsmain .nwsec:first-of-type .nwitem:first-of-type .nwhead{
+    font-size:1.5rem}
+}
