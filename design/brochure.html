@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Life brain — brochure</title>
+<!--
+  The one-page brochure, source for dist/life-brain-brochure.png.
+  Render it with:
+      python3 brain/tools/brochure.py
+  Art comes from brain/art (the same illustrations the page uses), fonts
+  from brain/fonts. Nothing here is generated: edit the copy, re-render.
+-->
+<style>
+  @font-face{font-family:'Bricolage';src:url('../brain/fonts/bricolage-700.woff2') format('woff2');font-weight:700;font-display:block}
+  @font-face{font-family:'Bricolage';src:url('../brain/fonts/bricolage-800.woff2') format('woff2');font-weight:800;font-display:block}
+  @font-face{font-family:'Figtree';src:url('../brain/fonts/figtree-full.woff2') format('woff2');font-display:block}
+  @font-face{font-family:'Petrona';src:url('../brain/fonts/petrona-i.woff2') format('woff2');font-style:italic;font-display:block}
+
+  :root{
+    --paper:#f8f3e9; --card:#fcf9f2; --line:#ece4d5;
+    --ink:#1d1a16; --body:#4a453d; --faint:#8a8377;
+    --peach:#fbe0c1; --amber:#8a5312;
+    --display:'Bricolage',system-ui,sans-serif;
+    --sans:'Figtree',system-ui,sans-serif;
+    --serif:'Petrona',Georgia,serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{
+    width:1440px; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); -webkit-font-smoothing:antialiased;
+    padding:76px 84px 62px;
+  }
+
+  header{display:flex; align-items:center; gap:26px}
+  header img{width:124px; height:124px; object-fit:contain; mix-blend-mode:multiply}
+  h1{font-family:var(--display); font-weight:800; font-size:92px; letter-spacing:-.02em; line-height:1}
+  .lede{
+    font-family:var(--serif); font-style:italic; font-size:41px; line-height:1.35;
+    color:#3c382f; margin:34px 0 0; max-width:1180px;
+  }
+
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:52px}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:24px;
+    padding:36px 40px 40px;
+  }
+  .card img{width:104px; height:104px; object-fit:contain; display:block; margin:0 0 20px -6px;
+    /* four of the illustrations ship on white rather than transparency;
+       multiply drops that box onto the card instead of boxing the brain */
+    mix-blend-mode:multiply}
+  .card h2{font-family:var(--display); font-weight:700; font-size:35px; letter-spacing:-.01em; margin:0 0 14px}
+  .card p{font-size:27px; line-height:1.45; color:var(--body)}
+
+  .also{margin:44px 4px 0; font-size:27px; line-height:1.5; color:var(--body)}
+
+  .band{
+    display:flex; align-items:center; gap:30px; margin-top:40px;
+    background:var(--peach); border-radius:22px; padding:30px 40px;
+  }
+  .band img{width:110px; height:110px; object-fit:contain; flex:0 0 auto; mix-blend-mode:multiply}
+  .band b{display:block; font-family:var(--display); font-weight:700; font-size:34px; color:var(--amber); margin-bottom:8px}
+  .band span{font-size:27px; color:#6b4a1c}
+
+  footer{
+    display:flex; justify-content:space-between; margin-top:44px;
+    font-family:var(--serif); font-style:italic; font-size:26px; color:var(--faint);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="../brain/art/celebrating.png" alt="">
+  <h1>Life brain</h1>
+</header>
+
+<p class="lede">A second brain for your life admin: plain text files, a page
+that renders them, and Claude Code doing the filing so you never have to.</p>
+
+<div class="grid">
+
+  <div class="card">
+    <img src="../brain/art/sleeping.png" alt="">
+    <h2>The morning plan</h2>
+    <p>Three doable things, written before you're up, fitted around your
+    calendar and the weather where you actually are.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/hurrying.png" alt="">
+    <h2>Your plate</h2>
+    <p>Every project and promise in one ranked list. Whatever has gone stale
+    or overdue sits at the top.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/waving.png" alt="">
+    <h2>Your people</h2>
+    <p>Who you owe a reply, who has gone quiet, whose birthday is near.
+    Friends get the same care as projects.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/envelope.png" alt="">
+    <h2>Drafts</h2>
+    <p>It writes the email or the message. Sending is a button only you
+    press.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/thinking.png" alt="">
+    <h2>Capture</h2>
+    <p>A line typed on the page, a text to your own Telegram bot, or a voice
+    note it types up for you.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/sleuthing.png" alt="">
+    <h2>Your project folders</h2>
+    <p>Point it at the folders you already work in and their to-do lists join
+    the page, re-read every twenty minutes.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/wayfinding.png" alt="">
+    <h2>Does the week fit?</h2>
+    <p>Give a task a deadline and a rough size, and the week says what fits,
+    what has to move, and what will be late whatever you do.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/reading.png" alt="">
+    <h2>Your briefing</h2>
+    <p>The news you actually follow, from outlets you pick — with the jargon
+    explained, for the fields you are learning.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/watering.png" alt="">
+    <h2>Habits, goals, seasons</h2>
+    <p>Weekly counts instead of streaks, finish lines with dates, and a
+    bucket list for this stretch of your life.</p>
+  </div>
+
+  <div class="card">
+    <img src="../brain/art/map.png" alt="">
+    <h2>The map</h2>
+    <p>Everything drawn as one picture: by deadline, by area of your life, or
+    by how close someone is.</p>
+  </div>
+
+</div>
+
+<p class="also">Also in there: a journal kept in your own words, a night shift
+that runs the heavy jobs at 1am, a notes room per project, a sketch of the
+coming week each Sunday, and six looks for the page if the first one isn't
+yours.</p>
+
+<div class="band">
+  <img src="../brain/art/hammock.png" alt="">
+  <div>
+    <b>You drop thoughts in and tick things off.</b>
+    <span>The filing and the chasing happen on their own.</span>
+  </div>
+</div>
+
+<footer>
+  <span>Everything stays on your own computer.</span>
+  <span>Sent as a zip; setup is a double-click.</span>
+</footer>
+
+</body>
+</html>

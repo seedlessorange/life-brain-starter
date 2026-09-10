@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life brain: what it is and how to set it up</title>
+<style>
+  :root{
+    --paper:#f7f4ed; --surface:#fbf9f4; --sunken:#efe9de;
+    --ink:#33302a; --dim:#67635a; --faint:#8f8a7c;
+    --line:#e4ddce; --line2:#d5cdba;
+    --olive:#5c672f; --olivebg:#e9ead6;
+    --terra:#c05f3c;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Cascadia Mono",monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#211f1a; --surface:#282520; --sunken:#1b1915;
+      --ink:#e8e4d9; --dim:#aaa494; --faint:#7d786a;
+      --line:#38342c; --line2:#454034;
+      --olive:#a8b36a; --olivebg:#3a3d28;
+      --terra:#d98a66;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font:400 1.0625rem/1.65 var(--serif);
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:680px; margin:0 auto; padding:0 24px 96px}
+
+  /* ---------- hero ---------- */
+  header{padding:72px 0 8px}
+  h1{
+    font:700 clamp(2.4rem,7vw,3.4rem)/1.05 var(--serif);
+    letter-spacing:-.015em; margin:0;
+  }
+  .squiggle{display:block; margin:10px 0 22px; color:var(--olive)}
+  .lede{font-size:1.25rem; line-height:1.5; color:var(--ink); margin:0; max-width:34em}
+
+  /* ---------- sections ---------- */
+  section{margin-top:64px}
+  .kicker{
+    font:600 .75rem/1 var(--sans); letter-spacing:.14em; text-transform:uppercase;
+    color:var(--faint); margin:0 0 6px;
+  }
+  h2{font:700 1.55rem/1.25 var(--serif); letter-spacing:-.01em; margin:0 0 14px}
+  p{margin:0 0 14px}
+  .quiet{color:var(--dim)}
+
+  /* the three questions */
+  .qs{display:grid; gap:14px; margin:22px 0 0}
+  .q{
+    background:var(--surface); border:1px solid var(--line);
+    border-left:3px solid var(--olive); border-radius:12px; padding:18px 20px;
+  }
+  .q h3{font:700 1.125rem/1.3 var(--serif); margin:0 0 6px}
+  .q p{margin:0; color:var(--dim); font-size:.9875rem}
+
+  /* your whole job */
+  .jobs{list-style:none; margin:20px 0 0; padding:0; counter-reset:job}
+  .jobs li{
+    position:relative; padding:2px 0 2px 46px; margin:0 0 16px; counter-increment:job;
+  }
+  .jobs li::before{
+    content:counter(job); position:absolute; left:0; top:1px;
+    width:30px; height:30px; border-radius:50%;
+    background:var(--olivebg); color:var(--olive);
+    font:700 .9rem/30px var(--sans); text-align:center;
+  }
+  .jobs b{font-weight:700}
+
+  /* the features grid */
+  .feats{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0 0}
+  @media (max-width:620px){.feats{grid-template-columns:1fr}}
+  .feat{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; padding:18px 20px;
+  }
+  .feat h3{font:700 1.0625rem/1.3 var(--serif); margin:0 0 6px}
+  .feat h3::before{
+    content:""; display:inline-block; width:8px; height:8px; border-radius:50%;
+    background:var(--terra); margin-right:9px; vertical-align:2px;
+  }
+  .feat p{margin:0; color:var(--dim); font-size:.9375rem; line-height:1.55}
+  .feat:last-child:nth-child(odd){grid-column:1/-1}
+  .feats-note{margin-top:16px; font-size:.9375rem}
+
+  /* ---------- setup ---------- */
+  .switch{
+    display:inline-flex; background:var(--sunken); border:1px solid var(--line2);
+    border-radius:999px; padding:3px; margin:6px 0 26px; gap:2px;
+  }
+  .switch button{
+    appearance:none; border:0; background:none; cursor:pointer;
+    font:600 .875rem/1 var(--sans); color:var(--dim);
+    padding:9px 20px; border-radius:999px;
+  }
+  .switch button[aria-pressed="true"]{
+    background:var(--ink); color:var(--paper);
+  }
+  .switch button:focus-visible{outline:2px solid var(--olive); outline-offset:2px}
+  body[data-os="mac"] .os-win{display:none}
+  body[data-os="win"] .os-mac{display:none}
+  .os-note{display:none}
+
+  .steps{list-style:none; margin:0; padding:0; counter-reset:step}
+  .steps>li{
+    position:relative; padding:0 0 26px 46px; counter-increment:step;
+    border-left:1px solid var(--line2); margin-left:15px;
+  }
+  .steps>li:last-child{border-left-color:transparent; padding-bottom:4px}
+  .steps>li::before{
+    content:counter(step); position:absolute; left:-16px; top:-2px;
+    width:31px; height:31px; border-radius:50%;
+    background:var(--olive); color:#fdfcf7;
+    font:700 .9rem/31px var(--sans); text-align:center;
+  }
+  .steps h3{font:700 1.1rem/1.35 var(--serif); margin:0 0 6px}
+  .steps p{font-size:.9875rem; color:var(--dim); margin:0 0 8px}
+  .steps p:last-child{margin-bottom:0}
+  code,kbd{
+    font:500 .85em var(--mono); background:var(--sunken);
+    border:1px solid var(--line); border-radius:6px; padding:2px 6px;
+    white-space:nowrap;
+  }
+  pre{
+    background:var(--sunken); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; margin:8px 0; overflow-x:auto;
+  }
+  pre code{background:none; border:0; padding:0; white-space:pre; font-size:.85rem}
+  .tip{
+    background:var(--olivebg); border-radius:10px; padding:12px 16px;
+    font-size:.9375rem; color:var(--ink); margin:10px 0 0;
+  }
+  .tip .sans{font:700 .8125rem var(--sans); color:var(--olive)}
+
+  /* stuck / data / cost */
+  .rescue{
+    background:var(--surface); border:1px solid var(--line); border-radius:12px;
+    padding:20px 22px; margin-top:20px;
+  }
+  .rescue p{margin:0}
+  a{color:var(--olive); text-decoration-color:color-mix(in oklab,var(--olive) 40%,transparent); text-underline-offset:3px}
+  a:hover{text-decoration-color:var(--olive)}
+
+  footer{
+    margin-top:72px; padding-top:22px; border-top:1px solid var(--line);
+    font:400 .875rem/1.6 var(--sans); color:var(--faint);
+  }
+
+  /* ---------- print: both platforms, no chrome ---------- */
+  @media print{
+    body{background:#fff; color:#222}
+    .page{max-width:100%; padding:0}
+    .switch{display:none}
+    body[data-os="mac"] .os-win, body[data-os="win"] .os-mac{display:revert}
+    .os-note{display:block; font:700 .8rem var(--sans); letter-spacing:.1em;
+      text-transform:uppercase; color:#888; margin:18px 0 10px}
+    section{margin-top:36px}
+    .q,.rescue,pre{border-color:#ddd; background:#fafafa}
+  }
+</style>
+</head>
+<body data-os="mac">
+<div class="page">
+
+<header>
+  <h1>Life brain</h1>
+  <svg class="squiggle" width="150" height="14" viewBox="0 0 150 14" fill="none" aria-hidden="true">
+    <path d="M2 8 C 8 2, 14 2, 20 8 S 32 14, 38 8 S 50 2, 56 8 S 68 14, 74 8 S 86 2, 92 8 S 104 14, 110 8 S 122 2, 128 8 S 140 14, 146 8"
+      stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>
+  <p class="lede">A second brain for your life admin: every project and
+  deadline you are carrying, with Claude Code doing the upkeep so you never
+  have to.</p>
+</header>
+
+<section>
+  <p class="kicker">What it is</p>
+  <h2>A folder, a page, and Claude</h2>
+  <p>The whole thing is a folder of ordinary text files, a page in your
+  browser that renders them, and Claude Code doing the filing. There is no
+  account to create, and if you one day abandon the tooling, the files still
+  read as plain English.</p>
+  <p>What makes it different from a to-do app is that it answers the three
+  questions a to-do app leaves you to work out alone.</p>
+  <div class="qs">
+    <div class="q">
+      <h3>What is quietly decaying?</h3>
+      <p>Deadlines gone past, things untouched for weeks, things never
+      started. The page flags them before they become emergencies.</p>
+    </div>
+    <div class="q">
+      <h3>Whose court is the ball in?</h3>
+      <p>What is on you, what is on someone else, and who has gone quiet long
+      enough that it is time to chase.</p>
+    </div>
+    <div class="q">
+      <h3>What deserves your next free hour?</h3>
+      <p>A short ranked list, with a reason for each item, instead of a wall
+      of two hundred tasks.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="kicker">The daily rhythm</p>
+  <h2>Your whole job is three things</h2>
+  <ol class="jobs">
+    <li><b>Drop thoughts in.</b> Type them into the box on the page, any
+    time, in any order. No categories, no tags.</li>
+    <li><b>Tick things off</b> as you do them.</li>
+    <li><b>Answer a question</b> when the brain asks one.</li>
+  </ol>
+  <p>Everything else is Claude's job: sorting your notes into the right
+  place, re-ranking what matters, chasing dates, rebuilding the page. Each
+  morning it can write you a plan of three achievable tasks. That division of
+  labour is the point of the design: a second brain that needs discipline
+  from a busy person is dead in three weeks.</p>
+  <p class="quiet">It also drafts for you. A task like "email the landlord"
+  comes back with the email already written, waiting for you to read and
+  send. Sending is always your click; the brain never sends anything itself.</p>
+</section>
+
+<section id="setup">
+  <p class="kicker">Setting it up</p>
+  <h2>Twenty minutes, mostly downloads</h2>
+  <p>You need the life-brain zip you were sent, a free install of Python, and
+  a Claude account (the Pro plan is enough) with
+  <a href="https://claude.com/claude-code">Claude Code</a>. You do not need
+  to know anything about terminals; the two places a terminal appears, the
+  steps tell you exactly what to type.</p>
+
+  <div class="switch" role="group" aria-label="Choose your computer">
+    <button type="button" data-pick="mac" aria-pressed="true">Mac</button>
+    <button type="button" data-pick="win" aria-pressed="false">Windows</button>
+  </div>
+
+  <!-- ================= MAC ================= -->
+  <div class="os-mac">
+    <p class="os-note">On a Mac</p>
+    <ol class="steps">
+      <li>
+        <h3>Put the folder somewhere permanent</h3>
+        <p>Double-click the zip, then move the folder it makes into
+        <code>Documents</code>. Don't leave it in Downloads; some Macs clean
+        that folder out, and this one becomes your actual notes.</p>
+      </li>
+      <li>
+        <h3>Open Terminal at the folder</h3>
+        <p>Press <kbd>⌘</kbd> <kbd>Space</kbd>, type <code>Terminal</code>,
+        press Return. Type <code>cd&nbsp;</code> (with a space), drag the
+        life-brain folder from Finder into the window, and press Return.
+        Terminal is now pointed at your folder. Leave it open.</p>
+      </li>
+      <li>
+        <h3>Let macOS trust the folder</h3>
+        <p>macOS blocks files that arrived from the internet until you say
+        otherwise. Paste this line into Terminal and press Return:</p>
+        <pre><code>xattr -dr com.apple.quarantine .</code></pre>
+        <p>Nothing visible happens. That is success.</p>
+      </li>
+      <li>
+        <h3>Check Python, then open the page</h3>
+        <p>Type <code>python3 --version</code>. A version number means you
+        are done. A pop-up offering developer tools means click Install and
+        wait; that gets you Python and Git in one go.</p>
+        <p>Then double-click <code>Open Brain.command</code> in the folder.
+        Your browser opens your brain page. Leave the small Terminal window
+        it spawns open while you use the page.</p>
+      </li>
+      <li>
+        <h3>Install Claude Code and sign in</h3>
+        <p>Follow the Mac instructions at
+        <a href="https://claude.com/claude-code">claude.com/claude-code</a>.
+        Then, back in your Terminal window, type <code>claude</code>. The
+        first run walks you through signing in with your Claude account, once.</p>
+      </li>
+      <li>
+        <h3>Build your brain</h3>
+        <p>With <code>claude</code> running, type <code>/onboard</code> and
+        press Return. Then talk: your projects, the people you owe replies
+        to, the deadlines you are carrying, in whatever order things come to
+        you. It sorts them out; there is no format to learn. When it
+        finishes, refresh your browser. Your brain is there.</p>
+        <div class="tip"><span class="sans">Worth doing on a Pro plan</span> &nbsp;
+        Leave the Careful/Full switch on the page set to Careful, and pick
+        Haiku or Sonnet when a job offers you a model (Opus is not included
+        on Pro). The full walkthrough in the folder covers the optional 7am
+        morning run and the 1am night shift.</div>
+      </li>
+    </ol>
+  </div>
+
+  <!-- ================= WINDOWS ================= -->
+  <div class="os-win">
+    <p class="os-note">On Windows</p>
+    <ol class="steps">
+      <li>
+        <h3>Put the folder somewhere permanent</h3>
+        <p>Unzip to <code>Documents\life-brain</code>. Don't leave it in
+        Downloads; some Windows setups clear that folder, and this one
+        becomes your actual notes.</p>
+      </li>
+      <li>
+        <h3>Install Python</h3>
+        <p>Download it from
+        <a href="https://www.python.org/downloads/">python.org/downloads</a>
+        and run the installer. On the first screen, tick the box that says
+        <b>"Add python.exe to PATH"</b>. It is at the bottom and easy to
+        miss, and it is the single most common reason setup fails. If you
+        missed it, run the installer again and choose Modify.</p>
+      </li>
+      <li>
+        <h3>Open the page</h3>
+        <p>Double-click <code>Open Brain.bat</code> in the folder. A black
+        window opens and your browser shows your brain page. Leave the black
+        window open while you use the page; closing it just stops the page,
+        nothing is lost.</p>
+      </li>
+      <li>
+        <h3>Install Claude Code</h3>
+        <p>Follow the Windows instructions at
+        <a href="https://claude.com/claude-code">claude.com/claude-code</a>.</p>
+      </li>
+      <li>
+        <h3>Open a terminal in the folder and sign in</h3>
+        <p>In File Explorer, open the life-brain folder, click the address
+        bar at the top, type <code>cmd</code>, and press Enter. A black
+        window opens, already pointed at the folder. Type
+        <code>claude</code>; the first run walks you through signing in with
+        your Claude account, once.</p>
+      </li>
+      <li>
+        <h3>Build your brain</h3>
+        <p>With <code>claude</code> running, type <code>/onboard</code> and
+        press Enter. Then talk: your projects, the people you owe replies
+        to, the deadlines you are carrying, in whatever order things come to
+        you. It sorts them out; there is no format to learn. When it
+        finishes, refresh your browser. Your brain is there.</p>
+        <div class="tip"><span class="sans">Worth doing on a Pro plan</span> &nbsp;
+        Set the Careful/Full switch on the page to Careful, and pick Haiku
+        or Sonnet when a job offers you a model (Opus is not included on
+        Pro). The full walkthrough in the folder covers the optional 7am
+        morning run and the 1am night shift.</div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="rescue">
+    <p><b>Stuck at any point?</b> Double-click
+    <span class="os-mac"><code>Check My Setup.command</code></span><span class="os-win"><code>Check My Setup.bat</code></span>
+    in the folder. It looks at your machine and tells you which step is
+    unfinished. And every step above is also walked through in more detail,
+    assuming nothing at all, in the <code>START HERE</code> file for your
+    computer, inside the folder.</p>
+  </div>
+</section>
+
+<section>
+  <p class="kicker">The rest of it</p>
+  <h2>What else it can do</h2>
+  <p>Most of this is already there the first time the page opens. The few
+  that reach outside your machine — your chats, a Telegram bot, your
+  calendar — take a couple of minutes each; the Connections button on the
+  page lists them with live status, and asking Claude in the folder sets any
+  of them up.</p>
+  <div class="feats">
+    <div class="feat">
+      <h3>A plan that fits the real week</h3>
+      <p>Give a task a deadline and a rough size, and the week answers
+      honestly: what fits, what has to move, what will be late whatever you
+      do. Your calendar and the weather where you actually are come into it,
+      so the outdoor job lands on the dry afternoon.</p>
+    </div>
+    <div class="feat">
+      <h3>Friendships get the same care as projects</h3>
+      <p>You give each person a rhythm (weekly for your mum, monthly for an
+      old friend) and the People page surfaces whoever has drifted past it,
+      who you owe a reply, and whose birthday is coming. Bridge your chats
+      through the free Beeper app and the last-spoke dates keep themselves
+      true, from chat names and dates only, never the messages.</p>
+    </div>
+    <div class="feat">
+      <h3>Rooms, and a finish line in each</h3>
+      <p>Your life groups into rooms — one per project, one per front — each
+      with its own notes and its own goals with dates on them. A goal that
+      slips makes its whole room shout, exactly the way a late deadline
+      does.</p>
+    </div>
+    <div class="feat">
+      <h3>The season you are in</h3>
+      <p>A bucket list for this stretch of life, with the months left drawn
+      out in front of you. Drag an item onto a day and it becomes a plan; if
+      it names people, the invitation is already written and waiting for you
+      to send.</p>
+    </div>
+    <div class="feat">
+      <h3>Tell it the day</h3>
+      <p>Type or speak how the day went. Your words are kept exactly as you
+      said them, then quietly farmed for the useful parts: who you spoke to,
+      what got finished. The journal stays yours — the scheduled runs are
+      blocked from opening it. Habits are counted for the week, with no
+      lecture attached.</p>
+    </div>
+    <div class="feat">
+      <h3>A briefing you would actually read</h3>
+      <p>A news page built from outlets you pick and filtered to the subjects
+      you follow. For a field you are learning, each morning adds a
+      plain-language breakdown and one term worth knowing, which collects
+      into a glossary of your own.</p>
+    </div>
+    <div class="feat">
+      <h3>Text it from the bus</h3>
+      <p>A Telegram bot, set up in two minutes. A thought sent from anywhere
+      lands in your inbox, "plan" answers with today's list, and a voice note
+      is transcribed on your own machine and turned into tasks.</p>
+    </div>
+    <div class="feat">
+      <h3>An assistant with a queue</h3>
+      <p>Type an ask on the page in plain words: "chase the letting agency
+      and draft the email for me". Next run, Claude works through the queue
+      and each card gets a note saying what it did.</p>
+    </div>
+    <div class="feat">
+      <h3>Your Claude Code conversations, on the page</h3>
+      <p>The Sessions page holds a live, resumable Claude Code conversation
+      for each of your projects, several at once, so you can run them from
+      the browser instead of a stack of terminals.</p>
+    </div>
+    <div class="feat">
+      <h3>Your whole life as one picture</h3>
+      <p>The map shows every workstream as a dot, clustered by area of your
+      life and coloured by what is wrong with it: red for late, amber for
+      someone owing you a reply, blue for going cold.</p>
+    </div>
+    <div class="feat">
+      <h3>It watches your project folders</h3>
+      <p>Point it at any folder with a TODO.md and the page picks up the open
+      items every twenty minutes, along with how long since anyone worked
+      there. Your projects show up without you filing anything.</p>
+    </div>
+    <div class="feat">
+      <h3>Mornings and nights run themselves</h3>
+      <p>At 7:00 it syncs, writes the day's plan, and notifies you only if
+      something is genuinely overdue. The heavy jobs can run at 1am instead,
+      in their own usage window, finished before you wake.</p>
+    </div>
+  </div>
+  <p class="feats-note quiet">The page comes in six looks — a warm workroom,
+  a printed broadsheet, a Bauhaus grid among them — and switching between
+  them takes one click in the Appearance menu.</p>
+</section>
+
+<section>
+  <p class="kicker">Your data</p>
+  <h2>What it does with your life</h2>
+  <p>Everything stays in the folder on your computer. The page is served at
+  an address only your own machine can reach.</p>
+  <p>The brain drafts messages and emails for you, but you always press send
+  yourself. Anyone you mark as family or a close friend is draft-only in the
+  code itself: the brain cannot message them even if asked to.</p>
+</section>
+
+<section>
+  <p class="kicker">The price</p>
+  <h2>What it costs</h2>
+  <p>Nothing beyond the Claude subscription you already have or would sign
+  up for. Pro is enough: the brain defaults to the cheapest models for
+  routine filing, and the heavy work can run at 1am in its own usage window,
+  finished long before you wake.</p>
+  <p>It also keeps its own books. Every Claude job lands in a ledger, by day
+  and by model, and a Usage page shows what each feature spends — so if a
+  week feels expensive, you can see which part of the brain did it.</p>
+</section>
+
+<footer>
+  <p>Made with a folder of markdown, a Python server, and Claude Code. When
+  a newer copy reaches you, ask Claude to update in place: the code changes,
+  your workstreams and people and settings stay exactly as they are. Once
+  yours is running, it can build a clean copy to pass on to the next
+  friend.</p>
+</footer>
+
+</div>
+<script>
+(function(){
+  var body=document.body;
+  var isWin=/Win/.test(navigator.platform)||/Windows/.test(navigator.userAgent);
+  set(isWin?"win":"mac");
+  document.querySelectorAll(".switch button").forEach(function(b){
+    b.addEventListener("click",function(){set(b.dataset.pick)});
+  });
+  function set(os){
+    body.dataset.os=os;
+    document.querySelectorAll(".switch button").forEach(function(b){
+      b.setAttribute("aria-pressed",String(b.dataset.pick===os));
+    });
+  }
+})();
+</script>
+</body>
+</html>

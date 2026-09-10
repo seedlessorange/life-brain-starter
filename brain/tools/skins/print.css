@@ -1,0 +1,640 @@
+/* PRINT SHOP — full skin (design/skins/SPECS.md §1; mockup: Today - print shop.dc.html).
+   Baked only when active, emitted after the token/theme blocks so it wins ties.
+   Every rule scoped [data-style="print"]. Fonts (Hanken/Spline Mono/Newsreader-i)
+   are emitted as @font-face by skins.py; Bricolage is always vendored. */
+
+/* ---------------------------------------------------------------- tokens */
+:root[data-style="print"]{
+  --paper:oklch(96.6% .019 88);
+  --surface:oklch(99.6% .006 88);
+  --sunken:oklch(94.9% .026 88);
+  --ink:oklch(25.5% .018 62);
+  --dim:oklch(48% .02 62);
+  --faint:oklch(63% .018 62);
+  --line:oklch(91.2% .018 80);
+  --line2:oklch(85.5% .022 80);
+  /* accent = the teal link/AI hue; amber is a fill, carried by --pr-amber */
+  --green:oklch(50.5% .072 205);
+  --greenbg:color-mix(in oklab,var(--green) 12%,var(--paper));
+  --terra:oklch(58.5% .12 45);
+  --bad:oklch(50.5% .14 28);
+  --badbg:color-mix(in oklab,var(--bad) 13%,var(--paper));
+  --wait:oklch(64% .11 75);
+  --waitbg:color-mix(in oklab,oklch(74.5% .13 78) 30%,var(--paper));
+  --cold:oklch(50.5% .08 250);
+  --coldbg:color-mix(in oklab,var(--cold) 11%,var(--paper));
+  --ok:oklch(52% .075 120);
+  --okt:color-mix(in oklab,var(--ok) 12%,var(--paper));
+  --pr-amber:oklch(74.5% .13 78);
+  --pr-ambermid:oklch(64% .11 75);
+  --pr-mono:'Spline Sans Mono',ui-monospace,Menlo,monospace;
+  --serif:'Bricolage',Georgia,sans-serif;
+  --sans:'Hanken Grotesk',system-ui,sans-serif;
+  --coach:'Newsreader',Georgia,serif;
+  --r-xl:0px;--r-lg:0px;--r-card:0px;--r-md:0px;--r-btn:0px;--r-sm:0px;
+  --shadow:none;
+  --shadow-lift:5px 5px 0 color-mix(in oklab,var(--ink) 12%,transparent);
+}
+
+/* Dark twins: primaries repinned; the tints above are color-mix over
+   var(--paper)/state hues, so they follow without restating. */
+:root[data-style="print"][data-theme="dark"]{
+  --paper:oklch(20.5% .012 75);
+  --surface:oklch(24% .014 78);
+  --sunken:oklch(17.5% .014 78);
+  --ink:oklch(92% .015 85);
+  --dim:oklch(70% .02 78);
+  --faint:oklch(56% .02 75);
+  --line:oklch(31% .015 78);
+  --line2:oklch(39% .018 78);
+  --green:oklch(72% .07 205);
+  --terra:oklch(70% .11 50);
+  --bad:oklch(70% .13 30);
+  --wait:oklch(76% .1 80);
+  --cold:oklch(72% .07 250);
+  --ok:oklch(72% .08 130);
+  --pr-amber:oklch(76% .12 80);
+  --pr-ambermid:oklch(70% .1 78);
+  --shadow:none;
+  --shadow-lift:5px 5px 0 oklch(0% 0 0/.45);
+}
+@media (prefers-color-scheme:dark){
+:root[data-style="print"]:not([data-theme="light"]){
+  --paper:oklch(20.5% .012 75);
+  --surface:oklch(24% .014 78);
+  --sunken:oklch(17.5% .014 78);
+  --ink:oklch(92% .015 85);
+  --dim:oklch(70% .02 78);
+  --faint:oklch(56% .02 75);
+  --line:oklch(31% .015 78);
+  --line2:oklch(39% .018 78);
+  --green:oklch(72% .07 205);
+  --terra:oklch(70% .11 50);
+  --bad:oklch(70% .13 30);
+  --wait:oklch(76% .1 80);
+  --cold:oklch(72% .07 250);
+  --ok:oklch(72% .08 130);
+  --pr-amber:oklch(76% .12 80);
+  --pr-ambermid:oklch(70% .1 78);
+  --shadow:none;
+  --shadow-lift:5px 5px 0 oklch(0% 0 0/.45);
+}
+}
+
+/* ------------------------------------------------------------ base type */
+[data-style="print"] a{color:var(--green)}
+[data-style="print"] a:hover{color:var(--ink)}
+[data-style="print"] .hero h1{font-weight:700;letter-spacing:-.03em}
+/* Bricolage has no italic: the serif flourishes ride Newsreader instead */
+[data-style="print"] .hero-why,
+[data-style="print"] .hero-matters,
+[data-style="print"] .matters,
+[data-style="print"] .tiernote,
+[data-style="print"] .hnote,
+[data-style="print"] .draftnote,
+[data-style="print"] .tnote{font-family:var(--coach)}
+[data-style="print"] input:not([type="checkbox"]):not([type="radio"]),
+[data-style="print"] textarea,
+[data-style="print"] select{border-radius:0}
+[data-style="print"] input[type="checkbox"]{accent-color:var(--ok)}
+
+/* mono metadata — uppercase Spline Sans Mono for stamps and stat strings */
+[data-style="print"] .meta,
+[data-style="print"] .test,
+[data-style="print"] .offerwhen,
+[data-style="print"] .fc-when,
+[data-style="print"] .qdate,
+[data-style="print"] .hzsince,
+[data-style="print"] .whensub,
+[data-style="print"] .cdn,
+[data-style="print"] .cddate,
+[data-style="print"] .draftsub,
+[data-style="print"] .rtwhen,
+[data-style="print"] .mo-across,
+[data-style="print"] .mo-fresh,
+[data-style="print"] .rank{
+  font-family:var(--pr-mono);font-weight:400;font-size:.71rem;
+  letter-spacing:.05em;text-transform:uppercase}
+[data-style="print"] .rank{font-size:.8rem;font-weight:600}
+/* a sentence, not a stat — exempt it */
+[data-style="print"] .qwlegend{font-family:var(--sans);text-transform:none;
+  letter-spacing:0;font-size:var(--t-xs)}
+
+/* -------------------------------------------------------------- header */
+[data-style="print"] .top{border-bottom:1.5px solid var(--ink)}
+[data-style="print"] .brand{font-family:var(--serif);font-weight:700;letter-spacing:-.015em}
+/* the stamp rides inside the sync pill — the pill wears the mono ticket look */
+[data-style="print"] .skinx-stamp{display:inline;white-space:nowrap}
+[data-style="print"] .syncstate{padding:5px 11px;border:1.5px solid var(--line2);
+  border-radius:20px;font:500 .68rem/1 var(--pr-mono);color:var(--dim);
+  letter-spacing:.05em}
+[data-style="print"] .syncstate i{background:var(--ok)}
+[data-style="print"] .topnav a{border-radius:0}
+[data-style="print"] .topnav a:hover{background:transparent;color:var(--ink)}
+[data-style="print"] .topnav a.on{background:transparent;color:var(--ink);
+  font-weight:700;box-shadow:0 3px 0 var(--pr-amber)}
+[data-style="print"] .askopen{background:var(--ink);color:var(--paper);
+  border:1.5px solid var(--ink);border-radius:7px;font-weight:600}
+[data-style="print"] .askopen:hover{border-color:var(--ink);opacity:.92}
+[data-style="print"] .ghostbtn{border:1.5px solid var(--line2);border-radius:7px;
+  color:var(--dim);font-weight:500}
+[data-style="print"] .ghostbtn:hover{background:var(--surface);color:var(--ink)}
+[data-style="print"] #updbtn{border-color:var(--ink);color:var(--ink);font-weight:600}
+[data-style="print"] .aprow>button{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] .cxact{border-radius:0}
+
+/* ------------------------------------------------- eyebrows & squiggles */
+/* filled label-chip eyebrow — the skin's signature */
+[data-style="print"] .eyebrow{display:inline-block;background:var(--pr-amber);
+  color:oklch(25.5% .018 62);padding:5px 9px;border-radius:0;
+  font:700 10.5px/1 var(--sans);letter-spacing:.17em;text-transform:uppercase}
+/* the Claude-voiced sections take the blue variant */
+[data-style="print"] .offercard .eyebrow,
+[data-style="print"] .qcard .eyebrow{background:var(--green);color:var(--paper)}
+/* a chip must not grow a squiggle inside its own fill */
+[data-style="print"] .qcard .eyebrow::after,
+[data-style="print"] .offercard .eyebrow::after{content:none;display:none}
+/* plain ink-adjacent section labels keep the letterpress tracking */
+[data-style="print"] .area{letter-spacing:.17em;color:var(--dim)}
+[data-style="print"] .todaywrap .doc h2{color:var(--dim);letter-spacing:.17em}
+/* the squiggle stays, amber-tinted */
+[data-style="print"] .wav,
+[data-style="print"] h3.area::after,
+[data-style="print"] #queue>h2::after,
+[data-style="print"] #drafts>h2::after,
+[data-style="print"] #connections>h2::after,
+[data-style="print"] #recordings>h2::after,
+[data-style="print"] #newfiles>h2::after,
+[data-style="print"] #people>h2::after,
+[data-style="print"] #attention>h2::after,
+[data-style="print"] #all>h2::after,
+[data-style="print"] .doc h2::after,
+[data-style="print"] .todaydoc h2::after{background:var(--pr-ambermid);opacity:.8}
+
+/* ------------------------------------------------- cards as inked bands */
+[data-style="print"] .todaywrap,
+[data-style="print"] .panel,
+[data-style="print"] .hzcard,
+[data-style="print"] .offercard,
+[data-style="print"] .bscard,
+[data-style="print"] .qcard,
+[data-style="print"] .daycard,
+[data-style="print"] .forecast,
+[data-style="print"] .draftcard,
+[data-style="print"] .stackrow{border:1.5px solid var(--ink);border-radius:0;
+  background:var(--surface);box-shadow:none}
+[data-style="print"] .dupcard{border:1.5px solid var(--ink);border-radius:0}
+[data-style="print"] .forecast{padding:14px 16px}
+/* rail cards sit one step down the border hierarchy */
+[data-style="print"] .railcard{border:1.5px solid var(--line2);border-radius:0;
+  background:var(--surface)}
+
+/* the vertical ink column rule between the work column and the rail */
+@media (min-width:1181px){
+  [data-style="print"] .todaygrid{gap:var(--s5)}
+  [data-style="print"] aside.todayrail{border-left:1.5px solid var(--ink);
+    padding-left:var(--s5)}
+}
+
+/* ----------------------------------------------------------------- hero */
+[data-style="print"] .hero-next{border:2px solid var(--ink);
+  background:var(--surface);padding:15px 17px;max-width:700px}
+[data-style="print"] .hero-next span{color:var(--green);letter-spacing:.17em}
+[data-style="print"] .heroplan{color:var(--green);text-decoration:none;
+  border-bottom:1.5px solid var(--green);font-weight:600}
+[data-style="print"] .heroplan:hover{color:var(--ink);border-bottom-color:var(--ink)}
+[data-style="print"] .skinx-prov{display:block;margin:2px 0 var(--s3);
+  font:400 .71rem/1.4 var(--pr-mono);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--faint)}
+
+/* bordered progress bars */
+[data-style="print"] main .bar{height:9px;border:1.5px solid var(--ink);
+  border-radius:0;background:var(--line)}
+[data-style="print"] main .bar i{border-radius:0;background:var(--pr-amber)}
+
+/* weather band */
+[data-style="print"] .wxline{background:var(--sunken);
+  border:1.5px solid var(--line2);padding:12px 16px;color:var(--ink)}
+[data-style="print"] .skinx-wx{display:block;margin-top:8px;
+  font:400 .68rem/1.7 var(--pr-mono);letter-spacing:.05em;
+  text-transform:uppercase;color:var(--faint)}
+
+/* ------------------------------------------------------------ the plan */
+[data-style="print"] .skinx-planstamp{display:inline-block;margin:0 8px 6px 0;
+  font:400 .71rem/1.6 var(--pr-mono);letter-spacing:.06em;
+  text-transform:uppercase;color:var(--faint)}
+[data-style="print"] .updnudge{background:var(--waitbg);
+  border:1.5px solid var(--ink);border-radius:0}
+[data-style="print"] .updnudge>span{font:italic 400 1rem/1.45 var(--coach);
+  color:var(--ink)}
+[data-style="print"] .evwrap{background:var(--sunken);
+  border:1.5px solid var(--ink);border-radius:0}
+/* task rows ruled like a printed list: ink lead rule, hairlines after */
+[data-style="print"] .todaydoc ul.tasks li,
+[data-style="print"] .qwins ul.tasks li{border-top:1.5px solid var(--line);
+  padding:11px 0}
+[data-style="print"] .todaydoc ul.tasks li:first-child{border-top:1.5px solid var(--ink)}
+[data-style="print"] .todaydoc ul.tasks,
+[data-style="print"] .qwins ul.tasks{border-bottom:1.5px solid var(--line)}
+[data-style="print"] .weekstrip{border-top:1.5px solid var(--line2)}
+[data-style="print"] .weekstrip>summary{font-family:var(--pr-mono);
+  letter-spacing:.1em;text-transform:uppercase}
+
+/* checkboxes: 2px ink squares; done fills with the moving green */
+[data-style="print"] .box{border:2px solid var(--ink);border-radius:0;
+  color:var(--ok)}
+[data-style="print"] button.box:hover{border-color:var(--ok)}
+[data-style="print"] .box.done{border-color:var(--ok)}
+[data-style="print"] button.tick[aria-pressed="true"]{background:var(--ok);
+  border-color:var(--ok);color:var(--paper)}
+
+/* chips square up; the estimate chip goes mono-outlined */
+[data-style="print"] .v{border-radius:0;border:1.5px solid currentColor}
+[data-style="print"] .test{border-radius:0;border:1.5px solid var(--line2);
+  background:transparent;color:var(--dim);padding:1px 7px}
+[data-style="print"] .tws{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] .ballpill{border-radius:0;
+  border:1.5px solid currentColor;padding:3px 10px}
+
+/* --------------------------------------------------------- button ranks */
+/* primary: ink block */
+[data-style="print"] .btnp{background:var(--ink);color:var(--paper);
+  border:1.5px solid var(--ink);border-radius:0;font-weight:600}
+/* secondary: 1.5px ink outline */
+[data-style="print"] .act{border:1.5px solid var(--ink);border-radius:0;
+  color:var(--ink);font-weight:600}
+[data-style="print"] .act:hover{background:var(--surface);border-color:var(--ink)}
+[data-style="print"] .act.right{border-style:solid;border-color:var(--line2);
+  color:var(--dim);font-weight:500}
+/* ghost: hairline outline, dim */
+[data-style="print"] .mini,
+[data-style="print"] .jobbtn{border:1.5px solid var(--line2);border-radius:0;
+  color:var(--dim);font-weight:500}
+[data-style="print"] .mini:hover,
+[data-style="print"] .jobbtn:hover{border-color:var(--ink);color:var(--ink);
+  background:var(--surface)}
+/* AI actions keep the teal voice */
+[data-style="print"] .offerbtn,
+[data-style="print"] .hzstart,
+[data-style="print"] .planrefresh{border-color:var(--green);color:var(--green)}
+[data-style="print"] .acts{border-top:1px solid var(--line)}
+[data-style="print"] .hero .acts{border-top:0}
+[data-style="print"] .tile{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] .tile.active{border-color:var(--ink)}
+
+/* --------------------------------------------------------------- plate */
+[data-style="print"] .row{border-bottom:1.5px solid var(--line)}
+[data-style="print"] #attention .row{border-bottom:1.5px solid var(--line2)}
+[data-style="print"] .csection>summary.circlehead .csub{border-radius:0}
+
+/* --------------------------------------------------------------- claude */
+[data-style="print"] .draft{border:1.5px solid var(--line2);border-radius:0}
+[data-style="print"] .clsub a.on{box-shadow:0 3px 0 var(--pr-amber)}
+[data-style="print"] .aopt{border-radius:0}
+
+/* ----------------------------------------------------------------- news */
+[data-style="print"] .nwsec h3{font:600 .71rem/1 var(--pr-mono);
+  letter-spacing:.17em;text-transform:uppercase;color:var(--dim)}
+[data-style="print"] .nwsec h3::after{background:var(--line2);height:1.5px}
+[data-style="print"] .nwitem{border-bottom:1px solid var(--line)}
+
+/* --------------------------------------------------------------- season */
+[data-style="print"] .sznav b{font-family:var(--pr-mono);font-size:.78rem;
+  letter-spacing:.05em;text-transform:uppercase}
+
+/* --------------------------------------- floating chrome: letterpress */
+[data-style="print"] #runbar,
+[data-style="print"] .runbar{border-radius:0;border:2px solid var(--ink);
+  background:var(--surface);
+  box-shadow:4px 4px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .runbar.rb-live{border-color:var(--green);
+  box-shadow:4px 4px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .rb-go{border-radius:0;background:var(--ink);
+  color:var(--paper)}
+[data-style="print"] #actdrawer,
+[data-style="print"] .actdrawer{border:2px solid var(--ink);border-radius:0;
+  box-shadow:6px 6px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .appanel{border:1.5px solid var(--ink);border-radius:0}
+[data-style="print"] .moreMenu{border:1.5px solid var(--ink);border-radius:0;
+  box-shadow:5px 5px 0 color-mix(in oklab,var(--ink) 12%,transparent)}
+[data-style="print"] .morepop{border:1.5px solid var(--ink);border-radius:0;
+  box-shadow:5px 5px 0 color-mix(in oklab,var(--ink) 12%,transparent)}
+[data-style="print"] .ramblewrap{border:2px solid var(--ink);border-radius:0}
+[data-style="print"] .ramblefab{border:2px solid var(--ink);
+  background:var(--surface);color:var(--ink);box-shadow:none}
+[data-style="print"] .fab{background:var(--pr-amber);color:oklch(25.5% .018 62);
+  border:2px solid var(--ink);
+  box-shadow:4px 4px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .toast{border-radius:0}
+
+/* ------------------------------------------------------------- phone */
+@media (max-width:760px){
+  [data-style="print"] aside.todayrail{border-left:0;padding-left:0}
+  [data-style="print"] .tabbar{border-top:1.5px solid var(--ink)}
+  [data-style="print"] .hero-next{padding:12px 14px}
+  [data-style="print"] .skinx-stamp{display:none}
+}
+
+/* ================== the non-home pages, same press ==================== */
+/* structural rule shade: near-ink, mixed toward paper so dark mode follows */
+
+/* Plate — ruled ledger bands, not cards. Ink lead rule per row (2px on the
+   first), transparent ground; an open row stays in the ledger, no lift. */
+[data-style="print"] #attention .stack>details.row,
+[data-style="print"] #all .stack>details.row{
+  border-bottom:0;background:transparent;
+  border-top:1.5px solid color-mix(in oklab,var(--ink) 80%,var(--paper))}
+[data-style="print"] #attention .stack>details.row:first-child,
+[data-style="print"] #all .stack>details.row:first-child{
+  border-top:2px solid var(--ink)}
+[data-style="print"] #attention .stack,
+[data-style="print"] #all .stack{border-bottom:1.5px solid var(--line2)}
+[data-style="print"] #attention .row summary,
+[data-style="print"] #all .row summary{padding:17px var(--s1)}
+[data-style="print"] .row[open]{background:transparent;box-shadow:none;
+  margin:0;padding:0;border-radius:0}
+/* rank numerals: mono (from the base metadata rule) in the press ochre;
+   severity keeps talking through the state-coloured reason lines */
+[data-style="print"] #attention .rank,
+[data-style="print"] #all .rank{color:var(--pr-ambermid)}
+
+/* the big section heads: Bricolage over a flat ochre slug, no squiggle */
+[data-style="print"] #attention>h2,[data-style="print"] #all>h2,
+[data-style="print"] #people>h2,[data-style="print"] #queue>h2,
+[data-style="print"] #drafts>h2{
+  font:700 1.45rem/1.25 var(--serif);letter-spacing:-.02em}
+[data-style="print"] #attention>h2::after,[data-style="print"] #all>h2::after,
+[data-style="print"] #people>h2::after,[data-style="print"] #queue>h2::after,
+[data-style="print"] #drafts>h2::after{
+  -webkit-mask:none;mask:none;height:3px;max-width:64px;opacity:1;
+  margin-top:7px;background:var(--pr-ambermid)}
+
+/* People — circle shelves ruled apart; the circle name is a mono stamp */
+[data-style="print"] .csection{
+  border-top:1.5px solid color-mix(in oklab,var(--ink) 80%,var(--paper))}
+[data-style="print"] details.shelf{border:0;background:transparent}
+[data-style="print"] .csection>summary.circlehead{
+  font-family:var(--pr-mono);font-weight:600;font-size:.74rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+[data-style="print"] .shmore{border-radius:0}
+
+/* Claude — the four verbs as inked plates: Bricolage face, mono sub-line,
+   hover flips to solid ink */
+[data-style="print"] .jobrow2 .jobbtn{
+  border:1.5px solid var(--ink);border-radius:0;background:transparent;
+  color:var(--ink);font-family:var(--serif);font-weight:700;
+  letter-spacing:-.01em}
+[data-style="print"] .jobrow2 .jobbtn span{
+  font:400 .68rem/1.5 var(--pr-mono);letter-spacing:.05em;
+  text-transform:uppercase;color:var(--dim)}
+[data-style="print"] .jobrow2 .jobbtn:hover{
+  background:var(--ink);color:var(--paper);border-color:var(--ink)}
+[data-style="print"] .jobrow2 .jobbtn:hover span{
+  color:color-mix(in oklab,var(--paper) 78%,var(--ink))}
+[data-style="print"] .jobrow2 .jobqueue{color:var(--green);border-color:var(--green)}
+[data-style="print"] .jobrow2 .jobqueue:hover{
+  background:var(--green);color:var(--paper);border-color:var(--green)}
+[data-style="print"] .draftcard{border-radius:0}
+[data-style="print"] .draftcard+.draftcard{margin-top:0;
+  border-top:1px solid var(--line)}
+[data-style="print"] .dkind{border-radius:0}
+
+/* News — broadsheet: hairlines between stories, an ink rule opening each
+   section, headlines in Bricolage; the rail hangs off a left column rule */
+[data-style="print"] .nwsec{padding-top:16px;
+  border-top:1.5px solid color-mix(in oklab,var(--ink) 80%,var(--paper))}
+[data-style="print"] .newsmain .nwsec:first-child{border-top:0;padding-top:0}
+[data-style="print"] .nwhead{font-family:var(--serif);font-weight:700;
+  font-size:1.12rem;letter-spacing:-.015em}
+@media (min-width:1181px){
+  [data-style="print"] .newsrail{
+    border-left:1.5px solid color-mix(in oklab,var(--ink) 80%,var(--paper));
+    padding-left:var(--s5)}
+}
+
+/* Season — the tray is a 2px ink box on the tint band; cells stay square
+   (the zeroed radius tokens already square .szday/.szwe hairline borders) */
+[data-style="print"] .sztray{border:2px solid var(--ink);border-radius:0;
+  background:var(--sunken)}
+[data-style="print"] .szchip,[data-style="print"] .szday,
+[data-style="print"] .szwe{border-radius:0}
+
+/* ================= rooms.html — the floor plan as a plan chest ========= */
+/* structural near-ink rule that follows the theme */
+:root[data-style="print"]{--pr-rule:color-mix(in oklab,var(--ink) 80%,var(--paper))}
+
+/* head strip: typography only (the mascot keeps its exact size) */
+[data-style="print"] .bar b{font-weight:700;letter-spacing:-.015em}
+[data-style="print"] .bar .n{font:400 .68rem/1.6 var(--pr-mono);
+  letter-spacing:.06em;text-transform:uppercase}
+
+/* wings become ruled bands: a 2px ink rule opens each, mono health line */
+[data-style="print"] .wing{background:transparent;border:0;border-radius:0;
+  border-top:2px solid var(--ink);overflow:visible;margin:0 0 26px;padding:0 2px}
+[data-style="print"] .wing>header{padding:14px 0 10px}
+[data-style="print"] .wing h2{font-weight:700;letter-spacing:-.015em}
+[data-style="print"] .whealth{font:400 .68rem/1.6 var(--pr-mono);
+  letter-spacing:.05em;text-transform:uppercase}
+[data-style="print"] .waudit{border:1.5px solid var(--line2);border-radius:0;
+  background:transparent;font:600 .66rem/1 var(--pr-mono);
+  letter-spacing:.08em;text-transform:uppercase;padding:7px 11px}
+[data-style="print"] .waudit:hover{border-color:var(--ink)}
+[data-style="print"] .roomgrid{padding:0 0 6px}
+
+/* room cards: squared hairline boxes, Bricolage names, mono stat line */
+[data-style="print"] .room{border:1.5px solid var(--line2);border-radius:0;
+  background:var(--surface)}
+[data-style="print"] .room:hover{border-color:var(--ink)}
+[data-style="print"] .room h3{font-family:var(--serif);font-weight:700;
+  letter-spacing:-.01em}
+[data-style="print"] .room .line{font:400 .66rem/1.6 var(--pr-mono);
+  letter-spacing:.05em;text-transform:uppercase}
+
+/* the finish-line strip: mono label, squared goal chips */
+[data-style="print"] .goalstrip b{font:600 .66rem/1.6 var(--pr-mono);
+  letter-spacing:.08em;text-transform:uppercase}
+[data-style="print"] .gchip{border:1.5px solid var(--line2);border-radius:0}
+[data-style="print"] .gchip:hover{border-color:var(--ink)}
+[data-style="print"] .gline{font:400 .68rem/1.5 var(--pr-mono);letter-spacing:.04em}
+[data-style="print"] .strip{font:400 .68rem/1.6 var(--pr-mono);
+  letter-spacing:.05em;text-transform:uppercase}
+
+/* inside a room: title in Bricolage, the state line in the coach serif */
+[data-style="print"] .rhead h1{font-weight:700;letter-spacing:-.02em}
+[data-style="print"] .rhead .wingtag{font:600 .64rem/1 var(--pr-mono);
+  letter-spacing:.14em}
+[data-style="print"] .rline{font:italic 400 .95rem/1.5 var(--coach)}
+
+/* zones: 1.5px ink-ruled boxes; the small-caps label is an ochre chip */
+[data-style="print"] .zone{border:1.5px solid var(--ink);border-radius:0;
+  background:var(--surface)}
+[data-style="print"] .zone>h2{display:inline-block;background:var(--pr-amber);
+  color:oklch(25.5% .018 62);padding:5px 9px;margin:0 0 11px;
+  font:700 10.5px/1 var(--sans);letter-spacing:.17em;text-transform:uppercase}
+[data-style="print"] .zone>h2::after{float:none;margin-left:8px;
+  color:oklch(25.5% .018 62)}
+/* the big-questions room stays paper: no chips, no boxes */
+[data-style="print"] #roomview.bigq .zone>h2{display:block;background:transparent;
+  padding:0;color:var(--faint);font:600 13px/1.4 var(--sans);letter-spacing:.12em}
+
+/* zone metadata goes mono uppercase */
+[data-style="print"] .tws,
+[data-style="print"] .docmeta,
+[data-style="print"] .cwhen,
+[data-style="print"] .chands,
+[data-style="print"] .hcount,
+[data-style="print"] .pulse .cd,
+[data-style="print"] .gprog,
+[data-style="print"] .urg,
+[data-style="print"] .hoffmeta,
+[data-style="print"] .hoffas,
+[data-style="print"] .hit .where{font-family:var(--pr-mono);
+  letter-spacing:.05em;text-transform:uppercase}
+
+/* the docs list as a ruled index */
+[data-style="print"] .docs li{border-top:1px solid var(--line);padding:6px 0}
+[data-style="print"] .docs li:first-child{border-top:1.5px solid var(--pr-rule)}
+[data-style="print"] .docbody{border:1.5px solid var(--line2);border-radius:0}
+[data-style="print"] .docbody pre{border-radius:0}
+[data-style="print"] .memread code{border-radius:0}
+[data-style="print"] .mdbox{border-radius:0}
+[data-style="print"] .hoff{border-radius:0}
+[data-style="print"] .hoffopen{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] .convo{border-radius:0}
+
+/* forms square up; the ask button is a solid-ink primary */
+[data-style="print"] #notes{border-radius:0}
+[data-style="print"] .askrow textarea,
+[data-style="print"] .askrow select,
+[data-style="print"] .askrow button,
+[data-style="print"] .noterow button,
+[data-style="print"] .addrow input,
+[data-style="print"] .addrow select,
+[data-style="print"] .addrow button,
+[data-style="print"] .tract button{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] button.go,
+[data-style="print"] .tract button.go,
+[data-style="print"] .addrow button.go{background:var(--ink);color:var(--paper);
+  border-color:var(--ink);font-weight:600}
+[data-style="print"] .ptick{border:1.5px solid var(--ink);border-radius:0}
+[data-style="print"] .ctxchip{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] .hint{font:italic 400 12px/1.55 var(--coach)}
+
+/* floating chrome on the rooms page: letterpress */
+[data-style="print"] .agentbar{border:2px solid var(--ink);border-radius:0;
+  box-shadow:4px 4px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .agentbar button{border-radius:0}
+
+/* ================== map.html — the chart room, same press ============== */
+/* the map's own bar (the one carrying the key strip) closes on an ink rule */
+[data-style="print"] .bar:has(>.barkey){border-bottom:1.5px solid var(--ink)}
+[data-style="print"] .barkey{border-top:1px solid var(--line);padding-top:6px}
+[data-style="print"] .bartitle b{font-weight:700;letter-spacing:-.015em}
+[data-style="print"] .bartitle .n{font:400 .68rem/1.6 var(--pr-mono);
+  letter-spacing:.06em;text-transform:uppercase}
+
+/* toolbar: squared tools, the view switch as an inked tray */
+[data-style="print"] a.back,
+[data-style="print"] button.tool{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] button.tool:hover{border-color:var(--ink)}
+[data-style="print"] .zgrp .tool,
+[data-style="print"] .zgrp .tool:first-child,
+[data-style="print"] .zgrp .tool:last-child{border-radius:0}
+[data-style="print"] .modes{border:1.5px solid var(--ink);border-radius:0;padding:2px}
+[data-style="print"] .modes button{border-radius:0}
+
+/* the key is the legend is the filter: squared mono chips */
+[data-style="print"] .keylab{font-family:var(--pr-mono)}
+[data-style="print"] .lg{border-radius:0;font-family:var(--pr-mono);
+  font-size:.66rem;letter-spacing:.05em;text-transform:uppercase}
+[data-style="print"] .lg:hover{border-color:var(--line2)}
+[data-style="print"] .lgclear{font-family:var(--pr-mono);font-size:.66rem;
+  letter-spacing:.05em;text-transform:uppercase}
+[data-style="print"] .lgclear.on{border-radius:0}
+
+/* the detail panel: a 1.5px ink box, letterpress only while it floats */
+[data-style="print"] .panel{border:1.5px solid var(--ink);border-radius:0;
+  box-shadow:5px 5px 0 color-mix(in oklab,var(--ink) 12%,transparent)}
+[data-style="print"] body.docked .panel{border-left:1.5px solid var(--ink);
+  box-shadow:none}
+[data-style="print"] .panel h2{font-family:var(--serif);font-weight:700;
+  letter-spacing:-.015em}
+[data-style="print"] .panel .area{font-family:var(--pr-mono);letter-spacing:.14em}
+[data-style="print"] .panel dt{font-family:var(--pr-mono);font-size:.66rem;
+  letter-spacing:.05em;text-transform:uppercase}
+[data-style="print"] .pprog{border:1.5px solid var(--ink);border-radius:0;
+  background:var(--line)}
+[data-style="print"] .pprog i{background:var(--pr-amber);border-radius:0}
+[data-style="print"] .pprog span{font-family:var(--pr-mono);top:10px}
+
+/* the rest of the floating chrome, same letterpress */
+[data-style="print"] .keycard{border:1.5px solid var(--ink);border-radius:0;
+  box-shadow:5px 5px 0 color-mix(in oklab,var(--ink) 12%,transparent)}
+[data-style="print"] .keysec{font-family:var(--pr-mono)}
+[data-style="print"] .scrub{border:1.5px solid var(--ink);border-radius:0;
+  box-shadow:4px 4px 0 color-mix(in oklab,var(--ink) 12%,transparent)}
+[data-style="print"] .sc-lab{font-family:var(--pr-mono)}
+[data-style="print"] #sc-date{font:400 .68rem/1.6 var(--pr-mono);
+  letter-spacing:.05em;text-transform:uppercase}
+[data-style="print"] .mapbar{border:2px solid var(--ink);border-radius:0;
+  box-shadow:4px 4px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .mapbar button{border-radius:0}
+[data-style="print"] .mtoast{border-radius:0}
+[data-style="print"] .focuschip{border-radius:0;
+  box-shadow:3px 3px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .mdlg{border:2px solid var(--ink);border-radius:0;
+  box-shadow:6px 6px 0 color-mix(in oklab,var(--ink) 15%,transparent)}
+[data-style="print"] .md-title{font-family:var(--serif)}
+[data-style="print"] .md-field label{font-family:var(--pr-mono)}
+[data-style="print"] .md-field input{border-radius:0;border:1.5px solid var(--line2)}
+[data-style="print"] .md-go{border-radius:0;background:var(--ink);color:var(--paper)}
+
+/* ============= the briefing as a broadsheet front page, 2026-08-28 ======
+   Deepens the News block above: masthead + dateline, lead-story scale,
+   2px ink rules between sections, mono story actions, boxed explainer. */
+
+/* masthead: Bricolage over a ruled mono dateline */
+[data-style="print"] .nwtop h2{font:700 2.3rem/1 var(--serif);
+  letter-spacing:-.025em}
+[data-style="print"] .nwdate{font:400 .71rem/1.8 var(--pr-mono);
+  font-style:normal;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--dim);max-width:700px;margin:10px 0 0;padding:5px 0;
+  border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+
+/* 2px ink rules open the sections; the hairlines between stories stay */
+[data-style="print"] .newsmain .nwsec{border-top:2px solid var(--ink);
+  padding-top:14px}
+[data-style="print"] .newsmain .nwsec:first-child{border-top:0;padding-top:0}
+
+/* the front page's first story at lead scale */
+[data-style="print"] .newsmain .nwsec:first-child .nwitem:first-of-type .nwhead{
+  font-size:1.6rem;line-height:1.1;letter-spacing:-.03em}
+[data-style="print"] .newsmain .nwsec:first-child .nwitem:first-of-type .nwsum{
+  font-size:1.02rem;line-height:1.5}
+
+/* story actions: small mono uppercase text links */
+[data-style="print"] .nwread{font:600 .64rem/1 var(--pr-mono);
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+  text-decoration:none;padding:4px 0}
+[data-style="print"] .nwread:hover{color:var(--ink);text-decoration:underline;
+  text-underline-offset:3px}
+
+/* the explainer: a 2px-ink boxed sidebar note on the tint band */
+[data-style="print"] .nwexplain{background:var(--sunken);
+  border:2px solid var(--ink);border-radius:0;padding:14px 16px}
+[data-style="print"] .nwexpact{font:400 .66rem/1.8 var(--pr-mono);
+  letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+
+/* the rail hangs off the ink column rule (set above): hairline boxes,
+   squared chips, mono glossary terms */
+[data-style="print"] .nrbox{border:1.5px solid var(--line2);border-radius:0}
+[data-style="print"] .nwchip,[data-style="print"] #nwaddin{border-radius:0;
+  border:1.5px solid var(--line2);background:transparent}
+[data-style="print"] .nwgloss dt{font:600 .71rem/1.5 var(--pr-mono);
+  letter-spacing:.08em;text-transform:uppercase}
+
+/* The label chips wanted more paper around the words. */
+[data-style="print"] .eyebrow{padding:8px 13px;font-size:.68rem;line-height:1.1}
+[data-style="print"] #attention>h2,[data-style="print"] #all>h2,
+[data-style="print"] #people>h2,[data-style="print"] #queue>h2,
+[data-style="print"] #drafts>h2{padding:9px 14px}

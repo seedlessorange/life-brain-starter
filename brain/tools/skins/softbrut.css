@@ -1,0 +1,753 @@
+/* Soft Brutalism — full skin (design/skins/SPECS.md §2; mockup
+   "Today - soft brutalism.dc.html" is ground truth). Every rule scoped
+   [data-style="softbrut"]; emitted after the token/theme blocks, so ties
+   here win. State-color meanings survive; faces and dots stay round. */
+
+/* ------------------------------------------------------------ tokens */
+:root[data-style="softbrut"]{
+  --paper:oklch(97.1% .017 92);
+  --surface:oklch(99.5% .005 92);
+  --sunken:oklch(95% .02 92);
+  --ink:oklch(24.5% .015 62);
+  --dim:oklch(42% .02 62);
+  --faint:oklch(46% .018 62);
+  /* both rules strong: everything is 2px ink */
+  --line:color-mix(in oklab,var(--ink) 62%,var(--paper));
+  --line2:var(--ink);
+  /* five pastel fills, each a semantic hue (amber=priority, sky=talk,
+     mint=done, coral=action, red-pink=urgent) */
+  --sb-amber:oklch(93% .058 88);
+  --sb-coral:oklch(93% .046 40);
+  --sb-sky:oklch(93% .04 200);
+  --sb-mint:oklch(94% .042 130);
+  --sb-pink:oklch(93% .046 25);
+  --sb-sh:var(--ink);
+  --green:oklch(50% .085 140);--greenbg:var(--sb-mint);
+  --bad:oklch(47% .14 25);--badbg:var(--sb-pink);
+  --wait:oklch(53% .105 80);--waitbg:var(--sb-amber);
+  --cold:oklch(50% .08 250);--coldbg:var(--sb-sky);
+  --terra:oklch(57% .12 48);
+  --ok:oklch(50% .08 140);--okt:var(--sb-mint);
+  --r-xl:18px;--r-lg:16px;--r-card:18px;--r-md:14px;--r-btn:22px;--r-sm:10px;
+  --shadow:3px 3px 0 var(--sb-sh);
+  --shadow-lift:5px 5px 0 var(--sb-sh);
+  --serif:'Figtree Full','Figtree',system-ui,sans-serif;
+  --sans:'Hanken Grotesk',system-ui,sans-serif;
+  --coach:'Newsreader',Georgia,serif;
+}
+
+/* Dark: deep tints (hue mixed toward dark paper), softened light borders,
+   near-black shadows. Pinned twice per CLASSMAP (media + data-theme). */
+@media (prefers-color-scheme:dark){
+  :root[data-style="softbrut"]:not([data-theme="light"]){
+    --paper:oklch(21% .014 92);
+    --surface:oklch(25% .016 92);
+    --sunken:oklch(18.5% .015 92);
+    --ink:oklch(92.5% .015 88);
+    --dim:oklch(71% .02 88);
+    --faint:oklch(60% .02 88);
+    --line:color-mix(in oklab,var(--ink) 48%,var(--paper));
+    --line2:color-mix(in oklab,var(--ink) 80%,var(--paper));
+    --sb-amber:oklch(31% .05 85);
+    --sb-coral:oklch(30.5% .045 40);
+    --sb-sky:oklch(29.5% .04 210);
+    --sb-mint:oklch(30% .045 135);
+    --sb-pink:oklch(29.5% .05 25);
+    --sb-sh:oklch(12% .01 92);
+    --green:oklch(75% .11 135);--greenbg:var(--sb-mint);
+    --bad:oklch(71% .12 28);--badbg:var(--sb-pink);
+    --wait:oklch(77% .105 85);--waitbg:var(--sb-amber);
+    --cold:oklch(73% .07 245);--coldbg:var(--sb-sky);
+    --terra:oklch(72% .11 50);
+    --ok:oklch(75% .11 145);--okt:var(--sb-mint);
+  }
+}
+:root[data-style="softbrut"][data-theme="dark"]{
+  --paper:oklch(21% .014 92);
+  --surface:oklch(25% .016 92);
+  --sunken:oklch(18.5% .015 92);
+  --ink:oklch(92.5% .015 88);
+  --dim:oklch(71% .02 88);
+  --faint:oklch(60% .02 88);
+  --line:color-mix(in oklab,var(--ink) 48%,var(--paper));
+  --line2:color-mix(in oklab,var(--ink) 80%,var(--paper));
+  --sb-amber:oklch(31% .05 85);
+  --sb-coral:oklch(30.5% .045 40);
+  --sb-sky:oklch(29.5% .04 210);
+  --sb-mint:oklch(30% .045 135);
+  --sb-pink:oklch(29.5% .05 25);
+  --sb-sh:oklch(12% .01 92);
+  --green:oklch(75% .11 135);--greenbg:var(--sb-mint);
+  --bad:oklch(71% .12 28);--badbg:var(--sb-pink);
+  --wait:oklch(77% .105 85);--waitbg:var(--sb-amber);
+  --cold:oklch(73% .07 245);--coldbg:var(--sb-sky);
+  --terra:oklch(72% .11 50);
+  --ok:oklch(75% .11 145);--okt:var(--sb-mint);
+}
+
+/* ---------------------------------------------------- big-card set */
+[data-style="softbrut"] .railcard,[data-style="softbrut"] .panel,
+[data-style="softbrut"] .todaywrap,[data-style="softbrut"] .hzcard,
+[data-style="softbrut"] .offercard,[data-style="softbrut"] .bscard,
+[data-style="softbrut"] .qcard,[data-style="softbrut"] .daycard,
+[data-style="softbrut"] .dupcard,[data-style="softbrut"] .forecast,
+[data-style="softbrut"] .draftcard,[data-style="softbrut"] .stackrow,
+[data-style="softbrut"] .appanel{
+  border:2px solid var(--line2);border-radius:18px;
+  background:var(--surface);box-shadow:4px 4px 0 var(--sb-sh)}
+[data-style="softbrut"] .todaywrap{padding:20px 22px 22px}
+[data-style="softbrut"] .appanel{border-radius:16px}
+/* pastel fills per section: routine amber; nudge/evening/questions sky */
+[data-style="softbrut"] .routinecard{background:var(--sb-amber)}
+[data-style="softbrut"] .qcard,[data-style="softbrut"] .evwrap,
+[data-style="softbrut"] .updnudge{background:var(--sb-sky)}
+[data-style="softbrut"] .dupcard{background:var(--waitbg);border-color:var(--line2)}
+[data-style="softbrut"] .updnudge,[data-style="softbrut"] .evwrap{
+  border:2px solid var(--line2);border-radius:18px;
+  box-shadow:4px 4px 0 var(--sb-sh);padding:16px 20px}
+[data-style="softbrut"] .updnudge>span{
+  font:italic 400 1.05rem/1.4 var(--coach)}
+[data-style="softbrut"] .qwins{
+  border:2px solid var(--line2);border-radius:18px;
+  background:var(--paper);padding:18px 20px;margin-top:var(--s5)}
+
+/* --------------------------------------------------------- header */
+[data-style="softbrut"] .top{border-bottom:0}
+[data-style="softbrut"] .brand{
+  font:800 1.3rem/1 var(--serif);letter-spacing:-.02em}
+/* the stamp rides inside the sync pill — plain text, the pill wears the chrome */
+[data-style="softbrut"] .skinx-stamp{
+  display:inline;font:inherit;letter-spacing:.02em;white-space:nowrap}
+[data-style="softbrut"] .syncstate{
+  padding:7px 12px;background:var(--sb-mint);border:2px solid var(--line2);
+  border-radius:20px;box-shadow:3px 3px 0 var(--sb-sh);
+  font:600 .72rem/1 var(--sans);letter-spacing:.02em;color:var(--ink)}
+[data-style="softbrut"] .syncstate:hover{background:var(--sb-mint);color:var(--ink)}
+[data-style="softbrut"] .topnav a{
+  padding:8px 13px;border-radius:22px;font-weight:500;color:var(--dim)}
+[data-style="softbrut"] .topnav a:hover{background:var(--surface);color:var(--ink)}
+[data-style="softbrut"] .topnav a.on{
+  background:var(--sb-amber);border:2px solid var(--line2);
+  box-shadow:3px 3px 0 var(--sb-sh);padding:6px 11px;
+  color:var(--ink);font-weight:700}
+[data-style="softbrut"] .askopen{
+  padding:10px 16px;background:var(--sb-coral);border:2px solid var(--line2);
+  border-radius:22px;box-shadow:3px 3px 0 var(--sb-sh);
+  color:var(--ink);font-weight:700}
+[data-style="softbrut"] .askopen:hover{border-color:var(--line2)}
+[data-style="softbrut"] .askopen:active{
+  transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .ghostbtn{
+  padding:9px 14px;background:var(--surface);border:2px solid var(--line2);
+  border-radius:22px;color:var(--ink);font-weight:600}
+[data-style="softbrut"] .ghostbtn:hover{background:var(--surface)}
+[data-style="softbrut"] #updbtn{box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] #updbtn:active{transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .banner{
+  background:var(--sb-amber);color:var(--ink);
+  border-bottom:2px solid var(--line2)}
+
+/* ------------------------------------- THE signature: the greeting */
+[data-style="softbrut"] .todaymain{display:flex;flex-direction:column}
+[data-style="softbrut"] .todaymain>*{min-width:0}
+[data-style="softbrut"] .skinx-greet{
+  display:block;order:-2;margin:10px 0 0;max-width:1100px;
+  font:900 clamp(34px,4.6vw,68px)/1.02 var(--serif);
+  letter-spacing:-.035em;color:var(--ink);overflow-wrap:break-word}
+/* the weather sentence rides directly beneath it — italic, no box */
+[data-style="softbrut"] .wxline{
+  order:-1;margin:10px 0 6px;
+  font:italic 400 clamp(15px,1.4vw,20px)/1.45 var(--coach);color:var(--dim)}
+[data-style="softbrut"] .skinx-wx{display:inline;color:var(--faint)}
+[data-style="softbrut"] .skinx-wx::before{content:" — "}
+
+/* ----------------------------------------------------------- hero */
+[data-style="softbrut"] .hero{
+  background:var(--sb-amber);border:2px solid var(--line2);
+  border-radius:18px;box-shadow:4px 4px 0 var(--sb-sh);
+  padding:22px 26px 20px;margin:var(--s5) 0 var(--s2)}
+[data-style="softbrut"] .hero .eyebrow{
+  display:inline-block;padding:6px 12px;background:var(--surface);
+  border:2px solid var(--line2);border-radius:20px;
+  font:700 .66rem/1 var(--sans);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink)}
+/* The playful font reserves padding under a bare eyebrow for its squiggle,
+   then zeroes it when a .wav follows. Correct for a plain label; wrong here,
+   where the padding IS the pill and losing the bottom half sits the words
+   low in the bubble. Both attributes are on <html>, so one combined
+   selector outranks it whatever the font is set to. (Measured: the glyph
+   box sat 6px from the top and 0.6px from the bottom. Symmetric padding
+   is the whole fix — the tracking does NOT need compensating here, and
+   subtracting it shoved the words 1.7px right.) */
+:root[data-font][data-style="softbrut"] .hero .eyebrow{padding:6px 12px}
+[data-style="softbrut"] .hero h1{
+  font:900 clamp(34px,3.7vw,56px)/1 var(--serif);letter-spacing:-.03em}
+[data-style="softbrut"] .hero-why{
+  font:italic 400 1.15rem/1.45 var(--coach);color:var(--dim);max-width:640px}
+[data-style="softbrut"] .hero-next{
+  background:var(--surface);border:2px solid var(--line2);
+  border-radius:14px;padding:14px 18px;max-width:680px;
+  font:600 1.2rem/1.32 var(--sans)}
+[data-style="softbrut"] .hero-next span{color:var(--faint)}
+[data-style="softbrut"] .heroplan{
+  padding:7px 13px;background:var(--coldbg);border:2px solid var(--line2);
+  border-radius:20px;color:var(--ink);font-weight:600}
+[data-style="softbrut"] .heroplan.off{border-color:var(--wait);color:var(--wait)}
+[data-style="softbrut"] .hero-matters,[data-style="softbrut"] .matters{
+  font-family:var(--coach);font-style:italic}
+/* .skinx-prov / .skinx-spec / .skinx-legend stay hidden — not this skin */
+
+/* pill progress bars, everywhere the decay fill appears.
+   NOT .szbar — that is the season planner's toolbar (prev/next + the view
+   switcher), and a 12px pill with overflow:hidden guillotined its own
+   buttons. Same four letters, different thing. */
+[data-style="softbrut"] main .bar{
+  height:12px;background:var(--surface);border:2px solid var(--line2);
+  border-radius:20px;overflow:hidden}
+[data-style="softbrut"] main .bar i{border-radius:20px;background:var(--terra)}
+
+/* ---------------------------------------------------- the squiggle */
+[data-style="softbrut"] .wav{background:var(--ink);opacity:.85}
+[data-style="softbrut"] h3.area::after,
+[data-style="softbrut"] .qcard .eyebrow::after,
+[data-style="softbrut"] .offercard .eyebrow::after,
+[data-style="softbrut"] #queue>h2::after,
+[data-style="softbrut"] #drafts>h2::after,
+[data-style="softbrut"] #connections>h2::after,
+[data-style="softbrut"] #recordings>h2::after,
+[data-style="softbrut"] #newfiles>h2::after,
+[data-style="softbrut"] #people>h2::after,
+[data-style="softbrut"] #attention>h2::after,
+[data-style="softbrut"] #all>h2::after,
+[data-style="softbrut"] .doc h2::after,
+[data-style="softbrut"] .todaydoc h2::after{
+  background:var(--ink);opacity:.85}
+
+/* -------------------------------------------------------- headings */
+[data-style="softbrut"] .eyebrow,[data-style="softbrut"] .area{
+  font:700 .68rem/1 var(--sans);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--faint)}
+[data-style="softbrut"] .doc h1,[data-style="softbrut"] .todaydoc h1{
+  font:900 1.8rem/1.15 var(--serif);letter-spacing:-.025em}
+[data-style="softbrut"] .doc h2,[data-style="softbrut"] .todaydoc h2{
+  font:800 1.3rem/1.2 var(--serif);letter-spacing:-.02em}
+[data-style="softbrut"] .coach{font:italic 400 1.02rem/1.55 var(--coach)}
+[data-style="softbrut"] .tnote{
+  font:italic 400 var(--t-xs)/1.35 var(--coach)}
+
+/* -------------------------------------------- metadata as pill chips */
+[data-style="softbrut"] .meta{
+  display:inline-block;width:fit-content;padding:4px 11px;
+  border:2px solid var(--line2);border-radius:16px;
+  font:600 .7rem/1.4 var(--sans);color:var(--ink)}
+[data-style="softbrut"] .skinx-planstamp{
+  display:inline-block;padding:5px 11px;border:2px solid var(--line2);
+  border-radius:20px;font:600 .72rem/1 var(--sans);color:var(--dim)}
+[data-style="softbrut"] .test{
+  margin-left:8px;padding:2px 9px;border:2px solid var(--line2);
+  border-radius:20px;background:var(--surface);color:var(--ink);
+  font:700 .7rem/1.5 var(--sans)}
+[data-style="softbrut"] .tws{
+  border:2px solid var(--line2);border-radius:20px;
+  font-weight:600;color:var(--ink)}
+[data-style="softbrut"] .cchip{
+  padding:8px 13px;border:2px solid var(--line2);border-radius:20px;
+  background:var(--surface);color:var(--ink);font-weight:600}
+[data-style="softbrut"] .cchip:hover{
+  color:var(--ink);border-color:var(--line2);background:var(--greenbg)}
+[data-style="softbrut"] .ballpill{
+  border:2px solid var(--line2);padding:3px 10px;font-weight:700}
+[data-style="softbrut"] .ballpill.mine{background:var(--greenbg);color:var(--ink)}
+[data-style="softbrut"] .ballpill.theirs{background:var(--waitbg);color:var(--ink)}
+[data-style="softbrut"] .ballpill.none{background:var(--sunken);color:var(--dim)}
+[data-style="softbrut"] .wpill{border-radius:8px}
+
+/* -------------------------------------------------------- checkboxes */
+[data-style="softbrut"] .box{
+  width:22px;height:22px;min-width:22px;border:2px solid var(--line2);
+  border-radius:8px;line-height:18px;font-size:13px;margin-top:1px}
+[data-style="softbrut"] .todaydoc .box{
+  width:26px;height:26px;min-width:26px;line-height:22px;font-size:15px}
+[data-style="softbrut"] button.tick[aria-pressed="true"]{
+  background:var(--green);border-color:var(--green);color:var(--paper)}
+
+/* plan tasks read as rounded row cards; urgency is the fill */
+[data-style="softbrut"] .todaydoc ul.tasks li{
+  align-items:center;gap:12px;padding:12px 15px;margin:0 0 10px;
+  background:var(--paper);border:2px solid var(--line2);border-radius:14px}
+[data-style="softbrut"] .todaydoc ul.tasks li.tdue-bad{background:var(--sb-pink)}
+[data-style="softbrut"] .todaydoc ul.tasks li.tdue-soon{background:var(--sb-coral)}
+[data-style="softbrut"] .todaydoc ul.tasks li .box{margin-top:0}
+[data-style="softbrut"] ul.tasks li.tdue-soon .tdue{color:var(--terra)}
+[data-style="softbrut"] ul.tasks li.tdue-bad .tdue{color:var(--bad)}
+
+/* ---------------------------------------------------------- buttons */
+/* secondary: raised-white pills; ink-shadow press on the shadowed ones */
+[data-style="softbrut"] .act,[data-style="softbrut"] .mini,
+[data-style="softbrut"] .nwread{
+  font:600 var(--t-xs)/1 var(--sans);padding:8px 13px;color:var(--ink);
+  background:var(--surface);border:2px solid var(--line2);border-radius:20px}
+[data-style="softbrut"] .act:hover,[data-style="softbrut"] .mini:hover,
+[data-style="softbrut"] .nwread:hover{
+  color:var(--ink);background:var(--surface);border-color:var(--line2);
+  box-shadow:2px 2px 0 var(--sb-sh);transform:translate(-1px,-1px)}
+[data-style="softbrut"] .act:active,[data-style="softbrut"] .mini:active,
+[data-style="softbrut"] .nwread:active{
+  transform:translate(2px,2px);box-shadow:none}
+[data-style="softbrut"] .act.right{border-style:solid}
+[data-style="softbrut"] .act b{color:inherit}
+/* + Task = primary ink pill; Worked on it = raised white */
+[data-style="softbrut"] .act[data-addtask]{
+  background:var(--ink);color:var(--paper);
+  box-shadow:3px 3px 0 var(--sb-sh);font-weight:700}
+[data-style="softbrut"] .act[data-addtask]:hover{
+  background:var(--ink);color:var(--paper)}
+[data-style="softbrut"] .act[data-touch]{
+  box-shadow:3px 3px 0 var(--sb-sh);font-weight:700}
+[data-style="softbrut"] .act[data-addtask]:active,
+[data-style="softbrut"] .act[data-touch]:active{
+  transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .ball{
+  border:2px solid var(--line2);border-radius:20px;padding:7px 12px;
+  background:var(--surface);color:var(--dim);font-weight:600}
+[data-style="softbrut"] .ball.on{
+  background:var(--ink);border-color:var(--line2);
+  color:var(--paper);font-weight:700}
+[data-style="softbrut"] .primary{
+  background:var(--ink);border:2px solid var(--line2);color:var(--paper);
+  border-radius:24px;font-weight:700;
+  /* An ink button can't wear the ink shadow — fill and shadow merge into
+     one smeared blob ("weird shadow", 31 Aug). Softened offset instead. */
+  box-shadow:3px 3px 0 color-mix(in oklab,var(--ink) 28%,transparent)}
+[data-style="softbrut"] .primary:hover{filter:none}
+[data-style="softbrut"] .primary:active{
+  transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .act.send{
+  background:var(--green);border-color:var(--green);color:var(--paper);
+  box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .act.send:active{
+  transform:translate(3px,3px);box-shadow:none}
+/* accent CTAs: coral = hand it to Claude, mint = resuggest/refresh */
+[data-style="softbrut"] .offercard .mini,
+[data-style="softbrut"] .offercard .act{
+  background:var(--sb-coral);box-shadow:3px 3px 0 var(--sb-sh);font-weight:700}
+[data-style="softbrut"] .offercard .mini:active,
+[data-style="softbrut"] .offercard .act:active{
+  transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .mini.planresug,
+[data-style="softbrut"] .mini.planrefresh{
+  background:var(--sb-mint);box-shadow:3px 3px 0 var(--sb-sh);font-weight:700}
+[data-style="softbrut"] .mini.planresug:active,
+[data-style="softbrut"] .mini.planrefresh:active{
+  transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .tmenu{border:0;background:none;border-radius:8px}
+[data-style="softbrut"] .tstart{border:0;background:transparent}
+[data-style="softbrut"] .moreMenu{
+  background:var(--surface);border:2px solid var(--line2);
+  border-radius:14px;box-shadow:4px 4px 0 var(--sb-sh)}
+[data-style="softbrut"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+[data-style="softbrut"] textarea,[data-style="softbrut"] select{
+  border:2px solid var(--line2);border-radius:14px;
+  background:var(--surface);color:var(--ink)}
+
+/* ----------------------------------------------------- avatar halos */
+[data-style="softbrut"] .pav{border:2px solid var(--line2)}
+[data-style="softbrut"] .shface .pav{box-shadow:0 0 0 3px var(--line)}
+[data-style="softbrut"] .sh-owed .pav{box-shadow:0 0 0 3px var(--wait)}
+[data-style="softbrut"] .sh-late .pav{box-shadow:0 0 0 3px var(--terra)}
+[data-style="softbrut"] .sh-held .pav{box-shadow:0 0 0 3px var(--line)}
+
+/* --------------------------------------- other views, same language */
+[data-style="softbrut"] .nwitem{
+  border:2px solid var(--line2);border-radius:14px;
+  background:var(--surface);padding:14px 16px;margin:0 0 10px}
+[data-style="softbrut"] .szchip{
+  border:2px solid var(--line2);border-radius:20px;
+  background:var(--surface);color:var(--ink);font-weight:600}
+[data-style="softbrut"] .psub a,[data-style="softbrut"] .clsub a{
+  border-radius:20px;padding:7px 12px}
+[data-style="softbrut"] .psub a.on,[data-style="softbrut"] .clsub a.on{
+  background:var(--sb-amber);border:2px solid var(--line2);
+  color:var(--ink);font-weight:700}
+[data-style="softbrut"] .stchip.on{
+  border:2px solid var(--line2);background:var(--sb-mint);border-radius:14px}
+[data-style="softbrut"] .weekstrip{
+  border:2px solid var(--line2);border-radius:14px;
+  background:var(--paper);padding:10px 14px}
+
+/* -------------------------------------------------- floating chrome */
+[data-style="softbrut"] .runbar{
+  background:var(--sb-amber);border:2px solid var(--line2);
+  border-radius:26px;box-shadow:4px 4px 0 var(--sb-sh);color:var(--ink)}
+[data-style="softbrut"] .actdrawer{
+  background:var(--surface);border:2px solid var(--line2);
+  border-radius:18px;box-shadow:5px 5px 0 var(--sb-sh)}
+[data-style="softbrut"] .fab{
+  background:var(--sb-coral);border:2px solid var(--line2);
+  color:var(--ink);box-shadow:4px 4px 0 var(--sb-sh)}
+[data-style="softbrut"] .ramblefab{
+  background:var(--surface);border:2px solid var(--line2);
+  color:var(--ink);box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .tabbar{border-top:2px solid var(--line2)}
+
+/* ------------------------------------------------------ phone ≤760 */
+@media (max-width:760px){
+  [data-style="softbrut"] .railcard,[data-style="softbrut"] .panel,
+  [data-style="softbrut"] .todaywrap,[data-style="softbrut"] .hzcard,
+  [data-style="softbrut"] .offercard,[data-style="softbrut"] .bscard,
+  [data-style="softbrut"] .qcard,[data-style="softbrut"] .daycard,
+  [data-style="softbrut"] .dupcard,[data-style="softbrut"] .forecast,
+  [data-style="softbrut"] .draftcard,[data-style="softbrut"] .stackrow,
+  [data-style="softbrut"] .appanel,[data-style="softbrut"] .hero,
+  [data-style="softbrut"] .updnudge,[data-style="softbrut"] .evwrap,
+  [data-style="softbrut"] .runbar,[data-style="softbrut"] .actdrawer,
+  [data-style="softbrut"] .fab{box-shadow:2px 2px 0 var(--sb-sh)}
+  [data-style="softbrut"] .skinx-greet{
+    font-size:34px;letter-spacing:-.025em}
+  [data-style="softbrut"] .hero{padding:16px 16px 14px}
+  [data-style="softbrut"] .hero h1{font-size:34px}
+  [data-style="softbrut"] .todaydoc ul.tasks li{padding:10px 12px}
+  [data-style="softbrut"] .topnav a.on,[data-style="softbrut"] .askopen,
+  [data-style="softbrut"] #updbtn,[data-style="softbrut"] .primary,
+  [data-style="softbrut"] .syncstate,[data-style="softbrut"] .ramblefab,
+  [data-style="softbrut"] .act[data-addtask],
+  [data-style="softbrut"] .act[data-touch]{box-shadow:2px 2px 0 var(--sb-sh)}
+}
+
+/* The pill chrome outgrows the header before the base layout expects it —
+   compact the ghosts a step early so nothing clips at 1440. */
+@media (max-width:1520px){
+  [data-style="softbrut"] .hacts .ghostbtn{padding:8px 12px;font-size:.78rem}
+  [data-style="softbrut"] .syncstate{font-size:.72rem}
+}
+
+/* ================= double-check fixes + the non-home pages =========== */
+
+/* The forecast was an unboxed section in the base skin, so it carries no
+   padding of its own — the card border exposed that, and the nowrap gap
+   line clipped at the rounded edge. */
+[data-style="softbrut"] .forecast{padding:18px 20px}
+[data-style="softbrut"] .fc-gap{white-space:normal;text-align:right}
+[data-style="softbrut"] .fc-list .risk{align-items:baseline}
+
+/* Plate — every ranked row is a card in its own right; the urgent one
+   wears the red-pink fill, exactly like an urgent task row on Today. */
+[data-style="softbrut"] .stack details.row{
+  border:2px solid var(--line2);border-radius:14px;background:var(--surface);
+  box-shadow:3px 3px 0 var(--sb-sh);padding:12px 16px;margin:0 0 16px}
+[data-style="softbrut"] .stack details.row[open]{box-shadow:5px 5px 0 var(--sb-sh)}
+[data-style="softbrut"] .stack details.row.sev-bad{background:var(--sb-pink)}
+[data-style="softbrut"] .stack details.row.sev-soon{background:var(--sb-amber)}
+[data-style="softbrut"] #attention>h2,[data-style="softbrut"] #all>h2,
+[data-style="softbrut"] #people>h2,[data-style="softbrut"] #queue>h2,
+[data-style="softbrut"] #drafts>h2{
+  font:800 1.5rem/1 var(--serif);letter-spacing:-.02em}
+
+/* People — each circle shelf is a raised card */
+[data-style="softbrut"] details.shelf{
+  border:2px solid var(--line2);border-radius:16px;background:var(--surface);
+  box-shadow:4px 4px 0 var(--sb-sh);padding:12px 16px;margin:0 0 18px}
+
+/* Claude — the job verbs are pressable cards, the drafts raised */
+[data-style="softbrut"] .jobbtn{
+  border:2px solid var(--line2);border-radius:14px;background:var(--surface);
+  box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .jobbtn:active{
+  transform:translate(3px,3px);box-shadow:0 0 0 var(--sb-sh)}
+[data-style="softbrut"] .draftcard{box-shadow:3px 3px 0 var(--sb-sh)}
+
+/* News — stories as cards on the paper, sections breathing */
+[data-style="softbrut"] article.nwitem{
+  border:2px solid var(--line2);border-radius:14px;background:var(--surface);
+  padding:14px 16px;margin:0 0 14px}
+[data-style="softbrut"] .nwsec{border:0}
+
+/* Season — the idea tray raised, like the plan card */
+[data-style="softbrut"] .sztray{
+  border:2px solid var(--line2);border-radius:16px;background:var(--sb-mint);
+  box-shadow:4px 4px 0 var(--sb-sh);padding:14px 16px}
+
+/* ============== rooms.html + map.html (their own base CSS) ============ */
+/* Both pages carry their base CSS in a <style> AFTER appearance.css, so
+   ties go to the page — every rule here leans on the [data-style] prefix
+   to outrank it. The map canvas, its dots and the mascot stay untouched. */
+
+/* ---- rooms: the head strip (type only; the mascot keeps its size) */
+[data-style="softbrut"] #bartitle{
+  font:800 21px/1.2 var(--serif);letter-spacing:-.02em;color:var(--ink)}
+[data-style="softbrut"] #search{
+  border:2px solid var(--line2);background:var(--surface);border-radius:999px}
+
+/* ---- rooms: the floor plan — wings raised, rooms pressable */
+[data-style="softbrut"] .wing{
+  border:2px solid var(--line2);border-radius:18px;background:var(--surface);
+  box-shadow:4px 4px 0 var(--sb-sh);margin:0 0 18px}
+[data-style="softbrut"] .wing h2{
+  font:800 17px/1.2 var(--serif);letter-spacing:-.015em}
+[data-style="softbrut"] .waudit{
+  border:2px solid var(--line2);border-radius:20px;background:var(--surface);
+  color:var(--ink);padding:6px 12px}
+[data-style="softbrut"] .waudit:hover{
+  color:var(--ink);border-color:var(--line2);background:var(--sb-amber)}
+[data-style="softbrut"] .room{
+  border:2px solid var(--line2);border-radius:14px;background:var(--paper)}
+[data-style="softbrut"] .room:hover{
+  border-color:var(--line2);box-shadow:3px 3px 0 var(--sb-sh);
+  transform:translate(-1px,-1px)}
+[data-style="softbrut"] .room:active{transform:translate(1px,1px);box-shadow:none}
+[data-style="softbrut"] .gchip{
+  border:2px solid var(--line2);border-radius:999px;background:var(--surface);
+  color:var(--ink)}
+[data-style="softbrut"] .gchip:hover{
+  color:var(--ink);border-color:var(--line2);background:var(--sb-amber)}
+
+/* ---- rooms: inside a room — zones as cards, three pastel families
+   (ask/do = coral, goals = butter, memory = sky; the rest stay white) */
+[data-style="softbrut"] .rhead h1{
+  font:800 28px/1.15 var(--serif);letter-spacing:-.025em}
+[data-style="softbrut"] .zone{
+  border:2px solid var(--line2);border-radius:16px;background:var(--surface);
+  box-shadow:4px 4px 0 var(--sb-sh);margin:0 0 16px}
+[data-style="softbrut"] .zone h2{
+  font:800 11.5px/1 var(--serif);letter-spacing:.13em;
+  text-transform:uppercase;color:var(--dim)}
+[data-style="softbrut"] .z-ask{background:var(--sb-coral)}
+[data-style="softbrut"] .z-goals{background:var(--sb-amber)}
+[data-style="softbrut"] .z-mem{background:var(--sb-sky)}
+/* the big-questions room is paper, not dashboard — no card shadow there */
+[data-style="softbrut"] #roomview.bigq .zone{box-shadow:none}
+[data-style="softbrut"] .convo:hover{background:var(--sunken)}
+
+/* ---- rooms: inputs stay obviously inputs, buttons become pills */
+[data-style="softbrut"] #notes{
+  border:2px solid var(--line2);border-radius:12px;background:var(--surface)}
+[data-style="softbrut"] .askrow textarea{
+  border:2px solid var(--line2);border-radius:12px;background:var(--surface)}
+[data-style="softbrut"] .askrow select,[data-style="softbrut"] .askrow button,
+[data-style="softbrut"] .noterow button,[data-style="softbrut"] .addrow button,
+[data-style="softbrut"] .addrow select,[data-style="softbrut"] .tract button{
+  border:2px solid var(--line2);border-radius:12px;background:var(--surface);
+  color:var(--ink);font-weight:600}
+[data-style="softbrut"] button.go,[data-style="softbrut"] .tract button.go,
+[data-style="softbrut"] .addrow button.go{
+  background:var(--green);border-color:var(--green);color:var(--paper);
+  box-shadow:3px 3px 0 var(--sb-sh);font-weight:700}
+[data-style="softbrut"] button.go:active,
+[data-style="softbrut"] .tract button.go:active,
+[data-style="softbrut"] .addrow button.go:active{
+  transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .ptick{border:2px solid var(--line2);border-radius:6px}
+[data-style="softbrut"] .hoffopen{border:2px solid var(--line2)}
+[data-style="softbrut"] .hoffopen:hover{
+  border-color:var(--line2);color:var(--ink);background:var(--sb-amber)}
+[data-style="softbrut"] .pchip{
+  border:2px solid var(--line2);color:var(--ink)}
+[data-style="softbrut"] .pchip:hover{
+  color:var(--ink);border-color:var(--line2);background:var(--sb-amber)}
+
+/* ---- rooms: what the room knows */
+[data-style="softbrut"] .hoff{
+  border:2px solid var(--line2);border-left:5px solid var(--green);
+  border-radius:12px;background:var(--paper)}
+[data-style="softbrut"] .docbody{
+  border:2px solid var(--line2);border-radius:12px;background:var(--paper)}
+[data-style="softbrut"] .agentbar{
+  background:var(--sb-amber);border:2px solid var(--line2);color:var(--ink);
+  box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .agentbar button{
+  border:2px solid var(--line2);color:var(--paper)}
+
+/* ---- map: the two-tier bar (canvas, dots, mascot untouched) */
+[data-style="softbrut"] .bar:has(>.apptop){border-bottom:2px solid var(--line2)}
+[data-style="softbrut"] .bartitle b{
+  font:800 15px/1.2 var(--serif);letter-spacing:-.01em}
+[data-style="softbrut"] a.back,[data-style="softbrut"] button.tool,
+[data-style="softbrut"] a.back.home{
+  border:2px solid var(--line2);border-radius:12px;background:var(--surface);
+  color:var(--ink);font-weight:600}
+[data-style="softbrut"] a.back:hover,[data-style="softbrut"] button.tool:hover{
+  border-color:var(--line2);background:var(--sb-amber)}
+[data-style="softbrut"] .zgrp .tool{border-radius:0;margin-left:-2px}
+[data-style="softbrut"] .zgrp .tool:first-child{
+  border-radius:12px 0 0 12px;margin-left:0}
+[data-style="softbrut"] .zgrp .tool:last-child{border-radius:0 12px 12px 0}
+[data-style="softbrut"] .pacts .tool.primary{
+  background:var(--green);border-color:var(--green);color:var(--paper);
+  box-shadow:3px 3px 0 var(--sb-sh);font-weight:700}
+[data-style="softbrut"] .pacts .tool.primary:active{
+  transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .modes{
+  border:2px solid var(--line2);border-radius:14px;background:var(--sunken)}
+[data-style="softbrut"] .modes button{border-radius:10px}
+
+/* ---- map: the legend chips are the filter — pills, hollow when off */
+[data-style="softbrut"] .barkey .lg{
+  border:2px solid var(--line2);border-radius:999px;background:var(--surface);
+  color:var(--ink);padding:3px 9px}
+[data-style="softbrut"] .barkey .lg:hover{
+  border-color:var(--line2);background:var(--sb-amber);color:var(--ink)}
+[data-style="softbrut"] .barkey .lg.off{
+  border-style:dashed;background:var(--paper);color:var(--faint)}
+[data-style="softbrut"] .barkey .lg[disabled]:hover{
+  border-color:var(--line2);background:var(--surface);color:var(--dim)}
+
+/* ---- map: floating chrome as offset-shadow cards */
+[data-style="softbrut"] #panel{
+  border:2px solid var(--line2);border-radius:18px;background:var(--surface);
+  box-shadow:4px 4px 0 var(--sb-sh)}
+[data-style="softbrut"] #panel h2{
+  font:800 17px/1.25 var(--serif);letter-spacing:-.015em}
+[data-style="softbrut"] #panel .pprog{
+  height:10px;border:2px solid var(--line2);border-radius:20px;
+  background:var(--surface)}
+[data-style="softbrut"] #panel .pprog i{border-radius:20px}
+[data-style="softbrut"] #panel .pprog span{top:12px}
+@media(min-width:1100px){
+  [data-style="softbrut"] body.docked #panel{
+    border:0;border-left:2px solid var(--line2);border-radius:0;box-shadow:none}
+}
+[data-style="softbrut"] .keycard{
+  border:2px solid var(--line2);border-radius:14px;background:var(--surface);
+  box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .scrub{
+  border:2px solid var(--line2);background:var(--surface);
+  box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .mapbar{
+  background:var(--sb-amber);border:2px solid var(--line2);color:var(--ink);
+  box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .mapbar button{border:2px solid var(--line2);color:var(--paper)}
+[data-style="softbrut"] .mdlg{
+  border:2px solid var(--line2);border-radius:18px;background:var(--surface);
+  box-shadow:5px 5px 0 var(--sb-sh)}
+[data-style="softbrut"] .md-title{font:800 17px/1.3 var(--serif);letter-spacing:-.015em}
+[data-style="softbrut"] .md-go{
+  background:var(--green);border:2px solid var(--green);color:var(--paper);
+  border-radius:12px;box-shadow:3px 3px 0 var(--sb-sh)}
+[data-style="softbrut"] .md-go:active{transform:translate(3px,3px);box-shadow:none}
+[data-style="softbrut"] .focuschip{
+  border:2px solid var(--line2);color:var(--paper);
+  box-shadow:3px 3px 0 var(--sb-sh)}
+
+/* ---- both pages, phone: shallower shadows, same language */
+@media(max-width:760px){
+  [data-style="softbrut"] .wing,[data-style="softbrut"] .zone,
+  [data-style="softbrut"] #panel,[data-style="softbrut"] .keycard,
+  [data-style="softbrut"] .mdlg,[data-style="softbrut"] .scrub,
+  [data-style="softbrut"] .mapbar,[data-style="softbrut"] .agentbar{
+    box-shadow:2px 2px 0 var(--sb-sh)}
+  [data-style="softbrut"] .room:hover{
+    box-shadow:2px 2px 0 var(--sb-sh);transform:none}
+  [data-style="softbrut"] #roomview.bigq .zone{box-shadow:none}
+}
+
+/* ================== her review pass, 2026-08-28 ==================== */
+
+/* Squiggles off in this skin — the outlined chips already carry the
+   hand-made feel; the waves underneath read as noise. */
+html[data-style="softbrut"] .eyebrow::after,html[data-style="softbrut"] .area::after,
+html[data-style="softbrut"] h2::after,html[data-style="softbrut"] h3::after,
+html[data-style="softbrut"] .wav{display:none;-webkit-mask:none;mask:none;
+  background:none;height:0;content:none}
+
+/* Buttons were shouting: the small controls drop to a 2px offset and the
+   segmented Next-move gets a proper pill tray instead of a loose outline. */
+[data-style="softbrut"] .act,[data-style="softbrut"] .mini{
+  box-shadow:2px 2px 0 var(--sb-sh)}
+[data-style="softbrut"] .act:active,[data-style="softbrut"] .mini:active{
+  transform:translate(2px,2px);box-shadow:0 0 0 var(--sb-sh)}
+[data-style="softbrut"] .ball{border:2px solid var(--line2);border-radius:20px;
+  box-shadow:none;margin:0}
+[data-style="softbrut"] .ball.on{background:var(--ink);color:var(--paper)}
+
+/* The week-ahead rows read ragged: dot · count · when on one line, the
+   shortfall tucked under them, right-aligned, without the airy gap. */
+[data-style="softbrut"] .fc-list .risk{display:grid;
+  grid-template-columns:auto auto 1fr;align-items:baseline;
+  column-gap:8px;row-gap:2px}
+[data-style="softbrut"] .fc-list .risk .fc-gap{grid-column:1/-1;
+  justify-self:end;text-align:right;margin:0}
+
+/* ================= the News page, deepened (2026-08-28) ============== */
+
+/* "Your briefing" at greeting scale; the freshness line rides beneath it
+   as the quiet subline, in the coaching voice. */
+[data-style="softbrut"] .nwtop h2{
+  font:900 clamp(30px,3.8vw,54px)/1.02 var(--serif);
+  letter-spacing:-.03em;color:var(--ink)}
+[data-style="softbrut"] .nwdate{
+  margin:8px 0 0;font:italic 400 clamp(14px,1.3vw,18px)/1.45 var(--coach);
+  color:var(--dim)}
+
+/* topic heads: outlined pill chips on a pastel tint, butter/sky/mint
+   cycling down the column (the front page counts as the first) */
+[data-style="softbrut"] .nwsec{margin-top:34px}
+[data-style="softbrut"] .nwsec h3{
+  display:inline-flex;width:fit-content;padding:8px 14px;margin:0 0 14px;
+  border:2px solid var(--line2);border-radius:20px;background:var(--sb-amber);
+  font:800 .7rem/1 var(--sans);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink)}
+[data-style="softbrut"] .newsmain .nwsec:nth-of-type(3n+2) h3{
+  background:var(--sb-sky)}
+[data-style="softbrut"] .newsmain .nwsec:nth-of-type(3n) h3{
+  background:var(--sb-mint)}
+
+/* the lead front-page story rides raised; the rest stay flat outlined */
+[data-style="softbrut"] article.nwitem{padding:16px 18px;margin:0 0 12px}
+[data-style="softbrut"] .newsmain .nwsec:first-of-type article.nwitem:first-of-type{
+  box-shadow:4px 4px 0 var(--sb-sh)}
+[data-style="softbrut"] .newsmain .nwsec:first-of-type article.nwitem:first-of-type .nwhead{
+  font:800 1.3rem/1.25 var(--serif);letter-spacing:-.015em}
+[data-style="softbrut"] .nwhead{font-weight:700;line-height:1.35}
+[data-style="softbrut"] .nwsum{line-height:1.55}
+
+/* the outlet line reads as text again — the buttons in it are the chips */
+[data-style="softbrut"] .nwitem .meta{
+  display:block;width:auto;border:0;border-radius:0;padding:0;
+  margin:4px 0 8px;font:600 .78rem/1.7 var(--sans);color:var(--faint)}
+[data-style="softbrut"] .newsv .nwread{
+  padding:4px 10px;font-size:.68rem;margin:0 2px}
+
+/* "In plain terms": the sky pastel, 2px ink all round */
+[data-style="softbrut"] .nwexplain{
+  background:var(--sb-sky);border:2px solid var(--line2);
+  border-radius:14px;padding:14px 18px;margin:0 0 14px}
+
+/* the rail boxes join the card language */
+[data-style="softbrut"] .nrbox{
+  border:2px solid var(--line2);border-radius:16px;background:var(--surface);
+  box-shadow:3px 3px 0 var(--sb-sh);padding:16px 18px}
+[data-style="softbrut"] .nwchip{
+  border:2px solid var(--line2);border-radius:999px;background:var(--paper);
+  font-weight:600;padding:4px 11px;color:var(--ink)}
+[data-style="softbrut"] #nwaddin{border-radius:999px}
+
+/* glossary: pill-chip headwords over plain definitions */
+[data-style="softbrut"] .nwgloss dt{
+  display:inline-block;padding:4px 12px;margin-top:14px;
+  border:2px solid var(--line2);border-radius:16px;background:var(--sb-amber);
+  font:700 .78rem/1.4 var(--sans);color:var(--ink)}
+[data-style="softbrut"] .nwgloss dd{margin:6px 0 0}
+[data-style="softbrut"] .nwgloss>.meta{
+  display:block;border:0;border-radius:0;padding:0;
+  font:italic 400 .85rem/1.5 var(--coach);color:var(--faint)}
+
+@media (max-width:760px){
+  [data-style="softbrut"] .nwtop h2{font-size:30px;letter-spacing:-.025em}
+  [data-style="softbrut"] .newsmain .nwsec:first-of-type article.nwitem:first-of-type,
+  [data-style="softbrut"] .nrbox{box-shadow:2px 2px 0 var(--sb-sh)}
+}
+
+/* Ink-filled pills cast no shadow — an ink shadow behind an ink pill reads
+   as a doubled edge. Light pills keep a single 2px offset. */
+[data-style="softbrut"] .hero .act,[data-style="softbrut"] .act{box-shadow:2px 2px 0 var(--sb-sh)}
+[data-style="softbrut"] .act[data-addtask],[data-style="softbrut"] .ball.on,
+[data-style="softbrut"] .askopen,[data-style="softbrut"] .rb-go{box-shadow:none}
+[data-style="softbrut"] .act[data-addtask]:active{transform:none}
+
+/* Pop-up notifications speak the skin too: one border, one shadow. */
+/* The base toast is paper text on ink; this one turns the panel light, so
+   it has to turn the text dark in the same breath or the message is
+   invisible on its own background. */
+[data-style="softbrut"] .toast,[data-style="softbrut"] .skinload{
+  border:2px solid var(--line2);border-radius:18px;background:var(--surface);
+  color:var(--ink);box-shadow:3px 3px 0 var(--sb-sh)}

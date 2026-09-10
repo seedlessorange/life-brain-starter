@@ -1,0 +1,158 @@
+{
+  "owner": "My",
+  "cold_days": 10,
+  "chase_days": 5,
+  "soon_days": 7,
+  "auto_sync_minutes": 20,
+  "sources": [],
+  "ai": "careful",
+  "appearance": {
+    "_comment": "Set from the page (Appearance). `style` is the whole posture of the page - workroom | print | softbrut | midcentury | manual | bauhaus; the accent/base/font/dots pick the colours and faces inside it.",
+    "accent": "indigo",
+    "base": "warm",
+    "font": "brain",
+    "dots": "berry",
+    "style": "workroom"
+  },
+  "circles": [
+    {
+      "name": "Inner",
+      "every": "weekly",
+      "personal": true
+    },
+    {
+      "name": "Close",
+      "every": "fortnightly",
+      "personal": true
+    },
+    {
+      "name": "Friends",
+      "every": "monthly",
+      "personal": true
+    },
+    {
+      "name": "Acquaintances",
+      "every": "quarterly",
+      "personal": true
+    },
+    {
+      "name": "Network",
+      "every": "",
+      "personal": false
+    },
+    {
+      "name": "Work",
+      "every": "",
+      "personal": false
+    },
+    {
+      "name": "One-off",
+      "every": "",
+      "personal": true
+    }
+  ],
+  "capacity": {
+    "daily_minutes": 180,
+    "default_task_minutes": 30,
+    "reply_minutes": 10,
+    "birthday_minutes": 20,
+    "horizon_days": 14
+  },
+  "rooms": {
+    "wings": []
+  },
+  "week": {
+    "_comment": "The fixed skeleton of your week \u2014 classes, work hours, standing commitments. /today plans around it. Leave unknowns empty; never guess.",
+    "days": {}
+  },
+  "calendar": false,
+  "news": {
+    "_comment": "The News tab's briefing, built by brain/tools/news.py - RSS and the Hacker News API from this hand-chosen list, never sources it found on its own. `interests` is what you want surfaced, in priority order; an earlier topic claims a story first. Add one with `python3 brain/tools/news.py add \"topic\"`, or ask Claude. A feed says where it may land: `topic` is exclusive, `topics` is a permission list the keywords choose within, and a feed with neither travels by keyword alone. Per interest: `count` overrides per_topic, `fresh_hours` widens the window for a slow subject, `per_outlet` stops one wire crowding out the rest, and `explain: true` adds a once-a-day plain-language breakdown (a Haiku-sized call, cents) for a field you are learning; the Usage page's News breakdowns switch (`ai_features.news`) turns those off without losing the briefing. The Guardian upgrades from RSS to full excerpts once you store a free key: `python3 brain/tools/news.py guardian KEY`.",
+    "interests": [
+      {
+        "topic": "AI & new apps",
+        "keywords": ["ai", "artificial intelligence", "openai", "anthropic", "chatgpt", "claude", "llm", "machine learning", "gemini", "copilot"]
+      },
+      {
+        "topic": "Talked about in tech",
+        "count": 4
+      },
+      {
+        "topic": "Money & markets",
+        "count": 3,
+        "per_outlet": 1,
+        "explain": true,
+        "lens": "how financial markets work",
+        "keywords": ["market", "stock", "fed", "ecb", "inflation", "interest rates", "central bank", "economy", "investor", "recession", "tariff"]
+      }
+    ],
+    "feeds": [
+      {
+        "name": "BBC World",
+        "url": "http://feeds.bbci.co.uk/news/world/rss.xml",
+        "front": true
+      },
+      {
+        "name": "The Guardian",
+        "url": "https://www.theguardian.com/world/rss",
+        "front": true
+      },
+      {
+        "name": "Ars Technica",
+        "url": "https://feeds.arstechnica.com/arstechnica/index"
+      },
+      {
+        "name": "The Verge",
+        "topics": ["AI & new apps"],
+        "url": "https://www.theverge.com/rss/index.xml"
+      },
+      {
+        "name": "TechCrunch",
+        "topics": ["AI & new apps"],
+        "url": "https://techcrunch.com/feed/"
+      },
+      {
+        "name": "The Guardian (business)",
+        "topics": ["Money & markets"],
+        "url": "https://www.theguardian.com/uk/business/rss"
+      },
+      {
+        "name": "Hacker News",
+        "url": "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=12",
+        "kind": "hn",
+        "topic": "Talked about in tech"
+      }
+    ],
+    "per_topic": 3,
+    "front_items": 3,
+    "fresh_hours": 36
+  },
+  "night": {
+    "_comment": "The night shift: heavy jobs run while you sleep, so they never compete with your day for the same five-hour usage window. 01:00 is deliberate - that window closes at 06:00, before the 07:00 morning plan opens a fresh one. Install with 'Set Up Night Shift (Windows).bat', or `zsh brain/tools/setup_night.sh` on a Mac, then turn it on from the page.",
+    "enabled": false,
+    "at": "01:00",
+    "jobs": [
+      "queue",
+      "wrap"
+    ],
+    "model": "",
+    "on_battery": false
+  },
+  "people": {
+    "_comment": "How many days after someone's message counts as owing them a reply. Their message showing as unanswered past this fuse is what puts them on the Today card.",
+    "reply_after_days": 2
+  },
+  "private": [
+    "brain/journal/"
+  ],
+  "_private_comment": "Files the scheduled runs (night shift, morning) never load — enforced by brain/tools/private_gate.py. The journal is the default; [] switches it off. Attended sessions are never filtered.",
+  "llm": {
+    "_comment": "Where the small no-tool jobs run (revise = draft rewording, name = conversation naming). provider: claude | ollama. Ollama needs a model name (e.g. llama3.2) and falls back to Claude whenever it can't answer. The heavy runs always stay Claude.",
+    "provider": "claude",
+    "ollama": {
+      "model": "",
+      "url": "http://127.0.0.1:11434"
+    },
+    "jobs": {}
+  }
+}

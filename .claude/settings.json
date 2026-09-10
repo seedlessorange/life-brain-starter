@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "todoFeatureEnabled": false,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob|Bash|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/brain/tools/private_gate.py\" || python \"$CLAUDE_PROJECT_DIR/brain/tools/private_gate.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

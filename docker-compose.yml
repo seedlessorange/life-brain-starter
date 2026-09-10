@@ -1,0 +1,51 @@
+# The brain as a two-container stack: the page server, and a cron container
+# running the same morning/night scripts a Mac schedules with launchd.
+# Run from the folder you cloned the brain into — that folder (code + your
+# data together, as always) is what gets mounted at /brain.
+#
+# First run: docker compose up -d --build
+# Claude login (once): docker exec -it life-brain claude
+# Update later: git pull && docker compose restart
+# Full guide: docker/README.md
+
+services:
+  brain:
+    build: .
+    image: life-brain
+    container_name: life-brain
+    environment:
+      # 0.0.0.0 is unavoidable inside a container. The request guard stays on
+      # because BRAIN_ALLOWED_HOSTS is set — put every name you reach the
+      # page by (LAN IP, hostname, tailnet name) in that list, or those
+      # requests are refused as foreign.
+      BRAIN_BIND: "0.0.0.0"
+      BRAIN_ALLOWED_HOSTS: ${BRAIN_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      TZ: ${TZ:-Europe/Paris}
+    ports:
+      - "${BRAIN_PORT:-7718}:7718"
+    volumes:
+      - .:/brain
+      - claude-auth:/root/.claude
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://127.0.0.1:7718/api/version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  cron:
+    image: life-brain
+    container_name: life-brain-cron
+    command: ["supercronic", "-passthrough-logs", "/brain/docker/crontab"]
+    environment:
+      TZ: ${TZ:-Europe/Paris}
+    volumes:
+      - .:/brain
+      - claude-auth:/root/.claude
+    restart: unless-stopped
+    depends_on:
+      brain:
+        condition: service_healthy
+
+volumes:
+  claude-auth:
