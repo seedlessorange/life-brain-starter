@@ -9,3 +9,6 @@ the room. Each is one checkbox, written to be answerable cold. Answer from
 the page (the Answer button hands it to Claude, who files it and ticks the
 box), or edit here directly. Claude: add follow-ups here as `- [ ]` lines;
 tick a question when its answer lands; never delete one unanswered.
+Before adding one, read the open ones: a follow-up that narrows an old
+question is written over it, never beside it. When work learns a fact, tick
+every open question that fact answers, not only the one you were working on.

@@ -62,6 +62,13 @@ A brain updated from memory next week is fiction; do it now, while it is true.
     this — if a file is not already loaded, it is not swept this week.
     Under 7 days: skip silently.
 
+7c. **Stale questions — every wrap.** Read the open checkboxes in
+    `brain/questions.md` (a handful). Tick any the brain now answers — a
+    fact filed this session or earlier, a tool that got connected — with
+    `**Filed:**` and the answer. Where two open questions ask about the same
+    thing, fold the older into the newer. Questions go stale within the
+    hour, because later work finds answers the earlier question never hears about.
+
 8. **Rebuild — this is not optional:**
    ```
    python3 brain/tools/build.py

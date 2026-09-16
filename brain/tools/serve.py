@@ -3895,7 +3895,8 @@ class Handler(SimpleHTTPRequestHandler):
                     f"\u201c{MD.plain(m.group(3))}\u201d \u2014 she said: {ans}\n\n"
                     "Put that fact where it actually lives (config, "
                     "workstreams, people, about-me), then tidy the question "
-                    "away. Do not ask her again.", "just-do-it")
+                    "away. Tick any other open question in that file the "
+                    "brain now answers too. Do not ask her again.", "just-do-it")
                 rebuild(map_too=False)
                 # Her answer IS "run it again" \u2014 a question the brain asked
                 # and she unblocked shouldn't also need her to find a button.

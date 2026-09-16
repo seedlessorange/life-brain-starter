@@ -133,7 +133,10 @@ dates, rebuilding the page — is yours.
   `(planned:)` on your own.
 - **`brain/questions.md`** — open questions for the owner, each a
   checkbox; answers arrive back as queue items. Tick a question when work
-  answers it, with the answer noted.
+  answers it, with the answer noted — and every other open question the
+  same fact answers. A follow-up that narrows an old question replaces it;
+  two live versions is how the owner gets asked for things the brain
+  already knows.
 - **`brain/interests.md`** — what the owner enjoys outside the
   obligations; `/today` draws the optional "for you" line from it.
 - **`brain/routine.md`** — the shape of the owner's ordinary day in their
