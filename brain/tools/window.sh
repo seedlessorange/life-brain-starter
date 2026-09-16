@@ -38,6 +38,9 @@ APPLESCRIPT
 # Terminal would ask before closing a busy window.
 brain_window_close() {
   [ -n "$BRAIN_WINDOW_ID" ] || return 0
+  # Terminal only acts on a queued close once it is the frontmost app. After
+  # Ctrl-C it is, so the window goes at once; stopped from elsewhere, it goes
+  # the next time she clicks on Terminal. Either way it does not survive.
   nohup osascript \
     -e "delay 0.6" \
     -e "tell application \"Terminal\" to close (every window whose id is $BRAIN_WINDOW_ID) saving no" \
