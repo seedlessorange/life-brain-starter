@@ -7,6 +7,10 @@
 
 cd "${0:A:h}" || exit 1
 
+# Closes this window on the way out, so dead windows don't pile up.
+[ -f brain/tools/window.sh ] && source brain/tools/window.sh
+type brain_window_remember >/dev/null 2>&1 && brain_window_remember
+
 PY=0; CLAUDE=0; GIT=0; FILES=0; RUNNING=0
 
 command -v python3 >/dev/null 2>&1 && PY=1
@@ -125,3 +129,4 @@ print "  --------------------------------------------"
 print ""
 print "  Press Return to close this window."
 read -r _
+type brain_window_close >/dev/null 2>&1 && brain_window_close
