@@ -3908,6 +3908,47 @@ class Handler(SimpleHTTPRequestHandler):
                 except ValueError:
                     pass
                 return self._json({"ok": True, "started": started})
+            if self.path == "/api/task/answer":
+                # What she learned goes onto the task first, then to the queue
+                # to be filed where it belongs. A conversation would hold the
+                # fact and the brain would still not know it.
+                src = (body.get("src") or "workstreams.md").strip()
+                key = (body.get("key") or "").strip()
+                ans = (body.get("answer") or "").strip()
+                if not ans:
+                    raise ValueError("nothing to file")
+                if "/" in src or not src.endswith(".md"):
+                    raise ValueError("that file is not one of yours")
+                path = os.path.join(BRAIN, src)
+                lines = read(path).split("\n")
+                hit = None
+                for i, line in enumerate(lines):
+                    m = re.match(r"^(\s*[-*]\s+)\[([ xX])\]\s+(.*)$", line)
+                    if m and MD.taskkey(_bare(m.group(3))) == key:
+                        hit = (i, m)
+                        break
+                if not hit:
+                    raise ValueError("that item has changed — reload the page")
+                i, m = hit
+                lines[i] = (f"{m.group(1)}[{m.group(2)}] "
+                            f"{m.group(3).rstrip()} — you said: {ans}")
+                write(path, "\n".join(lines))
+                queue_request(
+                    "A task now carries the answer: "
+                    f"\u201c{MD.plain(m.group(3))}\u201d \u2014 the answer: {ans}"
+                    "\n\nPut that fact where it actually lives (the workstream, "
+                    "people.md, config), tick the task if the answer finishes "
+                    "it, and say in the Outcome what you filed and what is "
+                    "still open. Do not ask again.",
+                    "just-do-it")
+                rebuild(map_too=False)
+                started = False
+                try:
+                    start_agent("queue")
+                    started = True
+                except ValueError:
+                    pass
+                return self._json({"ok": True, "started": started})
             if self.path == "/api/queue":
                 text = (body.get("text") or "").strip()
                 if not text:

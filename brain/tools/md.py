@@ -58,7 +58,13 @@ def bare(text):
     text = EST.sub("", text)
     text = re.sub(r"\s*\(urgent\)", "", text, flags=re.I)
     text = CARRYING.sub("", text)
-    return DROPPED.sub("", text).strip()
+    # Collapse the gaps a removed suffix leaves behind. model.py strips the
+    # same suffixes without their leading space, so a task that carries a
+    # note AFTER its "(due …) ~20m" ended up with two spaces on one side and
+    # one on the other — two different keys for one line, and every tick on
+    # it refused with "that item has changed".
+    text = re.sub(r"[ \t]{2,}", " ", DROPPED.sub("", text))
+    return text.strip()
 
 # Status words that get a coloured chip when they are a whole table cell.
 STATUS = {

@@ -613,7 +613,7 @@ def taskrow(t, src="workstreams.md", ws="", show_ws=False, ws_label=""):
     """One task, with its three honest endings behind a menu: done, parked
     until a date, or dropped — and the assistant's hand: a one-tap "Claude
     starts this" on every open task."""
-    key = MD.taskkey(t["text"])
+    key = MD.taskkey(MD.bare(t["text"]))
     cls = " ".join(filter(None, [
         "done" if t["done"] else "",
         "parked" if t.get("parked") else "",
@@ -722,7 +722,7 @@ def _seasonchip(i):
     """A bucket item as a draggable chip — on a day of the grid or in the
     idea tray. Click opens the exact-date box (also the touch path, since
     touch has no drag-and-drop)."""
-    key = MD.taskkey(i["text"])
+    key = MD.taskkey(MD.bare(i["text"]))
     planned = i["planned"]["start"].isoformat() if i["planned"] else ""
     pend = (i["planned"]["end"].isoformat()
             if i["planned"] and i["planned"]["end"] != i["planned"]["start"]
@@ -748,7 +748,7 @@ def _seasonchip(i):
 def _seasonrow(i):
     """A bucket item in the list below the grid: tickable, with its people
     and its day where the eye already is."""
-    key = MD.taskkey(i["text"])
+    key = MD.taskkey(MD.bare(i["text"]))
     notes = []
     if i["with"]:
         notes.append('<span class="szwho">'
@@ -1068,7 +1068,7 @@ def seasonview(cfg, today):
         "calok": calok,
         "events": busy,
         "chips": [{
-            "key": MD.taskkey(i["text"]),
+            "key": MD.taskkey(MD.bare(i["text"])),
             "title": i["text"],
             "label": clip(i["text"], 44),
             "planned": i["planned"]["start"].isoformat(),
@@ -8757,6 +8757,18 @@ SHEET = """
         project. Leave the date empty and it is live right away; set one and
         it stays parked until then.</span>
     </div>
+    <button class="tdopt needs-server" id="td-ans">
+      <span class="tdico ok">&#9998;</span>The answer came back&hellip;</button>
+    <div class="parkrow prow" id="ansrow" hidden>
+      <label class="plab"><b>What you heard</b>
+        <input type="text" id="ansline" maxlength="600"
+               placeholder="what came back"></label>
+      <span class="plab"><b></b>
+        <button class="primary" id="ansgo">File it</button></span>
+      <span class="mshelp">Writes it onto the task now, then hands it to
+        Claude to put where it belongs &mdash; the project, a person, the
+        class file. It ticks the task only if your answer finishes it.</span>
+    </div>
     <button class="tdopt needs-server" id="td-prog">
       <span class="tdico wait">&#8594;</span>I did my part &mdash; someone else
       has it now&hellip;</button>
@@ -11966,7 +11978,7 @@ SCRIPT = """
   // ---- task menu: the three honest endings, as a real dialog ---------------
   var tdlg = document.getElementById('taskdlg'), tscrim = document.getElementById('tscrim'),
       tdCur = null, parkrow = document.getElementById('parkrow');
-  var TD_ROWS = ['parkrow', 'duerow', 'estrow', 'editrow', 'progrow',
+  var TD_ROWS = ['ansrow', 'parkrow', 'duerow', 'estrow', 'editrow', 'progrow',
                  'nextrow', 'blockrow', 'swaprow', 'dayrow'];
   function tdHideRows(){
     TD_ROWS.forEach(function(r){
@@ -12240,6 +12252,25 @@ SCRIPT = """
   // Progress: the state between "done" and "not started", which is where most
   // real tasks actually live. Three fields, all pre-answered, so recording it
   // costs one click when the guesses are right.
+  // An answer is not a chat: it goes onto the task and into the queue, so it
+  // is filed where it belongs instead of living in a conversation.
+  document.getElementById('td-ans').onclick = function(){
+    if(tdRow('ansrow')) document.getElementById('ansline').focus();
+  };
+  document.getElementById('ansgo').onclick = function(){
+    var el = document.getElementById('ansline'), v = el.value.trim();
+    if(!v || !tdCur) return;
+    post('/api/task/answer', {src: tdCur.src, key: tdCur.key, answer: v})
+      .then(function(j){
+        try { sessionStorage.setItem('brain-toast',
+          j.started ? 'Filed \u2014 Claude is on it \u2713' : 'Filed \u2713'); } catch(e){}
+        location.reload();
+      })
+      .catch(function(e){ toast(e.message); });
+  };
+  document.getElementById('ansline').addEventListener('keydown', function(ev){
+    if(ev.key === 'Enter'){ ev.preventDefault(); document.getElementById('ansgo').click(); }
+  });
   var progrow = document.getElementById('progrow'), progdays = 7;
   document.getElementById('td-prog').onclick = function(){
     if(tdRow('progrow')){
