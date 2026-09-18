@@ -146,6 +146,16 @@ button{font:inherit;background:none;border:none;padding:0;cursor:pointer;color:i
 .crow{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;border:1px solid transparent;width:100%}
 .crow:hover{background:var(--card)}
 .crow.on{background:var(--card);border-color:var(--rule);box-shadow:inset 3px 0 0 var(--accent)}
+/* Closing one should not need opening it first: the x sits on the row and
+   appears when the row is under the pointer or the keyboard. */
+.crowwrap{position:relative}
+.xrow{position:absolute;right:7px;bottom:7px;width:22px;height:22px;border-radius:6px;
+  display:grid;place-items:center;font:400 15px/1 var(--sans);color:var(--ink3);
+  background:var(--card);opacity:0;transition:opacity .12s}
+.crowwrap:hover .xrow,.xrow:focus{opacity:1}
+.xrow:hover{background:var(--wash);color:var(--ink)}
+.sweep{font:500 12.5px/1.4 var(--sans);color:var(--accent);white-space:nowrap;flex:none}
+.sweep:hover{text-decoration:underline}
 .tab{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px 8px 0 0;border:1px solid var(--rule);border-bottom:none;background:var(--wash);font:500 13.5px/1 var(--sans);color:var(--ink2);cursor:pointer;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis;flex:none}
 .tab.on{background:var(--card);color:var(--ink);font-weight:600}
 .md{font:400 15px/1.65 var(--sans);color:var(--ink)}
@@ -358,7 +368,7 @@ iframe.web{width:100%;height:100%;border:1px solid var(--rule);border-radius:14p
 <div id="endkeeps" style="display:none;margin:14px 0 0;padding:13px 15px;border-radius:9px;background:var(--wash)"></div>
 <div style="display:flex;gap:8px;margin:18px 0 0">
 <button class="btn s" onclick="UI.cancelEnd()">Keep it open</button>
-<button class="btn p" style="background:var(--red)" onclick="UI.reallyEnd()">End it</button>
+<button class="btn p" id="endgo" style="background:var(--red)" onclick="UI.reallyEnd()">End it</button>
 <span style="align-self:center;margin-left:auto;font:400 12.5px/1 var(--sans);color:var(--ink3)">Esc keeps it</span>
 </div>
 </div>
@@ -400,6 +410,20 @@ function mini(md){
   return out.join("");
 }
 function inline(s){ return s.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`([^`]+)`/g,"<code>$1</code>"); }
+// A week with nothing said is the line between "open" and "clutter".
+var OLD_DAYS = 7;
+function daysIdle(c){
+  if (!c || !c.last) return 0;
+  var d = (Date.now() - new Date(c.last).getTime()) / 86400000;
+  return d > 0 ? d : 0;
+}
+function idleWords(c){
+  var d = Math.floor(daysIdle(c));
+  return d >= 60 ? Math.floor(d/30)+" months quiet"
+       : d >= 30 ? "a month quiet"
+       : d >= 14 ? Math.floor(d/7)+" weeks quiet"
+       : d >= 7  ? "a week quiet" : d+" days quiet";
+}
 function dotColor(st){ return st==="ask"?"var(--red)":st==="working"?"var(--green)":"var(--ink3)"; }
 
 const UI = {
@@ -537,15 +561,19 @@ const UI = {
         <button title="Another conversation in ${esc(p.name)}" style="margin-left:auto;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:300 17px/1 var(--sans);color:var(--ink3);flex:none" onclick="UI.newIn('${esc(p.src)}')">+</button></div>
         <div style="display:flex;align-items:center;gap:8px;margin:1px 0 0;padding-left:17px">
         <span style="font:400 12.5px/1.4 var(--sans);color:var(--ink3);white-space:nowrap">${p.convos.length===0?"nothing open":p.convos.length===1?"one conversation":p.convos.length+" conversations"}</span>
+        ${(()=>{ const old=p.convos.filter(c=>daysIdle(c)>=OLD_DAYS && c.state!=="working");
+          return old.length? `<button class="sweep" onclick="UI.askEndOld('${esc(p.src)}')">close ${old.length===1?"the quiet one":"the "+old.length+" quiet ones"}</button>` : ""; })()}
         ${un?`<span style="padding:2px 7px;border-radius:10px;background:var(--atint);font:600 10.5px/1.6 var(--sans);color:var(--accent);white-space:nowrap;flex:none">${un} new</span>`:""}</div></div>
         <div style="margin-top:5px;display:flex;flex-direction:column;gap:2px">${p.convos.map(c=>`
+          <div class="crowwrap">
           <button class="crow ${c.id===this.sel?"on":""}" onclick="UI.open('${c.id}')">
           <span class="dot ${c.state==="working"?"pulse":""}" style="background:${dotColor(c.state)};margin-top:6px"></span>
           <div style="min-width:0;flex:1"><div style="display:flex;align-items:center;gap:8px;min-width:0">
             <span class="clamp" style="font:600 15px/1.25 var(--sans);-webkit-line-clamp:2">${esc(c.topic)}</span>
             ${c.unread?'<span class="unread"></span>':""}
             <span style="font:500 10px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:${c.hands?"var(--green)":"var(--ink3)"};margin-left:auto;white-space:nowrap;flex:none">${c.hands?"has the hands":"talk only"}</span></div>
-          <div class="clamp" style="font:400 13.5px/1.45 var(--sans);color:${c.state==="ask"?"var(--red)":"var(--ink2)"};margin-top:4px">${esc(c.line||"")}</div></div></button>`).join("")}
+          <div class="clamp" style="font:400 13.5px/1.45 var(--sans);color:${c.state==="ask"?"var(--red)":"var(--ink2)"};margin-top:4px">${esc(c.line||"")}</div></div></button>
+          <button class="xrow" title="Close this conversation" aria-label="Close ${esc(c.topic)}" onclick="UI.askEnd('${c.id}')">×</button></div>`).join("")}
         ${p.convos.length? "" : p.history.slice(0,3).map(h=>`
           <button class="crow" style="padding:8px 11px" onclick="UI.reopen('${h.id}')">
           <div style="min-width:0;flex:1"><div class="oneline" style="font:500 14px/1.3 var(--sans);color:var(--ink3)">${esc(h.topic)}</div>
@@ -586,7 +614,7 @@ const UI = {
                       : c.topic.length>22 ? "21px" : "23px";
     this.paintHead();
     $("stopbtn").textContent = this.running? "Stop it here" : "End conversation";
-    $("stopbtn").onclick = ()=> this.running? this.stopRun() : this.askEnd();
+    $("stopbtn").onclick = ()=> this.running? this.stopRun() : this.askEnd(c.id);
     // tabs
     const tabs=$("tabs");
     if (p.convos.length>1){
@@ -840,9 +868,33 @@ const UI = {
     toast("Stopped — nothing was lost");
     this.running=false; setTimeout(()=>this.refresh(), 800);
   },
-  askEnd(){
-    const cur=this.convo(); if(!cur) return;
+  convoById(id){
+    for (const p of ((this.snap&&this.snap.projects)||[])){
+      const c=p.convos.find(x=>x.id===id); if(c) return {p,c};
+    }
+    return null;
+  },
+  // Closing several quiet ones at once: same dialog, same warning about what
+  // is only in the conversation, one confirmation instead of five.
+  askEndOld(src){
+    const p=((this.snap&&this.snap.projects)||[]).find(x=>x.src===src); if(!p) return;
+    const old=p.convos.filter(c=>daysIdle(c)>=OLD_DAYS && c.state!=="working");
+    if(!old.length) return;
+    if(old.length===1) return this.askEnd(old[0].id);
+    this.endIds=old.map(c=>c.id); this.endFiles=0;
+    $("endtitle").textContent=`Close ${old.length} quiet conversations?`;
+    $("endgo").textContent=`Close ${old.length}`;
+    $("endbody").textContent=`Nothing has been said in these for a week or more. Files they wrote stay where they are, and each one moves under “earlier in ${p.name}”, where it can be picked back up with its memory intact.`;
+    $("endkeeps").style.display="block";
+    $("endkeeps").innerHTML=`<div class="quiet" style="margin-bottom:8px">Closing</div>`
+      + old.map(c=>`<div style="display:flex;gap:10px;font:400 13px/1.7 var(--sans);color:var(--ink2)"><span class="oneline">${esc(c.topic)}</span><span style="margin-left:auto;color:${c.state==="ask"?"var(--red)":"var(--ink3)"};white-space:nowrap;flex:none">${c.state==="ask"?"asked you something · ":""}${idleWords(c)}</span></div>`).join("");
+    $("enddlg").style.display="grid"; this.endPending=true;
+  },
+  askEnd(id){
+    const cur=id? this.convoById(id) : this.convo(); if(!cur) return;
     const {p,c}=cur;
+    this.endIds=[c.id]; this.endFiles=(c.allfiles||[]).length;
+    $("endgo").textContent="End it";
     $("endtitle").textContent=`End “${c.topic}”?`;
     const n=(c.allfiles||[]).length;
     $("endbody").textContent = n
@@ -853,14 +905,24 @@ const UI = {
       + (c.allfiles||[]).map(f=>`<div style="font:400 12.5px/1.6 var(--sans);color:var(--ink2);font-family:ui-monospace,Menlo,monospace">${esc(f)}</div>`).join(""):"";
     $("enddlg").style.display="grid"; this.endPending=true;
   },
-  cancelEnd(){ $("enddlg").style.display="none"; this.endPending=false; },
+  cancelEnd(){ $("enddlg").style.display="none"; this.endPending=false; this.endIds=null; },
   async reallyEnd(){
-    const cur=this.convo();
-    const r = await post("/api/sessions/end", {id:this.sel});
+    const ids=(this.endIds&&this.endIds.length)? this.endIds.slice() : (this.sel?[this.sel]:[]);
+    const files=this.endFiles||0;
+    if(!ids.length) return this.cancelEnd();
+    let done=0, err="";
+    // One at a time on purpose: the server refuses a conversation that is
+    // mid-turn, and that refusal should stop only its own row.
+    for (const id of ids){
+      const r=await post("/api/sessions/end", {id});
+      if (r&&r.error) err=r.error; else done++;
+    }
     this.cancelEnd();
-    if (r.error){ toast(r.error); return; }
-    toast(cur&&(cur.c.allfiles||[]).length? "Ended — the files stayed ✓":"Ended ✓");
-    this.sel=null; await this.refresh();
+    if (!done){ toast(err||"nothing closed"); return; }
+    toast(ids.length>1 ? (err? `Closed ${done} — ${err}` : `Closed ${done} ✓`)
+                       : (files? "Ended — the files stayed ✓" : "Ended ✓"));
+    if (ids.includes(this.sel)) this.sel=null;
+    await this.refresh();
   },
   async reopen(id){
     await post("/api/sessions/reopen", {id});
