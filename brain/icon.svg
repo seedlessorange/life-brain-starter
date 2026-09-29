@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Home-screen icon. Deliberately not a brain cartoon: a seed with two
+       leaves, warm paper on forest green, matching the page's palette. -->
+  <rect width="512" height="512" rx="112" fill="#3D4A33"/>
+  <g fill="none" stroke="#F7F2E9" stroke-width="26" stroke-linecap="round">
+    <path d="M256 372V236"/>
+    <path d="M256 250c-46 0-84-36-84-82 46 0 84 36 84 82z" stroke-linejoin="round"/>
+    <path d="M256 286c46 0 84-36 84-82-46 0-84 36-84 82z" stroke-linejoin="round"/>
+  </g>
+  <circle cx="256" cy="392" r="15" fill="#B5703A"/>
+</svg>
