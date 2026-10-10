@@ -1,0 +1,6 @@
+# The same two jobs a Mac schedules with launchd, at the same hours.
+# Times are local to the container's TZ (set in docker-compose.yml).
+# Keep night at least five hours before morning — they must not share a
+# Claude usage window (the why is at the top of night.sh).
+0 7 * * * cd /brain && bash brain/tools/morning.sh
+0 1 * * * cd /brain && bash brain/tools/night.sh

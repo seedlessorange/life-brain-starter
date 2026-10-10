@@ -1,0 +1,877 @@
+/* ================================================================ ORBIT
+   Full skin — baked only when "orbit" is active, emitted after the token
+   and theme blocks. Spec: design/skins/SPECS.md §6 (Orbit). A calm dark
+   deck in the Claude mode of her reference: near-black with a teal glow
+   high in the middle, a faint grid floor at the foot of the screen, sparse
+   stars. Each section is one faint glass panel with its label inside;
+   rows are hairlines. Corner brackets frame only the plan and the plan
+   meter. On Today the deck (the orb, the clock, the three, the counts)
+   fills the first screen. Orbit is dark in BOTH themes — it pins its own
+   base tokens rather than following the light/dark switch. Faces, state
+   dots and the round buttons stay round; the five state colours keep
+   their meanings, re-tuned to read on the dark. */
+
+:root[data-style="orbit"]{
+  color-scheme:dark;
+  --paper:oklch(.15 .01 195);
+  --surface:oklch(.19 .013 190);
+  --sunken:oklch(.125 .009 195);
+  --ink:oklch(.94 .01 175);
+  --dim:oklch(.80 .014 180);
+  --faint:oklch(.68 .016 180);
+  --line:oklch(.28 .014 185);
+  --line2:oklch(.39 .02 180);
+
+  /* teal, Claude mode — rides the --green/--accent alias, so links, the ✦
+     actions, fills and the FAB follow without per-site rules */
+  --green:oklch(.84 .105 172);
+  --greenbg:oklch(.27 .045 172);
+
+  /* the orb: its particles, its listening tint, its halo (orb.py's
+     canvases read --orb and --orb-listen) */
+  --orb:oklch(82% .13 170);
+  --orb-listen:oklch(88% .11 195);
+  --orb-glow:oklch(72% .13 170 / .16);
+
+  /* the states, re-tuned for the dark; meanings unchanged. Moving green
+     sits at 138 so it never reads as the teal accent. */
+  --terra:oklch(.81 .085 52);                     /* due soon · now: peach */
+  --bad:oklch(.73 .13 25);   --badbg:oklch(.26 .05 25);
+  --wait:oklch(.84 .105 85); --waitbg:oklch(.27 .04 85);
+  --cold:oklch(.77 .075 250);--coldbg:oklch(.26 .035 252);
+  --ok:oklch(.82 .13 138);   --okt:oklch(.27 .045 138);
+
+  --shadow:none;
+  --shadow-lift:0 18px 44px -22px oklch(0 0 0 / .85);
+  --r-xl:10px;--r-lg:9px;--r-card:8px;--r-md:7px;--r-btn:6px;--r-sm:5px;
+
+  --serif:'Archivo','Helvetica Neue',-apple-system,sans-serif;
+  --sans:'IBM Plex Sans',-apple-system,system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --ob-num:'Darker Grotesque','Archivo',sans-serif;   /* narrow numerals */
+
+  /* the orbit's own */
+  --ob-peach:oklch(.83 .09 52);
+  --ob-glass2:color-mix(in oklab,var(--surface) 62%,transparent);
+  --ob-bc:color-mix(in oklab,var(--ink) 40%,transparent);
+  --ob-pc:color-mix(in oklab,var(--ob-peach) 55%,transparent);
+  --ob-brackets:
+    linear-gradient(var(--ob-bc),var(--ob-bc)) left 0 top 0/12px 1px no-repeat,
+    linear-gradient(var(--ob-bc),var(--ob-bc)) left 0 top 0/1px 12px no-repeat,
+    linear-gradient(var(--ob-bc),var(--ob-bc)) right 0 top 0/12px 1px no-repeat,
+    linear-gradient(var(--ob-bc),var(--ob-bc)) right 0 top 0/1px 12px no-repeat,
+    linear-gradient(var(--ob-bc),var(--ob-bc)) left 0 bottom 0/12px 1px no-repeat,
+    linear-gradient(var(--ob-bc),var(--ob-bc)) left 0 bottom 0/1px 12px no-repeat,
+    linear-gradient(var(--ob-bc),var(--ob-bc)) right 0 bottom 0/12px 1px no-repeat,
+    linear-gradient(var(--ob-bc),var(--ob-bc)) right 0 bottom 0/1px 12px no-repeat;
+  --ob-brackets-peach:
+    linear-gradient(var(--ob-pc),var(--ob-pc)) left 5px top 5px/11px 1px no-repeat,
+    linear-gradient(var(--ob-pc),var(--ob-pc)) left 5px top 5px/1px 11px no-repeat,
+    linear-gradient(var(--ob-pc),var(--ob-pc)) right 5px top 5px/11px 1px no-repeat,
+    linear-gradient(var(--ob-pc),var(--ob-pc)) right 5px top 5px/1px 11px no-repeat,
+    linear-gradient(var(--ob-pc),var(--ob-pc)) left 5px bottom 5px/11px 1px no-repeat,
+    linear-gradient(var(--ob-pc),var(--ob-pc)) left 5px bottom 5px/1px 11px no-repeat,
+    linear-gradient(var(--ob-pc),var(--ob-pc)) right 5px bottom 5px/11px 1px no-repeat,
+    linear-gradient(var(--ob-pc),var(--ob-pc)) right 5px bottom 5px/1px 11px no-repeat;
+}
+
+/* ------------------------------------------------------------ the room
+   Two fixed layers behind everything: a teal glow high in the middle
+   (where the orb sits on Today) and a faint perspective grid for a floor
+   at the foot of the screen. The stars belong to the orb: they sit round
+   it on Today's first screen and scroll away with it. Spread over the
+   whole page they landed inside sentences and read as stray full stops
+   (8 Oct). Nothing moves under reduced motion. */
+:root[data-style="orbit"] body{background:var(--paper);font-variant-numeric:tabular-nums}
+:root[data-style="orbit"]::before,
+:root[data-style="orbit"] body::before{content:"";position:fixed;z-index:-1;
+  pointer-events:none}
+:root[data-style="orbit"]::before{inset:0;
+  background:
+    radial-gradient(ellipse 42% 40% at 50% 34%,oklch(.40 .085 172 / .34),
+      oklch(.30 .06 175 / .12) 55%,transparent 78%),
+    radial-gradient(ellipse 90% 60% at 50% 110%,oklch(.26 .05 180 / .22),transparent 70%)}
+/* the floor: two sets of lines laid back in perspective, faded out
+   toward the horizon and the sides */
+:root[data-style="orbit"] body::before{left:-40%;right:-40%;bottom:0;height:46vh;
+  background:
+    repeating-linear-gradient(90deg,color-mix(in oklab,var(--orb) 30%,transparent) 0 1px,
+      transparent 1px 72px),
+    repeating-linear-gradient(0deg,color-mix(in oklab,var(--orb) 30%,transparent) 0 1px,
+      transparent 1px 56px);
+  background-position:center bottom;
+  transform:perspective(380px) rotateX(64deg);transform-origin:50% 100%;
+  opacity:.45;
+  -webkit-mask:radial-gradient(ellipse 46% 100% at 50% 100%,#000 25%,transparent 72%);
+  mask:radial-gradient(ellipse 46% 100% at 50% 100%,#000 25%,transparent 72%)}
+/* the orb's sky: a field wider than the orb, fading out before the two
+   sides of the deck and the day's line under it */
+/* the deck clips it sideways: at phone width the field is wider than the
+   screen and would let the page scroll sideways */
+:root[data-style="orbit"] .skinx-deck{overflow-x:clip}
+:root[data-style="orbit"] .deckorbbtn::before{content:"";position:absolute;
+  inset:-12% -22%;z-index:-1;pointer-events:none;
+  -webkit-mask:radial-gradient(closest-side,#000 52%,transparent);
+  mask:radial-gradient(closest-side,#000 52%,transparent);
+  /* two hand-scattered tiles of different sizes, so no grid shows */
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='997' height='1013' fill='%23e6fff6'%3E%3Ccircle cx='324' cy='155' r='0.68' fill-opacity='0.17'/%3E%3Ccircle cx='365' cy='61' r='0.63' fill-opacity='0.16'/%3E%3Ccircle cx='72' cy='94' r='0.6' fill-opacity='0.53'/%3E%3Ccircle cx='224' cy='635' r='0.78' fill-opacity='0.4'/%3E%3Ccircle cx='970' cy='50' r='0.75' fill-opacity='0.26'/%3E%3Ccircle cx='120' cy='314' r='0.74' fill-opacity='0.21'/%3E%3Ccircle cx='636' cy='378' r='0.64' fill-opacity='0.17'/%3E%3Ccircle cx='207' cy='688' r='0.6' fill-opacity='0.27'/%3E%3Ccircle cx='452' cy='305' r='0.73' fill-opacity='0.46'/%3E%3Ccircle cx='572' cy='532' r='0.76' fill-opacity='0.48'/%3E%3Ccircle cx='974' cy='122' r='0.6' fill-opacity='0.49'/%3E%3Ccircle cx='488' cy='42' r='0.68' fill-opacity='0.49'/%3E%3Ccircle cx='871' cy='319' r='0.69' fill-opacity='0.4'/%3E%3Ccircle cx='455' cy='849' r='0.78' fill-opacity='0.34'/%3E%3Ccircle cx='63' cy='709' r='0.68' fill-opacity='0.63'/%3E%3Ccircle cx='285' cy='391' r='0.68' fill-opacity='0.15'/%3E%3Ccircle cx='170' cy='121' r='0.47' fill-opacity='0.5'/%3E%3Ccircle cx='248' cy='397' r='0.75' fill-opacity='0.17'/%3E%3Ccircle cx='547' cy='893' r='0.74' fill-opacity='0.55'/%3E%3Ccircle cx='415' cy='364' r='0.76' fill-opacity='0.61'/%3E%3Ccircle cx='178' cy='237' r='0.53' fill-opacity='0.35'/%3E%3Ccircle cx='263' cy='7' r='0.6' fill-opacity='0.29'/%3E%3Ccircle cx='948' cy='698' r='0.63' fill-opacity='0.42'/%3E%3Ccircle cx='57' cy='909' r='0.72' fill-opacity='0.56'/%3E%3Ccircle cx='392' cy='405' r='0.49' fill-opacity='0.42'/%3E%3Ccircle cx='70' cy='213' r='0.51' fill-opacity='0.28'/%3E%3Ccircle cx='3' cy='155' r='0.49' fill-opacity='0.29'/%3E%3Ccircle cx='869' cy='621' r='0.5' fill-opacity='0.24'/%3E%3Ccircle cx='364' cy='127' r='0.75' fill-opacity='0.63'/%3E%3Ccircle cx='482' cy='89' r='0.49' fill-opacity='0.28'/%3E%3Ccircle cx='824' cy='166' r='0.46' fill-opacity='0.6'/%3E%3Ccircle cx='148' cy='550' r='0.46' fill-opacity='0.37'/%3E%3Ccircle cx='859' cy='704' r='0.54' fill-opacity='0.29'/%3E%3Ccircle cx='768' cy='539' r='0.72' fill-opacity='0.28'/%3E%3C/svg%3E") 0 0/997px 1013px,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1409' height='1361' fill='%23e6fff6'%3E%3Ccircle cx='638' cy='761' r='1.17' fill-opacity='0.55'/%3E%3Ccircle cx='827' cy='253' r='1.0' fill-opacity='0.63'/%3E%3Ccircle cx='135' cy='414' r='0.84' fill-opacity='0.73'/%3E%3Ccircle cx='62' cy='1334' r='1.19' fill-opacity='0.65'/%3E%3Ccircle cx='224' cy='23' r='1.01' fill-opacity='0.36'/%3E%3Ccircle cx='342' cy='44' r='0.99' fill-opacity='0.53'/%3E%3Ccircle cx='731' cy='871' r='1.0' fill-opacity='0.65'/%3E%3Ccircle cx='393' cy='1355' r='1.2' fill-opacity='0.75'/%3E%3Ccircle cx='445' cy='314' r='0.92' fill-opacity='0.36'/%3E%3Ccircle cx='565' cy='1150' r='0.95' fill-opacity='0.82'/%3E%3Ccircle cx='4' cy='287' r='1.16' fill-opacity='0.55'/%3E%3Ccircle cx='561' cy='102' r='1.05' fill-opacity='0.72'/%3E%3C/svg%3E") 311px 157px/1409px 1361px;
+  will-change:transform;animation:ob-drift 240s linear infinite alternate}
+@keyframes ob-drift{from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-64px,-44px,0)}}
+@media (prefers-reduced-motion:reduce){
+  :root[data-style="orbit"] .deckorbbtn::before{animation:none;will-change:auto}
+}
+:root[data-style="orbit"] ::selection{background:color-mix(in oklab,var(--green) 30%,transparent);
+  color:var(--ink)}
+:root[data-style="orbit"] a{color:var(--green)}
+:root[data-style="orbit"] a:hover{color:var(--ink)}
+
+/* the page's own dark-theme treatments, applied in the light theme too */
+:root[data-style="orbit"] .pav{
+  background:oklch(38% .06 var(--pavh));color:oklch(88% .05 var(--pavh))}
+:root[data-style="orbit"] .artvid{mix-blend-mode:normal;border-radius:var(--r-xl);
+  box-shadow:var(--shadow-lift)}
+
+/* ------------------------------------------------------- no mascots here
+   The drawn brains give way to a small orbit glyph in the orb's teal: two
+   thin rings round a lit core, and a spark on the outer ring that goes
+   round once every fourteen seconds (still under reduced motion). It is
+   drawn in em, so each host sets its size with font-size. Videos are
+   hidden and their holder draws the glyph; stills keep their box and
+   draw it in place of the picture. */
+:root[data-style="orbit"]{
+  --ob-glyph:
+    radial-gradient(circle at 50% .06em,var(--orb) 0 .05em,
+      color-mix(in oklab,var(--orb) 45%,transparent) .075em,transparent .11em),
+    radial-gradient(circle,var(--orb) 0 .05em,
+      color-mix(in oklab,var(--orb) 40%,transparent) .075em,transparent .12em),
+    radial-gradient(circle,transparent .235em,
+      color-mix(in oklab,var(--orb) 60%,transparent) .245em .28em,transparent .29em),
+    radial-gradient(circle,transparent .42em,
+      color-mix(in oklab,var(--orb) 26%,transparent) .43em .46em,transparent .47em),
+    radial-gradient(circle,var(--orb-glow) 0,transparent .5em)}
+@keyframes ob-orbit{to{transform:rotate(1turn)}}
+:root[data-style="orbit"] .cardhead-art>*,
+:root[data-style="orbit"] .dp-holder>*,
+:root[data-style="orbit"] .fivedone>video{display:none}
+:root[data-style="orbit"] .cardhead-art{width:1em;height:1em;font-size:26px;
+  margin-block:0;border-radius:50%;background:var(--ob-glyph);
+  animation:ob-orbit 14s linear infinite}
+:root[data-style="orbit"] .dp-holder::before,
+:root[data-style="orbit"] .fivedone::before{content:"";display:block;width:1em;height:1em;
+  font-size:48px;margin:0 auto 8px;border-radius:50%;background:var(--ob-glyph);
+  animation:ob-orbit 14s linear infinite}
+:root[data-style="orbit"] :is(.h2art,.sumart,.barart,.empty.art>img,.mapempty>img){
+  object-fit:none;object-position:-99em -99em;border-radius:50%;
+  background:var(--ob-glyph);animation:ob-orbit 14s linear infinite}
+:root[data-style="orbit"] .h2art{width:26px;height:26px;font-size:26px}
+:root[data-style="orbit"] .sumart{width:22px;height:22px;font-size:22px;vertical-align:-6px}
+:root[data-style="orbit"] .barart{width:26px;height:26px;font-size:26px}
+:root[data-style="orbit"] .empty.art>img{width:40px;height:40px;font-size:40px}
+:root[data-style="orbit"] .mapempty>img{width:72px;height:72px;font-size:72px}
+@media (prefers-reduced-motion:reduce){
+  :root[data-style="orbit"] :is(.cardhead-art,.h2art,.sumart,.barart,.empty.art>img,
+    .mapempty>img),
+  :root[data-style="orbit"] .dp-holder::before,
+  :root[data-style="orbit"] .fivedone::before{animation:none}
+}
+
+/* ---------------------------------------------------- no squiggles here */
+:root[data-style="orbit"] .wav,
+:root[data-style="orbit"] #queue>h2::after,:root[data-style="orbit"] #drafts>h2::after,
+:root[data-style="orbit"] #connections>h2::after,:root[data-style="orbit"] #recordings>h2::after,
+:root[data-style="orbit"] #newfiles>h2::after,:root[data-style="orbit"] #people>h2::after,
+:root[data-style="orbit"] #attention>h2::after,:root[data-style="orbit"] #all>h2::after,
+:root[data-style="orbit"] .doc h2:not(.todaydoc>h2)::after{display:none}
+:root[data-font][data-style="orbit"] .todaywrap{border-radius:0;border-width:0}
+:root[data-font][data-style="orbit"] .habit,
+:root[data-font][data-style="orbit"] .habit:nth-child(even){border-radius:var(--r-card);
+  border-width:1px}
+:root[data-font][data-style="orbit"] .empty,
+:root[data-font][data-style="orbit"] .row[open]{border-radius:var(--r-card)}
+:root[data-font][data-style="orbit"] .tile{border-radius:var(--r-btn)}
+:root[data-font][data-style="orbit"] .box{border-radius:4px;border-width:1px;
+  width:18px;height:18px}
+:root[data-font][data-style="orbit"] .box.done,
+:root[data-font][data-style="orbit"] .v-mine{transform:none}
+:root[data-font][data-style="orbit"] .empty::before{display:none}
+:root[data-font][data-style="orbit"] .tiernote,
+:root[data-font][data-style="orbit"] .hnote,
+:root[data-font][data-style="orbit"] .tnote{font-family:var(--coach)}
+
+/* --------------------------------------------------------------- labels
+   SKILLS  QUICK ACCESS ———— : uppercase mono, wide tracking, dim, and a
+   hairline that runs on after the words and fades out. */
+:root[data-style="orbit"] :is(.eyebrow,.area,.todaydoc>h2){
+  font:500 10.5px/1.5 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim)}
+/* the playful type's wonky labels reserve room for a squiggle: not here */
+html:root[data-font][data-style="orbit"] :is(.eyebrow,.area,.todaydoc>h2){
+  padding-bottom:0}
+:root[data-style="orbit"] p.eyebrow,:root[data-style="orbit"] h3.area,
+:root[data-style="orbit"] .todaydoc>h2,
+html:root[data-font][data-style="orbit"] :is(p.eyebrow,h3.area,.todaydoc>h2){
+  display:flex;align-items:center;gap:12px;position:static}
+/* no label grows a squiggle; the block ones get the hairline just below */
+:root[data-style="orbit"] :is(.eyebrow,.area)::after,
+html:root[data-font][data-style="orbit"] :is(.eyebrow,.area)::after{
+  content:none;display:none}
+:root[data-style="orbit"] p.eyebrow::after,:root[data-style="orbit"] h3.area::after,
+:root[data-style="orbit"] .todaydoc>h2::after,
+html:root[data-font][data-style="orbit"] :is(p.eyebrow,h3.area,.todaydoc>h2)::after{
+  content:"";display:block;position:static;flex:1 1 28px;min-width:28px;
+  max-width:none;height:1px;margin:0;opacity:1;
+  background:linear-gradient(90deg,var(--line2),transparent);
+  -webkit-mask:none;mask:none}
+/* a count or sub-label beside the words reads dimmer, like QUICK ACCESS */
+:root[data-style="orbit"] .area .csub,:root[data-style="orbit"] .area .agn,
+:root[data-style="orbit"] .eyebrow .csub{background:none;padding:0;border-radius:0;
+  font:500 10px/1 var(--mono);letter-spacing:.14em;color:var(--faint)}
+:root[data-style="orbit"] .foryou>.area .csub{color:var(--green);font-weight:600}
+
+/* ------------------------------------------------------------- headings */
+:root[data-style="orbit"] h1,:root[data-style="orbit"] h2{font-family:var(--serif);
+  font-weight:400;letter-spacing:0}
+:root[data-style="orbit"] .skinx-greet{display:block;margin:30px 0 8px;max-width:1080px;
+  font:220 clamp(32px,4.2vw,60px)/1.06 var(--serif);letter-spacing:-.012em;
+  color:var(--ink);overflow-wrap:break-word}
+:root[data-style="orbit"] .todaydoc h1,:root[data-style="orbit"] .doc h1{
+  font:300 1.6rem/1.2 var(--serif);letter-spacing:-.005em}
+/* the When column's date said the plan's title again beside it (8 Oct);
+   the bar keeps the date */
+:root[data-style="orbit"] .whenday{display:none}
+:root[data-style="orbit"] .platehead .triage,:root[data-style="orbit"] .psub{
+  font:300 1.45rem/1.35 var(--serif);letter-spacing:0}
+:root[data-style="orbit"] .pdtray>h2,:root[data-style="orbit"] .forecast h3,
+:root[data-style="orbit"] #queue>h2,:root[data-style="orbit"] #drafts>h2,
+:root[data-style="orbit"] #connections>h2,:root[data-style="orbit"] #recordings>h2,
+:root[data-style="orbit"] #newfiles>h2,:root[data-style="orbit"] #people>h2,
+:root[data-style="orbit"] #attention>h2,:root[data-style="orbit"] #all>h2{
+  font-family:var(--serif);font-weight:300;letter-spacing:0}
+:root[data-style="orbit"] .fc-head{font:300 1.4rem/1.3 var(--serif);letter-spacing:0}
+:root[data-style="orbit"] .fc-when{font-weight:600}
+:root[data-style="orbit"] .coach,:root[data-style="orbit"] .hero-why{color:var(--dim)}
+
+/* Each tab opens with one line in the deck's greeting type, led by a
+   still orbit glyph: the orb, small, on every tab. School and Jobs were
+   60px and Plate, People, Life and News 23px, so two tabs shouted and
+   four spoke (8 Oct). The glyph does not turn: something moving at the
+   edge of her eye all day is what the clock's seconds were cut for. */
+:root[data-style="orbit"] :is(.skinx-greet,.platehead .triage,.psub,.lifehead>h2,
+  .nwtop>h2,.season>h2.szname){
+  font:250 clamp(30px,2.9vw,42px)/1.15 var(--serif);letter-spacing:-.01em;
+  color:var(--ink);text-wrap:balance}
+:root[data-style="orbit"] :is(.skinx-greet,.platehead .triage,.psub,.lifehead>h2,
+  .nwtop>h2,.season>h2.szname)::before{content:"";display:inline-block;
+  width:1em;height:1em;font-size:.62em;margin:0 .5em 0 0;vertical-align:-.04em;
+  border-radius:50%;background:var(--ob-glyph)}
+
+/* ------------------------------------------------------ mono machinery */
+:root[data-style="orbit"] .whensub,:root[data-style="orbit"] .when .wt,
+:root[data-style="orbit"] .h2count,:root[data-style="orbit"] .rank,
+:root[data-style="orbit"] .test,:root[data-style="orbit"] .skinx-planstamp,
+:root[data-style="orbit"] .fc-gap{font-family:var(--mono);letter-spacing:.03em}
+:root[data-style="orbit"] .meta{font-size:12.5px;line-height:1.5;color:var(--faint)}
+:root[data-style="orbit"] .when .wt{letter-spacing:.12em}
+:root[data-style="orbit"] .skinx-planstamp{display:inline-block;margin:0 var(--s3) var(--s2) 0;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+/* the weather strip: a row of instrument readings */
+:root[data-style="orbit"] .wxline{font:500 13.5px/1.6 var(--sans);color:var(--dim)}
+:root[data-style="orbit"] .wxline .ico{opacity:.8}
+
+/* --------------------------------------------------------------- header */
+:root[data-style="orbit"] .top{background:color-mix(in oklch,var(--paper) 70%,transparent);
+  border-bottom:1px solid color-mix(in oklab,var(--line) 70%,transparent)}
+:root[data-style="orbit"] .brand{font:600 13px/1 var(--serif);letter-spacing:.24em;
+  text-transform:uppercase}
+:root[data-style="orbit"] .brand b{font-weight:300;color:var(--dim)}
+/* the pink brain was the only pink on the deck: tinted to the teal */
+:root[data-style="orbit"] .brand .logo{
+  filter:grayscale(1) sepia(1) hue-rotate(125deg) saturate(1.6) brightness(1.05)}
+:root[data-style="orbit"] .syncstate{font:500 10.5px/1 var(--mono);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);background:none;border:0;box-shadow:none}
+:root[data-style="orbit"] .syncstate:hover{color:var(--dim);background:var(--ob-glass2)}
+:root[data-style="orbit"] .skinx-stamp{display:inline;color:var(--dim);margin-right:2px}
+/* the date steps aside under 1280px, as in every style (chrome.py): kept,
+   it pushed Life and News under the find button at tablet widths, and
+   with Talk back in the bar (9 Oct) under "Claude · idle" too */
+@media (max-width:1280px){:root[data-style="orbit"] .syncstate .skinx-stamp{display:none}}
+:root[data-style="orbit"] .syncstate i{box-shadow:0 0 6px var(--green)}
+:root[data-style="orbit"] .topnav a,:root[data-style="orbit"] .appnav a{
+  font:500 13.5px/1 var(--sans);letter-spacing:0;text-transform:none;
+  padding:8px 11px;border:1px solid transparent;border-radius:var(--r-btn);
+  color:var(--dim)}
+:root[data-style="orbit"] .topnav a:hover,:root[data-style="orbit"] .appnav a:hover{
+  color:var(--ink);background:var(--ob-glass2)}
+:root[data-style="orbit"] .topnav a.on,:root[data-style="orbit"] .appnav a.on{color:var(--ink);
+  background:var(--ob-glass2);border-color:var(--line2)}
+:root[data-style="orbit"] .navmore>summary{font:500 13.5px/1 var(--sans)}
+:root[data-style="orbit"] .hoodlink{color:var(--dim)}
+:root[data-style="orbit"] .hoodlink.on{border-color:var(--line2);background:var(--ob-glass2)}
+/* ✦ Ask: outlined like the Talk pill beside it. It was the one filled
+   button, the brightest thing on screen, and it outshone the orb the deck
+   asks her to tap (29 Sep). */
+:root[data-style="orbit"] .askopen{background:color-mix(in oklab,var(--surface) 70%,transparent);
+  color:var(--ink);border:1px solid color-mix(in oklab,var(--orb) 30%,var(--line));
+  border-radius:var(--r-btn);
+  font:600 13px/1 var(--sans);letter-spacing:0;padding:9px 12px;box-shadow:none}
+:root[data-style="orbit"] .askopen:hover{border-color:color-mix(in oklab,var(--orb) 60%,var(--line));
+  box-shadow:0 0 0 3px color-mix(in oklab,var(--green) 22%,transparent),
+    0 0 22px -4px color-mix(in oklab,var(--green) 60%,transparent)}
+:root[data-style="orbit"] .ghostbtn{background:transparent;border:1px solid var(--line2);
+  border-radius:var(--r-btn);color:var(--dim);font:500 13px/1 var(--sans);
+  letter-spacing:0}
+:root[data-style="orbit"] .ghostbtn:hover{color:var(--ink);border-color:var(--green)}
+:root[data-style="orbit"] .banner{background:var(--sunken);color:var(--dim);
+  border-bottom:1px solid var(--line)}
+
+/* The Talk button: a small orb in a teal ring. Wide screens show the
+   orb's state beside it as a mono chip ("Claude · idle") instead of the
+   word; narrower ones keep the ring alone. */
+:root[data-style="orbit"] .vorbbtn{color:var(--dim);box-shadow:none;
+  background:color-mix(in oklab,var(--surface) 70%,transparent);
+  border:1px solid color-mix(in oklab,var(--orb) 30%,var(--line))}
+:root[data-style="orbit"] .vorbbtn:hover{color:var(--ink);
+  border-color:color-mix(in oklab,var(--orb) 60%,var(--line))}
+:root[data-style="orbit"] .vorbring{border-radius:50%;
+  box-shadow:0 0 0 1px color-mix(in oklab,var(--orb) 55%,transparent),
+    0 0 14px -1px color-mix(in oklab,var(--orb) 55%,transparent)}
+:root[data-style="orbit"] .vorbbtn[data-state="listening"] .vorbring{
+  box-shadow:0 0 0 1px var(--orb-listen),0 0 18px 0 color-mix(in oklab,var(--orb-listen) 60%,transparent)}
+:root[data-style="orbit"] .vorbbtn[data-state="thinking"] .vorbring{
+  box-shadow:0 0 0 1px var(--wait),0 0 18px 0 color-mix(in oklab,var(--wait) 60%,transparent)}
+:root[data-style="orbit"] .vorbbtn .vorbtxt{display:none}
+/* the state chip needs room: with seven tabs and a long name it fits
+   from 1320px (9 Oct) */
+@media (min-width:1341px){
+  :root[data-style="orbit"] .vorbbtn{border-radius:999px;padding:4px 12px 4px 5px}
+  :root[data-style="orbit"] .vorbbtn .vorbstate{display:inline;
+    font:500 11px/1 var(--mono);letter-spacing:.06em;color:var(--dim);white-space:nowrap}
+}
+:root[data-style="orbit"] #vpanel{border-color:var(--line2)}
+
+/* ------------------------------------------------------- the open layout
+   The cards lose the page's own fill and edge; "the panels" below gives
+   each section Orbit's glass instead, and a card inside a For-you line
+   stays bare. */
+:root[data-style="orbit"] .railcard,:root[data-style="orbit"] .forecast,
+:root[data-style="orbit"] .hzcard,:root[data-style="orbit"] .offercard,
+:root[data-style="orbit"] .bscard,:root[data-style="orbit"] .qcard,
+:root[data-style="orbit"] .daycard,:root[data-style="orbit"] .lifecard,
+:root[data-style="orbit"] .pdtray,:root[data-style="orbit"] .asker,
+:root[data-style="orbit"] .recwrap,
+:root[data-style="orbit"] .routinecard,:root[data-style="orbit"] .dupcard{
+  background:none;border:0;border-radius:0;box-shadow:none;
+  padding-left:0;padding-right:0}
+/* the duplicates still ask her to look: an amber edge on the left */
+:root[data-style="orbit"] .dupcard{border-left:2px solid var(--wait);padding-left:14px}
+:root[data-style="orbit"] .dupcard .eyebrow{color:var(--wait)}
+/* inside a For-you line those same cards are bare content, as elsewhere */
+:root[data-style="orbit"] .trbody :is(.pdtray,.mttray,.recwrap){
+  background:none;border:0;border-radius:0;padding:0}
+
+/* ---------------------------------------------------------- the panels
+   Each section is one faint glass panel: a shade lighter than the room,
+   a hairline edge, its label inside at the top. Until 9 Oct a section, a
+   group inside it and a row all ended on the same hairline at the same
+   gap, so nothing said where one section stopped (her words: "I find it
+   hard to differentiate the different sections sometimes in this
+   style"). The rows inside stay hairline rows; the deck and a card inside
+   a For-you line stay open. */
+:root[data-style="orbit"]{
+  --ob-panel:color-mix(in oklab,var(--surface) 52%,transparent);
+  --ob-panel-edge:color-mix(in oklab,var(--line2) 62%,transparent);
+  --ob-panel-pad:18px 22px 16px}
+:root[data-style="orbit"] :is(.railcard,.forecast,.hzcard,.offercard,.bscard,.qcard,
+  .daycard,.lifecard,.pdtray,.asker,.recwrap,.routinecard,.dupcard,.pgroup,
+  .finishlines,.alsodue,.sweep,.foryou):not(.trbody *),
+:root[data-style="orbit"] #attention,:root[data-style="orbit"] #all,
+:root[data-style="orbit"] #waiting{
+  background:var(--ob-panel);border:1px solid var(--ob-panel-edge);
+  border-radius:var(--r-xl);
+  box-shadow:inset 0 1px 0 color-mix(in oklab,var(--ink) 5%,transparent);
+  padding:var(--ob-panel-pad)}
+:root[data-style="orbit"] :is(.railcard,.forecast,.hzcard,.offercard,.bscard,.qcard,
+  .daycard,.lifecard,.pdtray,.asker,.recwrap,.routinecard,.dupcard,.pgroup,
+  .finishlines,.alsodue,.sweep,.foryou):not(.trbody *)>:first-child,
+:root[data-style="orbit"] :is(#attention,#all,#waiting)>:first-child{margin-top:0}
+:root[data-style="orbit"] :is(#attention,#all,#waiting,.finishlines){margin-top:var(--s4)}
+:root[data-style="orbit"] .finishlines{margin-bottom:var(--s5)}
+:root[data-style="orbit"] #people>.pgroup{margin:0 0 var(--s4)}
+:root[data-style="orbit"] #people>.csection>summary.area{margin-top:0;padding-top:0}
+:root[data-style="orbit"] .dupcard:not(.trbody *){border-left:2px solid var(--wait)}
+/* For you's mail check sits in the panel's corner, level with its label */
+:root[data-style="orbit"] .foryou>.fyact{top:13px;right:20px}
+@media (max-width:640px){
+  :root[data-style="orbit"]{--ob-panel-pad:14px 14px 12px}
+  :root[data-style="orbit"] .foryou>.fyact{top:10px;right:12px}
+}
+/* The label at the top of a panel names the section, in full ink. A
+   group inside a section (an area under Needs you, a stage under Your
+   applications) is a name, not another section: sentence case, quieter,
+   no hairline. They used to wear the same label as the section. */
+:root[data-style="orbit"] :is(.railcard,.forecast,.hzcard,.lifecard,.pdtray,.pgroup,
+  .finishlines,.alsodue,.sweep,.foryou):not(.trbody *)>:is(h3.area,p.eyebrow,summary.area):first-child,
+:root[data-style="orbit"] :is(.lchead,.cardhead) :is(.area,.eyebrow){color:var(--ink)}
+:root[data-style="orbit"] :is(.agroup>h3.area,.stack>h3.area,[id="attention"]>h3.area,
+  .pdtray>h3.area:not(:first-child)){
+  font:600 12.5px/1.4 var(--sans);letter-spacing:0;text-transform:none;
+  color:var(--faint);margin:20px 0 2px}
+:root[data-style="orbit"] :is(.agroup>h3.area,.stack>h3.area,[id="attention"]>h3.area,
+  .pdtray>h3.area:not(:first-child))::after{content:none;display:none}
+:root[data-style="orbit"] :is(.agroup:first-of-type>h3.area,.stack>h3.area:first-child,
+  [id="attention"]>h2+h3.area,.pdtray>h2+h3.area){margin-top:10px}
+/* a panel's last row ends on the panel's edge, not on a hairline of its own */
+:root[data-style="orbit"] :is(#attention,#all,.pgroup) .stack:last-child>:last-child,
+:root[data-style="orbit"] .finishlines .flchips>:last-child{border-bottom-color:transparent}
+/* list items: hairline rows, no boxes */
+:root[data-style="orbit"] details.tray,:root[data-style="orbit"] .draft,
+:root[data-style="orbit"] .draftcard,:root[data-style="orbit"] .qitem,
+:root[data-style="orbit"] .run,:root[data-style="orbit"] .connrow,
+:root[data-style="orbit"] .wrules,:root[data-style="orbit"] .stackrow,
+:root[data-style="orbit"] .pfbigq{
+  background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;
+  box-shadow:none}
+:root[data-style="orbit"] details.tray[open],:root[data-style="orbit"] .draft[open]{
+  background:color-mix(in oklab,var(--surface) 35%,transparent)}
+:root[data-style="orbit"] .panel,:root[data-style="orbit"] .convo{
+  background:var(--ob-glass2);border:1px solid var(--line);box-shadow:none}
+:root[data-style="orbit"] .dbody,:root[data-style="orbit"] .wrbody,
+:root[data-style="orbit"] .msteps,:root[data-style="orbit"] code{
+  background:color-mix(in oklab,var(--sunken) 75%,transparent)}
+/* popovers stay solid — text over text is unreadable */
+:root[data-style="orbit"] .appanel,:root[data-style="orbit"] .navmenu,
+:root[data-style="orbit"] .hmorepanel,:root[data-style="orbit"] .findout,
+:root[data-style="orbit"] .actdrawer,:root[data-style="orbit"] .toast{
+  background:var(--surface);border:1px solid var(--line2);
+  box-shadow:0 18px 50px -12px oklch(0 0 0 / .7)}
+
+/* the two framed things. The plan: corner brackets over the panels'
+   glass, and no edge. */
+:root[data-style="orbit"] .todaywrap{
+  background:var(--ob-brackets),linear-gradient(var(--ob-panel),var(--ob-panel));border:0;
+  border-radius:0;box-shadow:none}
+:root[data-style="orbit"] .updnudge{background:none;border:0;border-radius:0;
+  border-bottom:1px solid var(--line);box-shadow:none}
+:root[data-style="orbit"] .evwrap{background:none;border:0;border-radius:0;box-shadow:none;
+  padding-left:0;padding-right:0}
+:root[data-style="orbit"] .updnudge>span{font-family:var(--sans);color:var(--dim)}
+:root[data-style="orbit"] .fc-late{border-top-width:1px}
+
+/* The plan meter, his weekly-usage card: peach brackets, a warm shade of
+   glass, the big peach numeral, a tick-mark track with a lit knob. */
+:root[data-style="orbit"] .planmeter:not(.slim){position:relative;
+  padding:16px 18px 14px;border:1px solid color-mix(in oklab,var(--ob-peach) 18%,var(--line));
+  border-radius:var(--r-card);
+  background:var(--ob-brackets-peach),
+    linear-gradient(180deg,oklch(.23 .03 45 / .45),oklch(.17 .014 40 / .3))}
+:root[data-style="orbit"] .pmhead{font:500 10.5px/1.4 var(--mono);letter-spacing:.2em;
+  color:color-mix(in oklab,var(--ob-peach) 45%,var(--dim))}
+:root[data-style="orbit"] .pmold{font-family:var(--mono);letter-spacing:.04em}
+:root[data-style="orbit"] .pmrow{margin:8px 0 10px}
+:root[data-style="orbit"] .pmnum{font:300 64px/.85 var(--ob-num);letter-spacing:0;
+  color:var(--ob-peach)}
+:root[data-style="orbit"] .pmunit{font:500 13px/1 var(--sans);
+  color:color-mix(in oklab,var(--ob-peach) 65%,var(--dim))}
+:root[data-style="orbit"] .planmeter:not(.slim) .pmbar{height:20px;border-radius:3px;
+  border:1px solid var(--line);
+  background:
+    repeating-linear-gradient(90deg,color-mix(in oklab,var(--ink) 16%,transparent) 0 1px,
+      transparent 1px 11px),
+    color-mix(in oklab,var(--sunken) 80%,transparent)}
+:root[data-style="orbit"] .planmeter:not(.slim) .pmbar:not(.wait):not(.bad) i{
+  background:linear-gradient(90deg,oklch(.35 .04 50 / .3),color-mix(in oklab,var(--ob-peach) 55%,transparent))}
+:root[data-style="orbit"] .planmeter:not(.slim) .pmbar i::after{content:"";position:absolute;
+  right:1px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;
+  background:oklch(.97 .01 80);box-shadow:0 0 10px 2px color-mix(in oklab,var(--ob-peach) 70%,transparent)}
+:root[data-style="orbit"] .pmfoot{font:400 12.5px/1.5 var(--sans);
+  color:var(--faint)}
+
+
+/* ------------------------------------------------------------- buttons
+   Hairline tiles, plain words; the edge warms toward teal on hover. Round
+   ones stay round. */
+:root[data-style="orbit"] .act,:root[data-style="orbit"] .mini,
+:root[data-style="orbit"] .jobbtn,:root[data-style="orbit"] .tile,
+:root[data-style="orbit"] .cchip,
+:root[data-style="orbit"] .tickfoldbtn,:root[data-style="orbit"] .qcont{
+  background:color-mix(in oklab,var(--surface) 45%,transparent);
+  border:1px solid var(--line2);border-radius:var(--r-btn);box-shadow:none;
+  color:var(--ink);font-family:var(--sans);font-weight:500;letter-spacing:0;
+  text-transform:none}
+:root[data-style="orbit"] .act,:root[data-style="orbit"] .mini{font-size:13px}
+:root[data-style="orbit"] .act:hover,:root[data-style="orbit"] .mini:hover,
+:root[data-style="orbit"] .jobbtn:hover,:root[data-style="orbit"] .tile:hover:not([disabled]),
+:root[data-style="orbit"] .cchip:hover,
+:root[data-style="orbit"] .qcont:hover{
+  color:var(--ink);border-color:color-mix(in oklab,var(--green) 70%,var(--line2));
+  background:color-mix(in oklab,var(--green) 7%,var(--surface))}
+:root[data-style="orbit"] .act:active,:root[data-style="orbit"] .mini:active{transform:none}
+:root[data-style="orbit"] .tile.active{background:var(--ink);border-color:var(--ink);
+  color:var(--paper)}
+:root[data-style="orbit"] .tile.active b{color:var(--paper)}
+:root[data-style="orbit"] .addbutton{border-color:var(--line2);color:var(--dim);
+  font-family:var(--sans);font-size:13px;letter-spacing:0}
+:root[data-style="orbit"] .addbutton:hover{color:var(--green);border-color:var(--green)}
+:root[data-style="orbit"] .tstart,:root[data-style="orbit"] .hzstart{color:var(--green)}
+/* Actions are teal words. On the dark a hairline box is the loudest thing
+   on screen: Jobs had over twenty in its first screen, and Carry and Drop
+   weighed as much as the task they close (8 Oct). A row keeps one framed
+   button for its main move: Jobs' go buttons, Carry, a send, and the
+   button that adds what the box beside it holds. */
+:root[data-style="orbit"] :is(.act,.mini,.ghostbtn,.addbutton,.szouta){
+  background:transparent;border:1px solid transparent;border-radius:var(--r-btn);
+  box-shadow:none;padding:7px 8px;color:var(--green);
+  font:500 13px/1.1 var(--sans);letter-spacing:0;text-transform:none}
+:root[data-style="orbit"] :is(.act,.mini,.ghostbtn,.addbutton,.szouta):hover:not(:disabled){
+  color:var(--ink);border-color:transparent;
+  background:color-mix(in oklab,var(--surface) 75%,transparent)}
+:root[data-style="orbit"] :is(.act,.mini,.ghostbtn,.addbutton,.szouta):disabled{
+  color:var(--faint)}
+/* a row of words starts where the text above it starts: each word steps
+   left by its own padding and gives it back on the right, so a wrapped
+   line lines up too */
+:root[data-style="orbit"] :is(.scacts,.acts,.lcacts)>:is(.act,.mini,.ghostbtn,.addbutton):not(.go,.send,.right),
+:root[data-style="orbit"] .mini.prepl{margin-left:-8px;margin-right:8px}
+/* Jobs' moves sit at the right of their row: a word there ends where the
+   framed buttons above it end. On a phone the row stacks and the word
+   starts under the text instead. */
+:root[data-style="orbit"] .jobsview .jbacts>:is(.act,.mini):not(.go):last-child{
+  margin-right:-8px}
+@media (max-width:640px){
+  :root[data-style="orbit"] .jobsview .jbacts>:is(.act,.mini):not(.go):first-child{
+    margin-left:-8px;margin-right:8px}
+}
+/* a remove is rare and final: faint until pointed at */
+:root[data-style="orbit"] .mini[data-jdrop]{color:var(--faint)}
+/* a chosen tab or toggle shows it is chosen */
+:root[data-style="orbit"] :is(.act,.mini):is(.on,[aria-pressed="true"],[aria-selected="true"]){
+  color:var(--ink);border-color:var(--line2)}
+:root[data-style="orbit"] .act.justdone,:root[data-style="orbit"] .act.wsdone{color:var(--ok)}
+:root[data-style="orbit"] .act.wsfocus.on{background:var(--greenbg);color:var(--green);
+  border-color:transparent}
+/* the one framed button of a row */
+:root[data-style="orbit"] :is(.mini.go,.evact[data-evact="carry"],.act.send,.sznav .mini,
+  #jbcompadd,#nwaddbtn,#szaddbtn,#kaddbtn){
+  background:color-mix(in oklab,var(--surface) 45%,transparent);
+  border-color:var(--line2);color:var(--ink)}
+:root[data-style="orbit"] :is(.mini.go,.evact[data-evact="carry"],.act.send,.sznav .mini,
+  #jbcompadd,#nwaddbtn,#szaddbtn,#kaddbtn):hover:not(:disabled){
+  border-color:color-mix(in oklab,var(--green) 70%,var(--line2));
+  background:color-mix(in oklab,var(--green) 7%,var(--surface))}
+:root[data-style="orbit"] .stchip,:root[data-style="orbit"] .palchip{border-radius:var(--r-card)}
+:root[data-style="orbit"] .stchip.on,:root[data-style="orbit"] .palchip.on{
+  border-color:var(--green);background:color-mix(in oklab,var(--greenbg) 60%,transparent)}
+
+/* The finish lines read as rows, not pills: a state dot, the project,
+   the finish line itself, and the days left in narrow numerals at the end. */
+:root[data-style="orbit"] .flchips{flex-direction:column;flex-wrap:nowrap;gap:0;
+  border-top:1px solid var(--line)}
+:root[data-style="orbit"] .flchip{display:flex;align-items:baseline;gap:10px;
+  padding:10px 2px;background:none;border:0;border-bottom:1px solid var(--line);
+  border-radius:0;box-shadow:none;font:400 15px/1.5 var(--sans);color:var(--dim);
+  text-decoration:none}
+:root[data-style="orbit"] .flchip::before{content:"";flex:none;align-self:center;
+  width:6px;height:6px;border-radius:50%;background:var(--line2)}
+:root[data-style="orbit"] .flchip.bad::before{background:var(--bad);
+  box-shadow:0 0 6px color-mix(in oklab,var(--bad) 60%,transparent)}
+:root[data-style="orbit"] .flchip:hover{background:color-mix(in oklab,var(--surface) 40%,transparent);
+  color:var(--ink)}
+:root[data-style="orbit"] .flchip b{font-weight:600;color:var(--ink)}
+:root[data-style="orbit"] .flchip i{margin-left:auto;padding-left:12px;
+  font:400 13px/1.5 var(--mono);color:var(--dim)}
+:root[data-style="orbit"] .flchip.bad i{color:var(--bad)}
+
+:root[data-style="orbit"] .vpick .aplabel{font:500 14px/1.4 var(--sans);letter-spacing:0;
+  text-transform:none;color:var(--dim)}
+
+/* inputs: a sunken well with a hairline, teal when focused */
+:root[data-style="orbit"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+:root[data-style="orbit"] textarea,:root[data-style="orbit"] select{
+  background-color:color-mix(in oklab,var(--sunken) 82%,transparent);
+  border:1px solid color-mix(in oklab,var(--ink) 42%,var(--paper));border-radius:var(--r-btn)}
+:root[data-style="orbit"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+:root[data-style="orbit"] textarea:focus,:root[data-style="orbit"] select:focus{
+  border-color:var(--green);outline:none;
+  box-shadow:0 0 0 3px color-mix(in oklab,var(--green) 16%,transparent)}
+:root[data-style="orbit"] .findwrap input{border-radius:99px}
+
+/* ----------------------------------------------------------- the tasks */
+:root[data-style="orbit"] .box{border:1px solid var(--line2);border-radius:4px;
+  background:transparent}
+:root[data-style="orbit"] button.box:hover{border-color:var(--green)}
+:root[data-style="orbit"] .box.done,:root[data-style="orbit"] button.tick[aria-pressed="true"]{
+  border-color:var(--ok);color:var(--ok);background:var(--okt)}
+:root[data-style="orbit"] .h2tick{border-color:var(--line2)}
+
+
+/* the decay gauge as a tick-mark meter: ticks on a dark track, a teal
+   fill that brightens toward its end, a lit knob */
+:root[data-style="orbit"] main .bar{height:8px;border-radius:2px;overflow:visible;
+  border:1px solid var(--line);
+  background:
+    repeating-linear-gradient(90deg,color-mix(in oklab,var(--ink) 20%,transparent) 0 1px,
+      transparent 1px 6px),
+    color-mix(in oklab,var(--sunken) 85%,transparent)}
+:root[data-style="orbit"] main .bar>i{position:relative;height:100%;border-radius:1px;
+  background:linear-gradient(90deg,transparent,color-mix(in oklab,var(--green) 55%,transparent))}
+:root[data-style="orbit"] main .bar>i::after{content:"";position:absolute;right:-3px;top:50%;
+  width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--ink);
+  box-shadow:0 0 8px 1px color-mix(in oklab,var(--green) 70%,transparent)}
+
+/* ------------------------------------------------------ floating chrome */
+:root[data-style="orbit"] .fab{background:var(--ink);color:var(--paper);border:0;
+  box-shadow:0 0 0 1px var(--line2),0 0 24px -6px color-mix(in oklab,var(--green) 60%,transparent)}
+:root[data-style="orbit"] .fabstack>.btour-btn,
+:root[data-style="orbit"] .hacts>.btour-btn{
+  background:color-mix(in oklab,var(--surface) 85%,transparent);
+  border:1px solid var(--line2);color:var(--dim);box-shadow:none;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+:root[data-style="orbit"] .fabstack>.btour-btn:hover{
+  color:var(--ink);border-color:var(--green)}
+:root[data-style="orbit"] .runbar{background:var(--surface);border:1px solid var(--line2);
+  box-shadow:none}
+:root[data-style="orbit"] .tabbar{background:color-mix(in oklch,var(--paper) 86%,transparent);
+  border-top:1px solid var(--line)}
+:root[data-style="orbit"] .tabbar a{font:500 11px/1 var(--sans);letter-spacing:0}
+
+/* ================================================================ the deck
+   Today's first screen (orb.py markup, placed before .todaygrid; hidden in
+   every other style by .skinx). The orb is the hero: it takes the height
+   the screen allows once the day's line, the pills and the conversation
+   have their room, with nothing round it but a soft teal halo. The
+   clock floats over the top right corner, the place under it; the three, the meter and the counts sit left of the orb, the
+   next hour and the skills right of it, both centred on the orb with their
+   tops level. The orb's column is display:contents so its lines can run
+   the full width under it. */
+:root[data-style="orbit"] .skinx-deck{position:relative;display:flex;flex-direction:column;
+  --ob-orb:min(720px,66vh,calc(100vh - 300px));
+  min-height:calc(100vh - 64px);min-height:calc(100svh - 64px);
+  padding:6px 0 40px;box-sizing:border-box}
+@supports (height:1svh){
+  :root[data-style="orbit"] .skinx-deck{--ob-orb:min(720px,66svh,calc(100svh - 300px))}
+}
+:root[data-style="orbit"] .deckbar{position:absolute;top:14px;left:0;right:0;z-index:1;
+  display:flex;justify-content:flex-end;align-items:flex-start;gap:16px;
+  pointer-events:none}
+:root[data-style="orbit"] .deckbar>*{pointer-events:auto}
+/* minutes only: ticking seconds moved at the edge of her eye all day, and
+   the orb already keeps the deck alive */
+:root[data-style="orbit"] .deckclock{margin:0;text-align:right;line-height:1;
+  color:var(--ink);white-space:nowrap}
+:root[data-style="orbit"] .deckclock b{font:300 clamp(52px,5.2vw,78px)/.8 var(--ob-num);
+  letter-spacing:.01em}
+:root[data-style="orbit"] .deckclock small{display:block;margin-top:8px;
+  font:500 10px/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--faint)}
+/* the bar says THU 08 OCT above 760px (Orbit keeps the stamp past
+   chrome.py's 1280), so the clock under it says only where she is; at 760
+   and under the bar drops its date and the clock carries it, in the bar's
+   own format (8 Oct) */
+:root[data-style="orbit"] .deckclock .deckdate{display:none}
+@media (max-width:760px){:root[data-style="orbit"] .deckclock .deckdate{display:inline}}
+
+:root[data-style="orbit"] .deckgrid{flex:1;display:grid;align-content:center;
+  grid-template-columns:300px minmax(0,1fr) 300px;column-gap:32px;row-gap:0}
+:root[data-style="orbit"] .deckcore{display:contents}
+:root[data-style="orbit"] .deckorbbtn{grid-column:2;grid-row:1;justify-self:center;
+  position:relative;width:var(--ob-orb);max-width:100%;
+  background:radial-gradient(circle closest-side,var(--orb-glow) 0,
+    color-mix(in oklab,var(--orb) 5%,transparent) 55%,transparent 100%)}
+:root[data-style="orbit"] .deckorbbtn:focus-visible{
+  outline:1px solid color-mix(in oklab,var(--orb) 70%,transparent);outline-offset:4px}
+:root[data-style="orbit"] .deckorb{display:block;width:100%;height:100%}
+:root[data-style="orbit"] .skinx-deck[data-state="listening"] .deckorbbtn{
+  background:radial-gradient(circle closest-side,
+    color-mix(in oklab,var(--orb-listen) 22%,transparent) 0,
+    color-mix(in oklab,var(--orb-listen) 7%,transparent) 55%,transparent 100%)}
+:root[data-style="orbit"] .skinx-deck[data-state="thinking"] .deckorbbtn{
+  background:radial-gradient(circle closest-side,
+    color-mix(in oklab,var(--wait) 22%,transparent) 0,
+    color-mix(in oklab,var(--wait) 7%,transparent) 55%,transparent 100%)}
+
+/* under the orb, full width and centred: the day's line, the prompt, the
+   state, the last few lines of talk */
+:root[data-style="orbit"] :is(.deckgreet,.decksub,.deckpills,.decklog){grid-column:2;
+  justify-self:center;text-align:center}
+:root[data-style="orbit"] .deckgreet{grid-row:2;margin:6px 0 0;max-width:22em;
+  font:250 clamp(30px,2.9vw,42px)/1.15 var(--serif);letter-spacing:-.01em;
+  color:var(--ink);text-wrap:balance}
+:root[data-style="orbit"] .decksub{grid-row:3;margin:6px 0 0;
+  font:400 14px/1.5 var(--sans);color:var(--dim)}
+:root[data-style="orbit"] .deckpills{grid-row:4;display:flex;flex-wrap:wrap;
+  justify-content:center;gap:2px 14px;margin:12px 0 0}
+:root[data-style="orbit"] .deckpills span{padding:3px 2px 5px;
+  font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+  color:color-mix(in oklab,var(--faint) 80%,var(--paper))}
+:root[data-style="orbit"] .deckpills span.on{color:var(--orb);
+  text-shadow:0 0 10px color-mix(in oklab,var(--orb) 55%,transparent);
+  background:linear-gradient(90deg,transparent,var(--orb),transparent)
+    center bottom/100% 1px no-repeat}
+/* one word, the live one, and none at rest: the four read as tabs, and
+   "idle" was the third time the screen said it (29 Sep). The row keeps
+   its height so the deck does not jump when a talk starts. */
+:root[data-style="orbit"] .deckpills span:not(.on){display:none}
+:root[data-style="orbit"] .deckpills span.on[data-s="idle"]{visibility:hidden}
+/* the talk: three lines of room, the newest at the bottom, older lines
+   fading out at the top; it never pushes the page */
+:root[data-style="orbit"] .decklog{grid-row:5;width:100%;max-width:640px;height:78px;
+  margin:10px 0 0;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;
+  overflow:hidden;text-align:left;
+  -webkit-mask:linear-gradient(transparent,#000 45%);mask:linear-gradient(transparent,#000 45%)}
+:root[data-style="orbit"] .decklog .vline{max-width:88%;font:400 16.5px/1.5 var(--sans);
+  color:var(--ink)}
+:root[data-style="orbit"] .decklog .vline.her{color:var(--dim);text-align:right}
+
+/* the two sides: the same height of box each, centred on the orb's whole
+   column (the orb and the lines under it), so their tops sit level and
+   clear of the clock */
+:root[data-style="orbit"] .deckside{grid-row:1/6;align-self:center;min-width:0;
+  min-height:510px;display:flex;flex-direction:column;justify-content:flex-start}
+:root[data-style="orbit"] .deckleft{grid-column:1}
+:root[data-style="orbit"] .deckright{grid-column:3}
+:root[data-style="orbit"] .decksec+.decksec{margin-top:28px}
+:root[data-style="orbit"] .decklab{display:flex;align-items:center;gap:10px;margin:0 0 12px;
+  font:500 10.5px/1.4 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink)}
+:root[data-style="orbit"] .decklab span{font-size:9.5px;letter-spacing:.14em;color:var(--faint)}
+:root[data-style="orbit"] .decklab::after{content:"";flex:1 1 20px;min-width:20px;height:1px;
+  background:linear-gradient(90deg,var(--line2),transparent)}
+
+/* the three: small hollow squares, a done one lit teal */
+:root[data-style="orbit"] .deckthree{list-style:none;margin:0;padding:0}
+:root[data-style="orbit"] .deckthree a{display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
+:root[data-style="orbit"] .deckthree li{display:flex;gap:10px;align-items:flex-start;
+  margin:0 0 8px;font:400 15px/1.45 var(--sans);color:var(--ink)}
+:root[data-style="orbit"] .deckthree li>i{flex:none;width:9px;height:9px;margin-top:7px;
+  border:1px solid var(--line2);border-radius:1px}
+:root[data-style="orbit"] .deckthree li.none{color:var(--dim)}
+/* done reads as done: fainter and struck (it was 80% of the ink, 29 Sep) */
+:root[data-style="orbit"] .deckthree li.done{color:var(--faint)}
+:root[data-style="orbit"] .deckthree li.done a{text-decoration-line:line-through;
+  text-decoration-thickness:1px;
+  text-decoration-color:color-mix(in oklab,var(--faint) 55%,transparent)}
+:root[data-style="orbit"] .deckthree li.done>i{border-color:var(--orb);
+  background:color-mix(in oklab,var(--orb) 55%,transparent)}
+:root[data-style="orbit"] .deckthree a{color:inherit;text-decoration:none}
+:root[data-style="orbit"] .deckthree a:hover{color:var(--ink);text-decoration:underline;
+  text-decoration-color:var(--line2);text-underline-offset:3px}
+/* the counts: narrow numerals, then what */
+:root[data-style="orbit"] .deckcount{list-style:none;margin:0;padding:0}
+:root[data-style="orbit"] .deckcount li{display:flex;align-items:baseline;gap:12px;
+  margin:0 0 4px;min-width:0}
+:root[data-style="orbit"] .deckcount b{flex:none;min-width:2.4ch;text-align:right;
+  font:400 26px/1 var(--ob-num);color:var(--ink)}
+:root[data-style="orbit"] .deckcount span{min-width:0;font:400 14px/1.4 var(--sans);
+  color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+:root[data-style="orbit"] .deckusage .planmeter:not(.slim){margin:0}
+/* on the deck the plan meter is one faint line until the week passes 70%,
+   then the card (orb.py's data-full-at): at 29% it asked nothing of her
+   and was the second-loudest thing on the screen (29 Sep) */
+:root[data-style="orbit"] .deckusage .planmeter.slim{padding:0;gap:10px;
+  font:500 10.5px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--faint)}
+:root[data-style="orbit"] .deckusage .planmeter.slim b{font-weight:500;color:var(--dim)}
+:root[data-style="orbit"] .deckusage .planmeter.slim .pmbar{max-width:none;height:4px}
+
+/* your next hour: the strongest words on the right */
+:root[data-style="orbit"] .decknexttitle{margin:0;font:500 18px/1.35 var(--sans);
+  color:var(--ink)}
+:root[data-style="orbit"] .decknextwhy{margin:4px 0 0;font:400 14px/1.5 var(--sans);
+  color:var(--dim)}
+:root[data-style="orbit"] .decknextmore{list-style:none;margin:10px 0 0;padding:0}
+:root[data-style="orbit"] .decknextmore li{margin:3px 0 0;font:400 13px/1.45 var(--sans);
+  color:var(--faint)}
+/* the evening, once the three are done (orb.py sets .eve): the next hour
+   waits for next time, Wrap up leads the skills and Plan today goes last */
+:root[data-style="orbit"] .skinx-deck.eve .decknexttitle{font-weight:400;color:var(--dim)}
+:root[data-style="orbit"] .skinx-deck.eve .decktile[data-skill-run="wrap"]{order:-1}
+:root[data-style="orbit"] .skinx-deck.eve .decktile[data-skill-run="today"]{order:1}
+
+/* skills: tiles like his quick-access grid */
+:root[data-style="orbit"] .decktiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+:root[data-style="orbit"] .decktile{display:flex;align-items:center;justify-content:space-between;
+  gap:8px;min-height:50px;padding:9px 12px;text-align:left;cursor:pointer;
+  background:color-mix(in oklab,var(--surface) 40%,transparent);
+  border:1px solid var(--line2);border-radius:var(--r-btn);
+  font:500 14px/1.3 var(--sans);color:var(--ink)}
+:root[data-style="orbit"] .decktile i{flex:none;font-style:normal;color:var(--green)}
+:root[data-style="orbit"] .decktile:hover{border-color:color-mix(in oklab,var(--green) 70%,var(--line2));
+  background:color-mix(in oklab,var(--green) 7%,var(--surface))}
+:root[data-style="orbit"] .deckall{display:flex;justify-content:space-between;margin:12px 0 0;
+  font:500 14px/1.4 var(--sans);color:var(--ink);text-decoration:none}
+:root[data-style="orbit"] .deckall:hover{color:var(--green)}
+:root[data-style="orbit"] .deckfine{margin:6px 0 0;font:400 12.5px/1.5 var(--sans);
+  color:var(--faint)}
+:root[data-style="orbit"] .deckfine.on{color:var(--green)}
+/* the tile whose run is working: green edge, the arrow pulses */
+:root[data-style="orbit"] .decktile.running{border-color:var(--green);
+  background:color-mix(in oklab,var(--green) 9%,var(--surface))}
+:root[data-style="orbit"] .decktile.running i{animation:deckrun 1.4s ease-in-out infinite}
+@keyframes deckrun{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){:root[data-style="orbit"] .decktile.running i{animation:none}}
+:root[data-style="orbit"] :is(.decktile,.deckall,.deckmore,.deckthree a):focus-visible{
+  outline:1px solid var(--orb);outline-offset:3px}
+:root[data-style="orbit"] .deckmore{position:absolute;bottom:12px;left:50%;
+  transform:translateX(-50%);white-space:nowrap;
+  font:500 10.5px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);text-decoration:none}
+:root[data-style="orbit"] .deckmore:hover{color:var(--ink)}
+/* the deck already says the day's line; the plan below need not repeat it */
+:root[data-style="orbit"] .view:has(>.skinx-deck) .skinx-greet{display:none}
+
+/* ------------------------------------------------ rooms, map, the others
+   Tokens carry most of it; these are the few gestures that belong. */
+:root[data-style="orbit"] .wing,:root[data-style="orbit"] .room,:root[data-style="orbit"] .zone{
+  background:var(--ob-glass2);border-color:var(--line)}
+:root[data-style="orbit"] .wing h2,:root[data-style="orbit"] .rhead h1{font-weight:300}
+:root[data-style="orbit"] body>.bar b{font:400 17px/1.2 var(--serif);letter-spacing:0}
+:root[data-style="orbit"] a.back,:root[data-style="orbit"] button.tool{
+  border-color:var(--line2)}
+:root[data-style="orbit"] .mapbar,:root[data-style="orbit"] .agentbar,
+:root[data-style="orbit"] .keycard,:root[data-style="orbit"] .mdlg{
+  background:var(--surface);border:1px solid var(--line2);box-shadow:none}
+
+/* ------------------------------------------------------- narrow screens */
+@media (max-width:1320px){
+  :root[data-style="orbit"] .deckgrid{grid-template-columns:270px minmax(0,1fr) 270px;
+    column-gap:24px}
+}
+@media (max-width:1180px){
+  /* the page narrows to its reading column here: the orb first, its lines
+     under it, then the two sides next to each other */
+  :root[data-style="orbit"] .skinx-deck{min-height:0;padding:0 0 40px}
+  :root[data-style="orbit"] .deckbar{position:static;margin:14px 0 8px}
+  :root[data-style="orbit"] .deckgrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    column-gap:24px}
+  :root[data-style="orbit"] .deckorbbtn{grid-column:1/-1;width:min(80vw,560px)}
+  :root[data-style="orbit"] :is(.deckgreet,.decksub,.deckpills,.decklog){grid-column:1/-1}
+  /* not a one-screen layout here: an empty log takes no room */
+  :root[data-style="orbit"] .decklog:empty{height:0;margin:0}
+  :root[data-style="orbit"] .deckside{grid-row:6;align-self:start;min-height:0;
+    margin-top:30px}
+  :root[data-style="orbit"] .deckleft{grid-column:1}
+  :root[data-style="orbit"] .deckright{grid-column:2}
+}
+@media (max-width:760px){
+  :root[data-style="orbit"] .skinx-greet{margin-top:18px;font-size:clamp(28px,8.4vw,38px);
+    letter-spacing:-.01em}
+  :root[data-style="orbit"] .syncstate .skinx-stamp{display:none}
+  :root[data-style="orbit"] :is(.eyebrow,.area,.todaydoc>h2){letter-spacing:.12em}
+  :root[data-style="orbit"] body::before{height:36vh}
+  /* the deck, one column: the orb, its lines, then the left side, then
+     the right */
+  :root[data-style="orbit"] .deckgrid{grid-template-columns:minmax(0,1fr)}
+  :root[data-style="orbit"] .deckorbbtn{width:80vw}
+  :root[data-style="orbit"] .deckleft{grid-column:1;grid-row:6}
+  :root[data-style="orbit"] .deckright{grid-column:1;grid-row:7}
+  :root[data-style="orbit"] .deckgreet{font-size:clamp(26px,7.4vw,32px)}
+  :root[data-style="orbit"] :is(.skinx-greet,.platehead .triage,.psub,.lifehead>h2,
+    .nwtop>h2,.season>h2.szname){font-size:clamp(26px,7.4vw,32px)}
+  :root[data-style="orbit"] .decklog .vline{font-size:16px}
+  :root[data-style="orbit"] .deckclock b{font-size:48px}
+  :root[data-style="orbit"] .deckclock small{letter-spacing:.2em}
+  :root[data-style="orbit"] .decklab{letter-spacing:.14em}
+}

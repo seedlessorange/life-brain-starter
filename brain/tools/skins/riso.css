@@ -1,0 +1,419 @@
+/* RISOGRAPH: full skin. Baked only when data-style="riso".
+   Spec: design/skins/SPECS.md §7; the plan and its pictures:
+   design/skins/RISOGRAPH.md. A two-colour riso print: Federal Blue for
+   every word, Fluorescent Pink as the second drum, cream stock.
+
+   Scoped :root[data-style="riso"] throughout, one step above the other
+   skins: page.css is emitted AFTER the skin and ties at two classes plus
+   an element (.todaywrap .doc h1), so a plain [data-style] rule loses.
+
+   Two layers do the printing:
+   --ri-grain  paper tooth, one tiled image on the page background;
+   --ri-pin    pinholes: specks drawn in the PAPER's colour, laid over any
+               pink fill. Invisible on paper, they only show inside ink.
+   Both are backgrounds, never masks, so nothing costs anything to scroll. */
+
+/* ---------------------------------------------------------- tokens */
+:root[data-style="riso"]{
+  --paper:#f5efe2;--surface:#f5efe2;--card:#f5efe2;
+  --ri-blue:oklch(38.5% .1 266);             /* Federal Blue, printed heavy: 8.7:1 */
+  --ri-deep:oklch(30% .1 266);               /* labels and headings: 12.1:1 */
+  --ri-pink:#ff48b0;                         /* Fluorescent Pink */
+  --ri-plate:color-mix(in oklab,var(--ri-pink) 34%,var(--paper));
+  --ri-mark:color-mix(in oklab,var(--ri-pink) 80%,var(--paper));  /* label marker: 5.5:1 under deep ink */
+  --ri-screen:color-mix(in oklab,var(--ri-blue) 7%,var(--paper));  /* a light screen of the key ink */
+  --ri-blend:multiply;
+  --ri-off:2px;                              /* how far the pink drum misses */
+  --ri-mast:oklch(38.5% .1 266);             /* solid ink areas: the masthead, label slugs */
+  --ri-cream:#f5efe2;                        /* words knocked out of solid ink */
+  --ri-grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .14  0 0 0 0 .16  0 0 0 0 .3  9 0 0 0 -5.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+  --ri-inkgrain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .95  0 0 0 0 .92  0 0 0 0 .85  9 0 0 0 -5.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.36'/%3E%3C/svg%3E");
+  --ri-pin:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.961  0 0 0 0 0.937  0 0 0 0 0.886  12 0 0 0 -7.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --ink:var(--ri-blue);
+  --dim:color-mix(in oklab,var(--ri-blue) 78%,var(--paper));     /* 5.1:1 */
+  --faint:color-mix(in oklab,var(--ri-blue) 58%,var(--paper));   /* 3.1:1 */
+  --sunken:var(--ri-screen);
+  --line:color-mix(in oklab,var(--ri-blue) 22%,var(--paper));
+  --line2:color-mix(in oklab,var(--ri-blue) 50%,var(--paper));
+  --green:var(--ri-blue);
+  --greenbg:color-mix(in oklab,var(--ri-blue) 10%,var(--paper));
+  /* state colours keep their meanings, re-tuned to riso drum hues */
+  --bad:oklch(52% .19 27);    --badbg:color-mix(in oklab,var(--bad) 14%,var(--paper));    /* Bright Red */
+  --wait:oklch(56% .12 72);   --waitbg:color-mix(in oklab,var(--wait) 18%,var(--paper));  /* Sunflower */
+  --cold:oklch(52% .14 245);  --coldbg:color-mix(in oklab,var(--cold) 13%,var(--paper));  /* Riso Blue */
+  --terra:oklch(55% .15 45);                                                              /* Orange */
+  --ok:oklch(50% .13 155);    --okt:color-mix(in oklab,var(--ok) 14%,var(--paper));       /* Green */
+  --shadow:none;--shadow-lift:none;
+  --r-xl:3px;--r-lg:3px;--r-card:3px;--r-md:3px;--r-btn:3px;--r-sm:2px;
+  --serif:'Anybody','Archivo',-apple-system,sans-serif;
+  --sans:'Figtree','Schibsted',-apple-system,sans-serif;
+}
+/* Real fluorescent ink sits outside ordinary screen colour; a wide-gamut
+   screen can show a step more of it. */
+@supports (color:color(display-p3 1 1 1)){
+  :root[data-style="riso"]{--ri-pink:color(display-p3 1 .28 .68)}
+}
+/* Dark: a blue-black stock, the key ink turns cream, the pink drum stays.
+   Overlaps switch from multiply to screen. */
+:root[data-style="riso"][data-theme="dark"]{
+  --paper:#1e2233;--surface:#1e2233;--card:#1e2233;
+  --ri-blue:#f1e8d4;--ri-deep:#f6efdf;--ri-mast:oklch(40% .1 266);
+  --ri-plate:color-mix(in oklab,var(--ri-pink) 30%,var(--paper));
+  --ri-mark:color-mix(in oklab,var(--ri-pink) 55%,var(--paper));
+  --ri-screen:color-mix(in oklab,var(--ri-blue) 6%,var(--paper));
+  --ri-blend:screen;
+  --ri-grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .95  0 0 0 0 .92  0 0 0 0 .85  9 0 0 0 -5.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+  --ri-pin:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.118  0 0 0 0 0.133  0 0 0 0 0.2  12 0 0 0 -7.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --dim:color-mix(in oklab,var(--ri-blue) 80%,var(--paper));
+  --faint:color-mix(in oklab,var(--ri-blue) 60%,var(--paper));
+  --line:color-mix(in oklab,var(--ri-blue) 18%,var(--paper));
+  --line2:color-mix(in oklab,var(--ri-blue) 45%,var(--paper));
+  --bad:oklch(70% .15 27);  --badbg:oklch(30% .06 27);
+  --wait:oklch(80% .12 85); --waitbg:oklch(31% .05 85);
+  --cold:oklch(74% .11 245);--coldbg:oklch(30% .05 245);
+  --terra:oklch(74% .13 50);
+  --ok:oklch(75% .13 155);  --okt:oklch(30% .05 155);
+}
+@media (prefers-color-scheme:dark){
+  :root[data-style="riso"]:not([data-theme="light"]){
+    --paper:#1e2233;--surface:#1e2233;--card:#1e2233;
+    --ri-blue:#f1e8d4;--ri-deep:#f6efdf;--ri-mast:oklch(40% .1 266);
+    --ri-plate:color-mix(in oklab,var(--ri-pink) 30%,var(--paper));
+    --ri-mark:color-mix(in oklab,var(--ri-pink) 55%,var(--paper));
+    --ri-screen:color-mix(in oklab,var(--ri-blue) 6%,var(--paper));
+    --ri-blend:screen;
+    --ri-grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .95  0 0 0 0 .92  0 0 0 0 .85  9 0 0 0 -5.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+    --ri-pin:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.118  0 0 0 0 0.133  0 0 0 0 0.2  12 0 0 0 -7.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --dim:color-mix(in oklab,var(--ri-blue) 80%,var(--paper));
+    --faint:color-mix(in oklab,var(--ri-blue) 60%,var(--paper));
+    --line:color-mix(in oklab,var(--ri-blue) 18%,var(--paper));
+    --line2:color-mix(in oklab,var(--ri-blue) 45%,var(--paper));
+    --bad:oklch(70% .15 27);  --badbg:oklch(30% .06 27);
+    --wait:oklch(80% .12 85); --waitbg:oklch(31% .05 85);
+    --cold:oklch(74% .11 245);--coldbg:oklch(30% .05 245);
+    --terra:oklch(74% .13 50);
+    --ok:oklch(75% .13 155);  --okt:oklch(30% .05 155);
+  }
+}
+
+/* ---------------------------------------------------------- the stock */
+:root[data-style="riso"] body{background:var(--ri-grain),var(--paper);
+  font-family:var(--sans)}
+
+/* ---------------------------------------------------------- display type */
+/* Anybody, wide and heavy, like a poster headline. The big ones carry the
+   pink drum's copy, a hair down and to the left. */
+:root[data-style="riso"] .brand{font-family:var(--serif);font-weight:800;
+  font-stretch:108%;letter-spacing:-.005em;color:var(--ri-deep)}
+:root[data-style="riso"] .brand b{font-weight:800}
+:root[data-style="riso"] .todaywrap .todaydoc>h1,
+:root[data-style="riso"] .whenday,
+:root[data-style="riso"] .hero h1,
+:root[data-style="riso"] .pdtray>h2,
+:root[data-style="riso"] #queue>h2,:root[data-style="riso"] #drafts>h2,
+:root[data-style="riso"] #connections>h2,:root[data-style="riso"] #recordings>h2,
+:root[data-style="riso"] #newfiles>h2,:root[data-style="riso"] #people>h2,
+:root[data-style="riso"] #attention>h2,:root[data-style="riso"] #all>h2,
+:root[data-style="riso"] .psub,
+:root[data-style="riso"] .newshead h1{
+  font-family:var(--serif);font-weight:800;font-stretch:115%;
+  letter-spacing:-.01em;line-height:1.08;
+  color:color-mix(in srgb,var(--ri-deep) 90%,transparent);
+  text-shadow:calc(-1 * var(--ri-off)) var(--ri-off) 0 var(--ri-pink);
+  mix-blend-mode:var(--ri-blend)}
+:root[data-style="riso"] .todaywrap .todaydoc>h1{font-size:clamp(1.6rem,2.4vw,2.05rem)}
+:root[data-style="riso"] .whenday{font-size:1.3rem;--ri-off:1.5px}
+:root[data-style="riso"] .pdtray>h2{font-size:1.35rem}
+:root[data-style="riso"] .todayrail .pdtray>h2{font-size:1.1rem;
+  --ri-off:1.5px}
+:root[data-style="riso"] .pdtray>h2 .sccount,
+:root[data-style="riso"] .pdtray>h2 .csub{font:600 .85rem/1 var(--sans);
+  text-shadow:none;letter-spacing:0}
+/* smaller heads: the face without the copy */
+:root[data-style="riso"] .doc:not(.todaydoc) h2,
+:root[data-style="riso"] .doc h1,
+:root[data-style="riso"] .rowname,
+:root[data-style="riso"] .money .mo-total{font-family:var(--serif);
+  font-weight:750;font-stretch:112%;color:var(--ri-deep)}
+
+/* ---------------------------------------------------------- labels */
+/* A label is a slug of solid ink with its words knocked out to paper, and
+   the pink plate printed under it a hair down and left. Summaries keep the
+   pink marker instead (a slug would shrink their tap area); it sits on
+   ::first-line, which hugs the words whatever box they are in. */
+:root[data-style="riso"] :is(.eyebrow,.area,.todaywrap .doc h2):not(summary){
+  width:fit-content;max-width:100%;box-sizing:border-box;
+  padding:.34em .6em .28em;border-radius:1px;
+  background:var(--ri-inkgrain),var(--ri-mast);color:var(--ri-cream);
+  box-shadow:calc(-1.5 * var(--ri-off)) calc(1.5 * var(--ri-off)) 0 var(--ri-pink)}
+:root[data-style="riso"] :is(.eyebrow,.area):not(summary) :is(.agn,.csub,.sccount,span){
+  color:color-mix(in oklab,var(--ri-cream) 78%,var(--ri-mast))}
+:root[data-style="riso"] .pdtop .eyebrow{flex:0 1 auto;margin-right:auto}
+:root[data-style="riso"] summary.area{color:var(--ri-deep)}
+:root[data-style="riso"] summary.area::first-line{
+  background:var(--ri-pin),
+    linear-gradient(var(--ri-mark),var(--ri-mark)) .22em 92%/100% 62% no-repeat}
+:root[data-style="riso"] .dupcard .eyebrow{background:var(--wait);color:var(--ri-cream)}
+
+/* No squiggles: the marker does their job. */
+:root[data-style="riso"] .wav,
+:root[data-style="riso"] .eyebrow::after,
+:root[data-style="riso"] .area::after,
+:root[data-style="riso"] h3.area::after,
+:root[data-style="riso"] .qcard .eyebrow::after,
+:root[data-style="riso"] .offercard .eyebrow::after,
+:root[data-style="riso"] #queue>h2::after,:root[data-style="riso"] #drafts>h2::after,
+:root[data-style="riso"] #connections>h2::after,:root[data-style="riso"] #recordings>h2::after,
+:root[data-style="riso"] #newfiles>h2::after,:root[data-style="riso"] #people>h2::after,
+:root[data-style="riso"] #attention>h2::after,:root[data-style="riso"] #all>h2::after,
+:root[data-style="riso"] .doc h2::after,
+:root[data-style="riso"] .todaydoc h2::after{display:none}
+:root[data-style="riso"] :is(.eyebrow,.area,h2,h3):has(+ .wav){margin-bottom:var(--s3)}
+
+/* ---------------------------------------------------------- links */
+/* blue words, a pink rule under them */
+:root[data-style="riso"] main p a:not(.plink),
+:root[data-style="riso"] main li a:not(.plink){color:inherit;
+  text-decoration:underline;text-decoration-color:var(--ri-pink);
+  text-decoration-thickness:2px;text-underline-offset:3px}
+:root[data-style="riso"] .plink:hover{text-decoration-color:var(--ri-pink)}
+
+/* ---------------------------------------------------------- header */
+/* The masthead is a band of solid Federal Blue with the paper showing
+   through its grain; words knocked out to cream, the current tab over a
+   pink bar, Ask printed in the pink drum. The search results that open
+   inside it go back to paper. */
+:root[data-style="riso"] header.top{background:var(--ri-inkgrain),var(--ri-mast);
+  border-bottom:4px solid var(--ri-pink);box-shadow:none;color:var(--ri-cream);
+  -webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-style="riso"] header.top .brand,
+:root[data-style="riso"] header.top .brand b{color:var(--ri-cream)}
+:root[data-style="riso"] header.top .brand{text-shadow:-1.5px 1.5px 0 var(--ri-pink)}
+:root[data-style="riso"] header.top .syncstate{color:color-mix(in oklab,var(--ri-cream) 75%,var(--ri-mast));
+  background:transparent}
+:root[data-style="riso"] .topnav a{color:color-mix(in oklab,var(--ri-cream) 82%,var(--ri-mast));
+  background:transparent;border-radius:0}
+:root[data-style="riso"] .topnav a:hover{color:var(--ri-cream);background:transparent}
+:root[data-style="riso"] .topnav a.on{color:var(--ri-cream);font-weight:700;
+  background:linear-gradient(var(--ri-pink),var(--ri-pink)) 3px 100%/calc(100% - 6px) 4px no-repeat}
+:root[data-style="riso"] header.top .findwrap{color:var(--ri-cream)}
+/* search: closed it is a cream-rimmed circle on the band; open, a cream
+   field with blue words (the closed input's text stays transparent) */
+:root[data-style="riso"] header.top #findq{background:transparent;border-radius:99px;
+  border:1.5px solid color-mix(in oklab,var(--ri-cream) 45%,var(--ri-mast))}
+:root[data-style="riso"] header.top #findq:is(:focus,:not(:placeholder-shown)){
+  background:var(--ri-cream);color:var(--ri-mast);border-color:var(--ri-pink);border-radius:3px}
+:root[data-style="riso"] header.top #findq:focus::placeholder{
+  color:color-mix(in oklab,var(--ri-mast) 60%,var(--ri-cream))}
+:root[data-style="riso"] header.top .findicon{color:var(--ri-cream)}
+:root[data-style="riso"] header.top .findwrap:focus-within .findicon{color:var(--ri-mast)}
+:root[data-style="riso"] header.top #findout{background:var(--ri-grain),var(--paper);color:var(--ri-blue);
+  border:1.5px solid var(--ri-blue);border-radius:3px;box-shadow:none}
+:root[data-style="riso"] header.top :is(.didbell,.hoodlink){color:var(--ri-cream);
+  border-color:color-mix(in oklab,var(--ri-cream) 40%,var(--ri-mast));background:transparent}
+:root[data-style="riso"] .askopen{background:var(--ri-pin),var(--ri-pink);color:var(--ri-deep);
+  border:0;border-radius:3px;font-weight:700}
+:root[data-style="riso"] .askopen:hover{background:var(--ri-pin),var(--ri-plate)}
+:root[data-style="riso"][data-theme="dark"] .askopen{color:#1e2233}
+:root[data-style="riso"] .ghostbtn{border:1.5px solid var(--ri-blue);border-radius:3px;
+  color:var(--ri-blue);background:transparent}
+:root[data-style="riso"] nav.tabbar{background:var(--ri-inkgrain),var(--ri-mast);
+  border-top:0;box-shadow:0 -4px 0 var(--ri-pink)}
+:root[data-style="riso"] nav.tabbar a{color:color-mix(in oklab,var(--ri-cream) 72%,var(--ri-mast))}
+:root[data-style="riso"] nav.tabbar a.on{color:var(--ri-cream)}
+:root[data-style="riso"] nav.tabbar a.on svg{filter:drop-shadow(-1.5px 1.5px 0 var(--ri-pink))}
+
+/* ------------------------------------------------ cards come off the page */
+/* No boxes. The big cards lose edge, fill and corner; each section opens
+   under a 3px rule of the key ink, like a zine column head. */
+:root[data-style="riso"] .railcard,:root[data-style="riso"] .panel,
+:root[data-style="riso"] .todaywrap,:root[data-style="riso"] .hzcard,
+:root[data-style="riso"] .offercard,:root[data-style="riso"] .bscard,
+:root[data-style="riso"] .qcard,:root[data-style="riso"] .daycard,
+:root[data-style="riso"] .forecast,:root[data-style="riso"] .draftcard,
+:root[data-style="riso"] .stackrow,:root[data-style="riso"] .pdtray{
+  background:transparent;border:0;border-radius:0;box-shadow:none}
+:root[data-style="riso"] .todaywrap,
+:root[data-style="riso"] .railcard,
+:root[data-style="riso"] .pdtray{border-top:0;padding:calc(var(--s5) + 8px) 0 var(--s4);
+  background:linear-gradient(var(--ri-blue),var(--ri-blue)) 0 0/100% 3px no-repeat,
+    linear-gradient(var(--ri-pink),var(--ri-pink)) 7px 2px/calc(100% - 7px) 8px no-repeat;
+  background-blend-mode:multiply,normal}
+:root[data-style="riso"] .hzcard,:root[data-style="riso"] .offercard,
+:root[data-style="riso"] .bscard,:root[data-style="riso"] .qcard,
+:root[data-style="riso"] .forecast{border-top:1.5px solid var(--ri-blue);
+  padding:var(--s4) 0}
+:root[data-style="riso"] .draftcard,:root[data-style="riso"] .stackrow{
+  border-top:1px solid var(--line2);padding:var(--s4) 0}
+:root[data-style="riso"] .trbody .pdtray{border-top:0;padding:0}
+/* the cards that came after the big-card set: Life's cards, People's five,
+   the hood's asker and recordings; their rows sit between hairlines */
+:root[data-style="riso"] .lifecard,:root[data-style="riso"] #pneeds,
+:root[data-style="riso"] .routinecard{border:0;border-radius:0;box-shadow:none;
+  padding-left:0;padding-right:0;padding-top:calc(var(--s4) + 8px);
+  background:linear-gradient(var(--ri-blue),var(--ri-blue)) 0 0/100% 3px no-repeat,
+    linear-gradient(var(--ri-pink),var(--ri-pink)) 7px 2px/calc(100% - 7px) 8px no-repeat;
+  background-blend-mode:multiply,normal}
+:root[data-style="riso"] .asker,:root[data-style="riso"] .recwrap{
+  background:transparent;border:0;border-top:1.5px solid var(--ri-blue);
+  border-radius:0;box-shadow:none}
+:root[data-style="riso"] .connrow,:root[data-style="riso"] details.draft,
+:root[data-style="riso"] .qitem{background:transparent;border:0;
+  border-top:1px solid var(--line2);border-radius:0;box-shadow:none}
+:root[data-style="riso"] details.tray{border:0;border-top:1px solid var(--line2);
+  border-radius:0;background:transparent;margin:0}
+:root[data-style="riso"] details.tray>summary:hover{background:var(--ri-screen);border-radius:0}
+:root[data-style="riso"] .updnudge{background:var(--ri-screen);border:0;border-radius:0}
+:root[data-style="riso"] .dupcard{background:var(--waitbg);border:0;border-radius:0}
+
+/* The evening check is the one pink plate on the page; its words stay
+   full ink (6.4:1 on the plate). */
+:root[data-style="riso"] .evwrap{background:var(--ri-pin),color-mix(in oklab,var(--ri-pink) 48%,var(--paper));
+  border:0;border-radius:0;box-shadow:none;color:var(--ri-blue)}
+:root[data-style="riso"] .evwrap>p{color:var(--ri-blue)}
+:root[data-style="riso"] .railcard.daycard{background:var(--ri-screen);background-blend-mode:normal;
+  border-top:0;padding:var(--s4)}
+
+/* floating things: paper, a 1.5px edge of the key ink, no shadow */
+:root[data-style="riso"] .appanel,:root[data-style="riso"] .actdrawer{
+  background:var(--ri-grain),var(--paper);border:1.5px solid var(--ri-blue);
+  border-radius:3px;box-shadow:none}
+:root[data-style="riso"] .runbar{border:1.5px solid var(--ri-blue);border-radius:3px;
+  box-shadow:none;background:var(--paper)}
+:root[data-style="riso"] .fab{background:var(--ri-pin),var(--ri-pink);
+  color:var(--ri-deep);box-shadow:none;border:0}
+:root[data-style="riso"] .fab svg{mix-blend-mode:var(--ri-blend)}
+:root[data-style="riso"] .fabstack>.btour-btn,
+:root[data-style="riso"] .hacts>.btour-btn{border:1.5px solid var(--ri-blue);
+  box-shadow:none;background:var(--paper);color:var(--ri-blue)}
+
+/* ---------------------------------------------------------- buttons */
+/* a 1.5px outline of the key ink; hover lays the pink plate behind */
+:root[data-style="riso"] .act,:root[data-style="riso"] .mini,
+:root[data-style="riso"] .addbutton{border:1.5px solid var(--ri-blue);
+  border-radius:3px;background:transparent;color:var(--ri-blue);box-shadow:none}
+:root[data-style="riso"] .act:hover:not([disabled]),
+:root[data-style="riso"] .mini:hover:not([disabled]),
+:root[data-style="riso"] .addbutton:hover:not([disabled]){
+  background:var(--ri-pin),var(--ri-plate);border-color:var(--ri-blue);color:var(--ri-deep)}
+/* the main button of an area: solid ink, its words knocked out to paper */
+:root[data-style="riso"] .act.send,:root[data-style="riso"] .act.primary,
+:root[data-style="riso"] button.go,:root[data-style="riso"] .md-go{
+  background:var(--ri-blue);color:var(--paper);border-color:var(--ri-blue)}
+:root[data-style="riso"] .act.send:hover,:root[data-style="riso"] button.go:hover{
+  background:var(--ri-deep);color:var(--paper)}
+/* ✦ hand-to-Claude actions read as ink text with a pink rim */
+:root[data-style="riso"] .tstart,:root[data-style="riso"] .ttalk{color:var(--ri-blue)}
+:root[data-style="riso"] .tstart:hover,:root[data-style="riso"] .ttalk:hover{
+  color:var(--ri-deep);text-shadow:-1px 1px 0 var(--ri-pink)}
+:root[data-style="riso"] input:not([type=checkbox]):not([type=radio]):not([type=range]),
+:root[data-style="riso"] textarea,:root[data-style="riso"] select{
+  border:1.5px solid var(--line2);border-radius:3px;background:var(--paper);
+  color:var(--ri-blue);box-shadow:none}
+:root[data-style="riso"] :is(input,textarea,select):focus{border-color:var(--ri-blue)}
+:root[data-style="riso"] :focus-visible{outline:2px solid var(--ri-blue);
+  outline-offset:2px}
+
+/* ---------------------------------------------------------- chips */
+/* time estimates on the pink plate; project pills square off */
+:root[data-style="riso"] .test{background:var(--ri-pin),var(--ri-plate);
+  color:var(--ri-deep);border-radius:2px;font-weight:700}
+:root[data-style="riso"] .tws{border:1.5px solid var(--ri-blue);border-radius:2px;
+  color:var(--ri-blue);background:transparent}
+:root[data-style="riso"] .tws:hover{background:var(--ri-pin),var(--ri-plate)}
+:root[data-style="riso"] .ballpill{border-radius:2px}
+:root[data-style="riso"] .ballpill.mine{background:var(--ri-pin),var(--ri-plate);
+  color:var(--ri-deep)}
+:root[data-style="riso"] .tile{border-radius:2px;border:1.5px solid var(--line2);
+  background:transparent}
+:root[data-style="riso"] .tile.active{background:var(--ri-blue);border-color:var(--ri-blue);
+  color:var(--paper)}
+
+/* ---------------------------------------------------------- ticks */
+/* blue squares; a done one fills pink and lands off its square */
+:root[data-style="riso"] .box{border:1.5px solid var(--ri-blue);border-radius:2px;
+  background:transparent;color:transparent}
+:root[data-style="riso"] button.box:hover{border-color:var(--ri-deep);
+  background:var(--ri-screen)}
+:root[data-style="riso"] .box[aria-pressed="true"],
+:root[data-style="riso"] li.done>.box{color:var(--ri-deep);border-color:var(--ri-blue);
+  background:var(--ri-pin),var(--ri-pink);
+  box-shadow:inset calc(-1 * var(--ri-off)) var(--ri-off) 0 var(--paper)}
+:root[data-style="riso"] ul.tasks li.parked .box{border-style:dashed}
+:root[data-style="riso"] .h2tick{border:1.5px solid var(--ri-blue)}
+:root[data-style="riso"] .habit2.done .h2tick{background:var(--ri-pin),var(--ri-pink);
+  border-color:var(--ri-blue);color:var(--ri-deep)}
+:root[data-style="riso"] .habit2{border-radius:3px}
+:root[data-style="riso"] .habit2.done{background:var(--ri-screen)}
+:root[data-style="riso"] .hdots i.on{background:var(--ri-pink)}
+:root[data-style="riso"] .hdots i.today{outline-color:var(--ri-blue)}
+
+/* ---------------------------------------------------------- bars */
+/* halftone: the one place dots belong, on shapes that hold no words */
+:root[data-style="riso"] .bar,:root[data-style="riso"] .rsvpbar{height:6px;
+  border-radius:0;background:transparent;
+  box-shadow:inset 0 0 0 1px var(--line2)}
+:root[data-style="riso"] .bar i,:root[data-style="riso"] .rsvpbar i{border-radius:0;
+  background:radial-gradient(circle,var(--ri-pink) 0 1.1px,transparent 1.5px) 0 0/4px 4px,
+    color-mix(in oklab,var(--ri-pink) 22%,transparent)}
+
+/* ---------------------------------------------------------- the rail */
+:root[data-style="riso"] .todayrail .railcard{padding-top:var(--s4)}
+:root[data-style="riso"] .when .wnow{color:var(--ri-deep);font-weight:700}
+:root[data-style="riso"] .when .wnow::before{background:var(--ri-pink)}
+:root[data-style="riso"] .cdrow .cdn{font-family:var(--serif);font-weight:800;
+  font-stretch:120%;color:var(--ri-deep);
+  text-shadow:-1px 1px 0 var(--ri-pink)}
+
+/* ---------------------------------------------------------- plate */
+:root[data-style="riso"] #attention .stack,
+:root[data-style="riso"] #all .stack{border-top:3px solid var(--ri-blue)}
+:root[data-style="riso"] .row{border-bottom:1px solid var(--line2)}
+:root[data-style="riso"] .row summary{border-radius:0}
+:root[data-style="riso"] .row summary:hover{background:var(--ri-screen)}
+:root[data-style="riso"] .row[open]{background:transparent;border-radius:0}
+:root[data-style="riso"] .rank{font-family:var(--serif);font-weight:800;
+  font-stretch:120%;color:var(--ri-deep);text-shadow:-1px 1px 0 var(--ri-pink)}
+:root[data-style="riso"] .calmrow{border-radius:0}
+
+/* ---------------------------------------------------------- people */
+:root[data-style="riso"] .shelf{border-top:1px solid var(--line2)}
+
+/* ---------------------------------------------------------- news */
+:root[data-style="riso"] .newsmain{max-width:700px}
+:root[data-style="riso"] .newsmain p{line-height:1.65}
+
+/* ---------------------------------------------------------- season */
+:root[data-style="riso"] .szbar{border-radius:0;border-top:1.5px solid var(--ri-blue)}
+
+/* ================= rooms.html ======================================== */
+:root[data-style="riso"] #floor .wing{background:transparent;border:0;
+  border-top:3px solid var(--ri-blue);border-radius:0;box-shadow:none}
+:root[data-style="riso"] #floor .wing h2{font-family:var(--serif);font-weight:800;
+  font-stretch:122%;color:var(--ri-deep);text-shadow:-1.5px 1.5px 0 var(--ri-pink)}
+:root[data-style="riso"] #floor .room{background:transparent;border:0;
+  border-top:1px solid var(--line2);border-radius:0;box-shadow:none}
+:root[data-style="riso"] #floor .room:hover{background:var(--ri-screen)}
+:root[data-style="riso"] #roomview .zone{background:transparent;border:0;
+  border-top:1.5px solid var(--ri-blue);border-radius:0;box-shadow:none}
+:root[data-style="riso"] #roomview .zone>h2{font-family:var(--serif);
+  font-weight:750;font-stretch:115%;color:var(--ri-deep)}
+
+/* ================= map.html ========================================== */
+/* chrome only: the canvas, the dots and the mascot are left alone */
+:root[data-style="riso"] .mapbar{background:var(--ri-grain),var(--paper);
+  border-bottom:1.5px solid var(--ri-blue);box-shadow:none}
+:root[data-style="riso"] #panel,:root[data-style="riso"] .keycard{
+  background:var(--ri-grain),var(--paper);border:1.5px solid var(--ri-blue);
+  border-radius:3px;box-shadow:none}
+:root[data-style="riso"] #panel h2{font-family:var(--serif);font-weight:800;
+  font-stretch:118%;color:var(--ri-deep)}
+
+/* ---------------------------------------------------------- phone */
+/* the pink drum misses by less at phone size, so small heads stay sharp */
+@media (max-width:760px){
+  :root[data-style="riso"]{--ri-off:1px}
+  :root[data-style="riso"] .todaywrap .todaydoc>h1{font-size:1.5rem}
+  :root[data-style="riso"] .whenday{font-size:1.2rem}
+  :root[data-style="riso"] .pdtray>h2{font-size:1.2rem}
+}

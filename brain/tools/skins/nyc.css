@@ -1,0 +1,410 @@
+/* NEW YORK: full skin. Baked only when data-style="nyc".
+   Spec: design/skins/SPECS.md §8; the plan and its pictures:
+   design/skins/NYC.md. The brain signed like the New York subway: black
+   signs in white Helvetica with a thin white rule near the top, a line
+   badge for each area of her life, the day drawn as a subway line.
+
+   The badges come from data-line (the letter) and data-lc (the colour)
+   that lines.py writes on every area heading and attention dot; the
+   colours are the subway's trunk lines. A line colour only ever appears
+   inside a lettered badge, so it can't be read as a state colour.
+
+   Scoped :root[data-style="nyc"] throughout: page.css comes after the
+   skin and ties at two classes plus an element. An id never goes inside
+   an :is() list (its weight would leak onto every class in the list and
+   beat the board's own rule); it gets a rule of its own. Type is Helvetica
+   Neue, already on every Apple device; nothing to vendor. */
+
+/* ---------------------------------------------------------- tokens */
+:root[data-style="nyc"]{
+  --paper:#f6f6f3;--surface:#ffffff;--card:#ffffff;--sunken:#ececE8;
+  --ink:#141414;--dim:#4a4a4a;--faint:#6e6e6e;
+  --line:#d9d9d4;--line2:#9a9a96;
+  --green:#141414;--greenbg:#ececE8;
+  --bad:#d0261d;--badbg:#fbe3e1;--wait:#9a6a00;--waitbg:#fdf1cf;
+  --cold:#0039A6;--coldbg:#e1e8f6;--terra:#d1470b;--ok:#00873a;--okt:#dcf1e3;
+  --shadow:none;--shadow-lift:none;
+  --r-xl:6px;--r-lg:6px;--r-card:6px;--r-md:5px;--r-btn:5px;--r-sm:4px;
+  --serif:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  --ny-sign:#151515;--ny-rule:#ffffff;--ny-btn:#ffffff;
+  --ny-yellow:#FCCC0A;--ny-red:#EE352E;--ny-amber:#ffb000;
+}
+:root[data-style="nyc"][data-theme="dark"]{
+  --paper:#101010;--surface:#181818;--card:#181818;--sunken:#1f1f1f;
+  --ink:#f2f2f2;--dim:#c4c4c4;--faint:#9a9a9a;--line:#2e2e2e;--line2:#5a5a5a;
+  --green:#f2f2f2;--greenbg:#232323;
+  --bad:#ff6a5e;--badbg:#3a1714;--wait:#ffc233;--waitbg:#3a2c08;
+  --cold:#7da6ff;--coldbg:#14223f;--terra:#ff8a4c;--ok:#3fd17a;--okt:#103a22;
+  --ny-sign:#262626;--ny-btn:transparent;
+}
+@media (prefers-color-scheme:dark){
+  :root[data-style="nyc"]:not([data-theme="light"]){
+    --paper:#101010;--surface:#181818;--card:#181818;--sunken:#1f1f1f;
+    --ink:#f2f2f2;--dim:#c4c4c4;--faint:#9a9a9a;--line:#2e2e2e;--line2:#5a5a5a;
+    --green:#f2f2f2;--greenbg:#232323;
+    --bad:#ff6a5e;--badbg:#3a1714;--wait:#ffc233;--waitbg:#3a2c08;
+    --cold:#7da6ff;--coldbg:#14223f;--terra:#ff8a4c;--ok:#3fd17a;--okt:#103a22;
+    --ny-sign:#262626;--ny-btn:transparent;
+  }
+}
+/* the trunk-line colours */
+:root[data-style="nyc"] [data-lc="blue"]{--lc:#0039A6}
+:root[data-style="nyc"] [data-lc="orange"]{--lc:#FF6319}
+:root[data-style="nyc"] [data-lc="purple"]{--lc:#B933AD}
+:root[data-style="nyc"] [data-lc="brown"]{--lc:#996633}
+:root[data-style="nyc"] [data-lc="lime"]{--lc:#6CBE45}
+:root[data-style="nyc"] [data-lc="red"]{--lc:#EE352E}
+:root[data-style="nyc"] [data-lc="green"]{--lc:#00933C}
+:root[data-style="nyc"] [data-lc="yellow"]{--lc:#FCCC0A;--lct:#141414}
+:root[data-style="nyc"] [data-lc="grey"]{--lc:#808183}
+
+:root[data-style="nyc"] body{background:var(--paper);font-family:var(--sans)}
+
+/* ---------------------------------------------------------- header */
+/* The masthead is a sign: black, with the thin white rule near its top
+   edge. The current tab sits over a MetroCard-yellow bar; Ask is the
+   yellow button. The search results that open inside it stay on paper. */
+:root[data-style="nyc"] header.top{
+  background:linear-gradient(var(--ny-rule),var(--ny-rule)) 0 5px/100% 1.5px no-repeat,var(--ny-sign);
+  color:#fff;border-bottom:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+:root[data-style="nyc"] header.top .brand,
+:root[data-style="nyc"] header.top .brand b{color:#fff;font-family:var(--sans);font-weight:700;letter-spacing:-.01em}
+:root[data-style="nyc"] header.top .syncstate{color:#b8b8b8;background:transparent}
+:root[data-style="nyc"] .topnav a{color:#d6d6d6;background:transparent;border-radius:0;font-weight:500}
+:root[data-style="nyc"] .topnav a:hover{color:#fff;background:transparent}
+:root[data-style="nyc"] .topnav a.on{color:#fff;font-weight:700;
+  background:linear-gradient(var(--ny-yellow),var(--ny-yellow)) 4px 100%/calc(100% - 8px) 4px no-repeat}
+:root[data-style="nyc"] header.top #findq{background:transparent;border:1.5px solid #8a8a8a;border-radius:99px}
+:root[data-style="nyc"] header.top #findq:is(:focus,:not(:placeholder-shown)){
+  background:#fff;color:#141414;border-color:var(--ny-yellow);border-radius:5px}
+:root[data-style="nyc"] header.top #findq:focus::placeholder{color:#6e6e6e}
+:root[data-style="nyc"] header.top .findicon{color:#fff}
+:root[data-style="nyc"] header.top .findwrap:focus-within .findicon{color:#141414}
+:root[data-style="nyc"] header.top #findout{background:var(--surface);color:var(--ink);
+  border:1.5px solid var(--ink);border-radius:6px;box-shadow:none}
+:root[data-style="nyc"] header.top :is(.didbell,.hoodlink){color:#fff;border-color:#6a6a6a;background:transparent}
+:root[data-style="nyc"] .askopen{background:var(--ny-yellow);color:#141414;border:0;border-radius:5px;font-weight:700}
+:root[data-style="nyc"] .askopen:hover{background:#ffd93d;color:#141414}
+:root[data-style="nyc"] nav.tabbar{background:var(--ny-sign);border-top:0;box-shadow:none}
+:root[data-style="nyc"] nav.tabbar a{color:#bdbdbd}
+:root[data-style="nyc"] nav.tabbar a.on{color:#fff;
+  background:linear-gradient(var(--ny-yellow),var(--ny-yellow)) 50% 2px/22px 3px no-repeat}
+
+/* ---------------------------------------------------------- display type */
+/* Helvetica, bold and tight, like a station name */
+:root[data-style="nyc"] .todaywrap .todaydoc>h1,:root[data-style="nyc"] .whenday,
+:root[data-style="nyc"] .hero h1,:root[data-style="nyc"] .pdtray>h2,:root[data-style="nyc"] .psub,
+:root[data-style="nyc"] #queue>h2,:root[data-style="nyc"] #drafts>h2,:root[data-style="nyc"] #people>h2,
+:root[data-style="nyc"] #attention>h2,:root[data-style="nyc"] #all>h2,:root[data-style="nyc"] #connections>h2,
+:root[data-style="nyc"] #recordings>h2,:root[data-style="nyc"] #newfiles>h2,
+:root[data-style="nyc"] .doc h1,:root[data-style="nyc"] .rowname{
+  font-family:var(--sans);font-weight:700;letter-spacing:-.022em;color:var(--ink)}
+:root[data-style="nyc"] .todaywrap .todaydoc>h1{font-size:2.3rem;line-height:1.05}
+
+/* ---------------------------------------------------------- signs */
+/* Section labels are signs: a black panel, the thin white rule near its
+   top, white Helvetica in sentence case (the markup's words, not caps). */
+:root[data-style="nyc"] :is(.eyebrow,.area,.todaywrap .doc h2):not(summary){
+  display:block;
+  background:linear-gradient(var(--ny-rule),var(--ny-rule)) 0 4px/100% 1px no-repeat,var(--ny-sign);
+  color:#fff;text-transform:none;letter-spacing:0;font:700 1rem/1.2 var(--sans);
+  padding:.62em .75em .5em;border-radius:3px}
+:root[data-style="nyc"] :is(.eyebrow,.area) :is(.agn,.csub,.sccount){color:#a8a8a8;font-weight:500}
+:root[data-style="nyc"] summary.area{text-transform:none;letter-spacing:0;font:700 1rem/1.3 var(--sans)}
+/* the wavy underline is Workroom's; the signs do its job here */
+:root[data-style="nyc"] .wav,
+:root[data-style="nyc"] .eyebrow::after,:root[data-style="nyc"] .area::after,
+:root[data-style="nyc"] .qcard .eyebrow::after,:root[data-style="nyc"] .offercard .eyebrow::after,
+:root[data-style="nyc"] #queue>h2::after,:root[data-style="nyc"] #drafts>h2::after,
+:root[data-style="nyc"] #connections>h2::after,:root[data-style="nyc"] #recordings>h2::after,
+:root[data-style="nyc"] #newfiles>h2::after,:root[data-style="nyc"] #people>h2::after,
+:root[data-style="nyc"] #attention>h2::after,:root[data-style="nyc"] #all>h2::after,
+:root[data-style="nyc"] .doc h2::after,:root[data-style="nyc"] .todaydoc h2::after{display:none}
+:root[data-style="nyc"] :is(.eyebrow,.area,h2,h3):has(+ .wav){margin-bottom:var(--s3)}
+
+/* An area heading carries its line's badge: a coloured circle, a white letter */
+:root[data-style="nyc"] h3.area[data-line]::before{content:attr(data-line);
+  display:inline-grid;place-items:center;width:1.6em;height:1.6em;margin:-.15em .55em -.15em 0;
+  border-radius:50%;background:var(--lc);color:var(--lct,#fff);font:700 .95em/1 var(--sans);vertical-align:middle}
+/* Where your attention went: each area's dot becomes its badge */
+:root[data-style="nyc"] .frow .fdot[data-line]{display:inline-grid;place-items:center;
+  width:1.45em;height:1.45em;border-radius:50%;background:var(--lc);flex:none}
+:root[data-style="nyc"] .frow .fdot[data-line]::after{content:attr(data-line);
+  color:var(--lct,#fff);font:700 .78em/1 var(--sans);font-style:normal}
+
+/* ---------------------------------------------------------- no boxes */
+:root[data-style="nyc"] :is(.railcard,.panel,.todaywrap,.hzcard,.offercard,.bscard,.qcard,
+  .forecast,.pdtray,.lifecard,.routinecard,.asker,.recwrap){
+  background:transparent;border:0;border-radius:0;box-shadow:none;padding-left:0;padding-right:0}
+/* People's five has an id of its own, and page.css sets it by that id */
+:root[data-style="nyc"] #pneeds{background:transparent;border:0;border-radius:0;box-shadow:none;
+  padding-left:0;padding-right:0}
+:root[data-style="nyc"] .agroup+.agroup{border-top:0;padding-top:4px}
+:root[data-style="nyc"] .updnudge{background:var(--surface);border:1.5px solid var(--line);border-radius:6px}
+/* floating things: paper, a black rim, no shadow */
+:root[data-style="nyc"] :is(.appanel,.actdrawer){background:var(--surface);
+  border:1.5px solid var(--ink);border-radius:6px;box-shadow:none}
+:root[data-style="nyc"] .runbar{background:var(--surface);border:1.5px solid var(--ink);box-shadow:none}
+:root[data-style="nyc"] .fab{background:var(--ny-yellow);color:#141414;box-shadow:none;border:0}
+:root[data-style="nyc"] :is(.fabstack,.hacts)>.btour-btn{background:var(--surface);color:var(--ink);
+  border:1.5px solid var(--ink);box-shadow:none}
+
+/* The evening check is a planned-work notice: a yellow sheet, black type */
+:root[data-style="nyc"] .evwrap{background:var(--ny-yellow);border:0;border-radius:4px;color:#141414}
+:root[data-style="nyc"] .evwrap :is(p,span,b){color:#141414}
+:root[data-style="nyc"] .evwrap .area{background:transparent;color:#141414;padding:0;font-size:1.05rem}
+:root[data-style="nyc"] .evwrap :is(.mini,.act){background:#fff;color:#141414;border-color:#141414}
+
+/* ---------------------------------------------------------- buttons */
+/* Helvetica, a black rim; they fill black on hover */
+:root[data-style="nyc"] :is(.mini,.act,.addbutton,.ghostbtn){border:1.5px solid var(--ink);border-radius:5px;
+  background:var(--ny-btn);color:var(--ink);font-family:var(--sans);font-weight:600}
+:root[data-style="nyc"] :is(.mini,.act,.addbutton):hover:not([disabled]){background:var(--ink);color:var(--paper)}
+:root[data-style="nyc"] :is(.act.send,button.go,.md-go){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+:root[data-style="nyc"] .tws{border:1.5px solid var(--ink);border-radius:99px;background:var(--ny-btn);color:var(--ink)}
+:root[data-style="nyc"] .test{background:var(--ink);color:var(--paper);border-radius:99px;font-weight:700}
+:root[data-style="nyc"] .tile{border-radius:99px}
+:root[data-style="nyc"] .tile.active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+:root[data-style="nyc"] .ballpill{border-radius:99px}
+:root[data-style="nyc"] input:not([type=checkbox]):not([type=radio]):not([type=range]),
+:root[data-style="nyc"] textarea,:root[data-style="nyc"] select{
+  border:1.5px solid var(--line2);border-radius:5px;background:var(--surface);color:var(--ink)}
+:root[data-style="nyc"] :is(input,textarea,select):focus{border-color:var(--ink)}
+:root[data-style="nyc"] :focus-visible{outline:2.5px solid var(--ny-yellow);outline-offset:2px}
+:root[data-style="nyc"] main p a:not(.plink),:root[data-style="nyc"] main li a:not(.plink){
+  color:inherit;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+
+/* ---------------------------------------------------------- ticks */
+/* round, like badges: an open ring, then a filled disc */
+:root[data-style="nyc"] .box{border:2px solid var(--ink);border-radius:50%;background:var(--ny-btn);color:transparent}
+:root[data-style="nyc"] .box[aria-pressed="true"],:root[data-style="nyc"] li.done>.box{
+  background:var(--ink);color:var(--paper)}
+:root[data-style="nyc"] ul.tasks li.parked .box{border-style:dashed}
+:root[data-style="nyc"] .h2tick{border:2px solid var(--ink)}
+:root[data-style="nyc"] .habit2.done .h2tick{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+:root[data-style="nyc"] .hdots i.on{background:var(--ink)}
+
+/* ---------------------------------------------------------- the day */
+/* a subway line: thick, in the ink; classes are station rings; now is a
+   red you-are-here */
+:root[data-style="nyc"] .when{padding-left:34px}
+:root[data-style="nyc"] .when::before{left:9px;width:8px;top:6px;bottom:12px;background:var(--ink);border-radius:4px}
+:root[data-style="nyc"] .when .wfix::before{left:-31px;top:2px;width:14px;height:14px;border-radius:50%;
+  background:var(--paper);border:3px solid var(--ink);box-sizing:content-box}
+:root[data-style="nyc"] .when .wnow{color:var(--ny-red);font-weight:700}
+:root[data-style="nyc"] .when .wnow::before{left:-34px;top:-1px;width:20px;height:20px;border-radius:50%;
+  background:var(--ny-red);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--ny-red)}
+:root[data-style="nyc"] .when .wt{font-weight:700;color:var(--ink);letter-spacing:.01em}
+:root[data-style="nyc"] .when .wfree .wtask{border:2px solid var(--line2);border-radius:8px;background:var(--surface)}
+
+/* ---------------------------------------------------------- countdowns */
+/* a platform clock: a black board, white names, amber times */
+:root[data-style="nyc"] .railcard.cdcard{background:#111;border-radius:6px;padding:14px 16px;color:#fff}
+:root[data-style="nyc"] .railcard.cdcard .area{background:transparent;padding:0 0 8px;
+  border-bottom:1px solid #3a3a3a;border-radius:0;margin-bottom:10px}
+:root[data-style="nyc"] .cdcard .cdlab{color:#fff;font-weight:500}
+:root[data-style="nyc"] .cdcard .cdn{color:var(--ny-amber);font-weight:700;font-variant-numeric:tabular-nums}
+:root[data-style="nyc"] .cdcard .cddate{color:#9a9a9a}
+
+/* ---------------------------------------------------------- bars */
+/* The gauges only. body>.bar is the map and project pages' title strip,
+   which also answers to .bar: squeezed to 6px it measured the header as
+   6px tall, and the map drew its column names under it (9 Oct). */
+:root[data-style="nyc"] :not(body)>.bar{height:6px;border-radius:3px;background:var(--line)}
+:root[data-style="nyc"] :not(body)>.bar i{border-radius:3px;background:var(--ink)}
+
+/* ---------------------------------------------------------- plate */
+:root[data-style="nyc"] .row{border-bottom:1px solid var(--line)}
+:root[data-style="nyc"] .row summary{border-radius:0}
+:root[data-style="nyc"] .row summary:hover{background:var(--sunken)}
+
+/* ================= rooms.html and map.html: chrome only ============== */
+:root[data-style="nyc"] #floor .wing{background:transparent;border:0;border-radius:0;box-shadow:none}
+:root[data-style="nyc"] #floor .wing h2{font-family:var(--sans);font-weight:700;letter-spacing:-.015em}
+:root[data-style="nyc"] .mapbar{background:var(--surface);border-bottom:1.5px solid var(--ink);box-shadow:none}
+:root[data-style="nyc"] :is(#panel,.keycard){background:var(--surface);border:1.5px solid var(--ink);
+  border-radius:6px;box-shadow:none}
+
+/* ================= the colour pass (9 Oct, her review: "a bit too
+   monochrome... really lean into the metro aesthetic") ================ */
+/* ---- everything rides its line ---- */
+/* a task row knows its line from its project pill; an area group from its own attribute */
+:root[data-style="nyc"] li:has(> .tws[data-lc="blue"]){--lc:#0039A6}
+:root[data-style="nyc"] li:has(> .tws[data-lc="orange"]){--lc:#FF6319}
+:root[data-style="nyc"] li:has(> .tws[data-lc="purple"]){--lc:#B933AD}
+:root[data-style="nyc"] li:has(> .tws[data-lc="brown"]){--lc:#996633}
+:root[data-style="nyc"] li:has(> .tws[data-lc="lime"]){--lc:#6CBE45}
+:root[data-style="nyc"] li:has(> .tws[data-lc="red"]){--lc:#EE352E}
+:root[data-style="nyc"] li:has(> .tws[data-lc="green"]){--lc:#00933C}
+:root[data-style="nyc"] li:has(> .tws[data-lc="yellow"]){--lc:#FCCC0A}
+:root[data-style="nyc"] li:has(> .tws[data-lc="grey"]){--lc:#808183}
+
+/* project pills are route pills: filled in the line's colour */
+:root[data-style="nyc"] .tws[data-lc]{background:var(--lc);border-color:var(--lc);color:var(--lct,#fff);font-weight:700}
+:root[data-style="nyc"] .tws[data-lc]:hover{filter:brightness(1.12)}
+
+/* ticks are stations on the line: a ring in its colour, filled when done */
+:root[data-style="nyc"] :is(.agroup[data-lc],li:has(> .tws[data-lc])) .box{border-color:var(--lc);border-width:3px}
+:root[data-style="nyc"] :is(.agroup[data-lc],li:has(> .tws[data-lc])) .box[aria-pressed="true"]{background:var(--lc);color:#fff}
+
+/* An area group is a line diagram. The line drops out of the badge on the
+   sign (the list is indented so the 22px stations sit under the badge's
+   centre, 1.51rem from the sign's edge) and joins station to station:
+   each row draws a segment from its station's centre to the next one's
+   (17.5px + 2px + 11px down every row, so a row of any height joins up),
+   and the first row adds the short drop from the sign. A one-task group is
+   a stub ending at its station, as a branch does. */
+:root[data-style="nyc"] .agroup[data-lc] ul.tasks{padding-left:calc(1.51rem - 11px)}
+:root[data-style="nyc"] .agroup[data-lc] ul.tasks>li{position:relative;padding-top:6px;padding-bottom:6px}
+:root[data-style="nyc"] .agroup[data-lc] ul.tasks>li>.box{position:relative;z-index:1;
+  width:22px;height:22px;min-width:22px;margin-top:2px;background:var(--paper);line-height:16px}
+:root[data-style="nyc"] .agroup[data-lc] ul.tasks>li>.box[aria-pressed="true"]{background:var(--lc)}
+:root[data-style="nyc"] .agroup[data-lc] ul.tasks>li:not(:last-child)::before,
+:root[data-style="nyc"] .agroup[data-lc]>ul.tasks>li:first-child::after{content:"";position:absolute;
+  left:8.5px;width:5px;background:var(--lc)}
+:root[data-style="nyc"] .agroup[data-lc] ul.tasks>li:not(:last-child)::before{top:19px;bottom:-19px}
+:root[data-style="nyc"] .agroup[data-lc]>ul.tasks>li:first-child::after{top:-4px;height:23px}
+:root[data-style="nyc"] .agroup[data-lc] .amore{margin-left:0}
+:root[data-style="nyc"] .agroup[data-lc] .amore>summary{margin-left:calc(1.51rem + 21px)}
+@media (max-width:760px){
+  :root[data-style="nyc"] .agroup[data-lc] ul.tasks{padding-left:calc(1.4345rem - 11px)}
+  :root[data-style="nyc"] .agroup[data-lc] .amore>summary{margin-left:calc(1.4345rem + 21px)}
+}
+
+/* the day: classes are stops on the School line, a slotted task on its own */
+:root[data-style="nyc"] .when .wfix[data-lc]::before{border-color:var(--lc)}
+/* A task slotted into free time is a stop of its own: a ring on the day's
+   line in its line's colour, and a card with a solid rim and the line's
+   badge. No dashed box, and no stripe down one side (her design no-list). */
+:root[data-style="nyc"] .when .wfree::before{content:"";position:absolute;left:-29px;top:4px;
+  width:10px;height:10px;border-radius:50%;background:var(--paper);
+  border:3px solid var(--lc,var(--line2));box-sizing:content-box}
+:root[data-style="nyc"] .when .wfree .wtask[data-lc]{position:relative;border-color:var(--lc);padding-left:44px}
+:root[data-style="nyc"] .when .wfree .wtask[data-line]::before{content:attr(data-line);position:absolute;
+  left:11px;top:10px;width:22px;height:22px;border-radius:50%;background:var(--lc);
+  color:var(--lct,#fff);font:700 12px/22px var(--sans);text-align:center}
+
+/* the masthead's bottom edge: a strip of every line, in her colours
+   (--ny-strip and --ny-tiles come from lines.strip_css) */
+:root[data-style="nyc"] header.top{border-bottom:5px solid;border-image:var(--ny-strip,linear-gradient(90deg,#0039A6 0 20%,#FF6319 20% 40%,#B933AD 40% 60%,#EE352E 60% 80%,#6CBE45 80%)) 1}
+
+/* Today's title is a station name tablet: a frieze of tiles above and below */
+:root[data-style="nyc"] .todaywrap .todaydoc>h1{padding:16px 0 14px;width:fit-content;max-width:100%;
+  background:var(--ny-tiles,repeating-linear-gradient(90deg,#0039A6 0 13px,var(--paper) 13px 15px,#FF6319 15px 28px,var(--paper) 28px 30px,#B933AD 30px 43px,var(--paper) 43px 45px,#EE352E 45px 58px,var(--paper) 58px 60px,#6CBE45 60px 73px,var(--paper) 73px 75px)) 0 0/100% 7px no-repeat,
+    var(--ny-tiles,repeating-linear-gradient(90deg,#0039A6 0 13px,var(--paper) 13px 15px,#FF6319 15px 28px,var(--paper) 28px 30px,#B933AD 30px 43px,var(--paper) 43px 45px,#EE352E 45px 58px,var(--paper) 58px 60px,#6CBE45 60px 73px,var(--paper) 73px 75px)) 0 100%/100% 7px no-repeat}
+
+/* ---- the map: Plate's "Your lines" (metro.py), hidden in every other style ---- */
+/* The lines leave the Today interchange side by side and peel off at 45
+   degrees; stations are the NYC map's own marks (a black dot on the line
+   for a stop that needs her, an open ring for one that doesn't); names
+   are angled, as on a transit map. */
+:root[data-style="nyc"] .skinx-metro{display:block;margin:var(--s5) 0}
+:root[data-style="nyc"] .metrowrap{overflow-x:auto;padding:4px 0 0}
+:root[data-style="nyc"] svg.metro{display:block;width:100%;min-width:700px;height:auto;overflow:visible}
+:root[data-style="nyc"] .metro .mline{fill:none;stroke:var(--lc);stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
+:root[data-style="nyc"] .metro .mst{cursor:pointer}
+:root[data-style="nyc"] .metro .mst circle{fill:var(--paper);stroke:var(--ink);stroke-width:2.5}
+:root[data-style="nyc"] .metro .mst.mneed circle{fill:var(--ink);stroke:var(--paper);stroke-width:2}
+:root[data-style="nyc"] .metro .mst.mlate circle{fill:var(--paper);stroke:var(--ny-red);stroke-width:3.5}
+:root[data-style="nyc"] .metro .mst text{font:500 12.5px var(--sans);fill:var(--ink);letter-spacing:-.005em}
+:root[data-style="nyc"] .metro .mst.mneed text{font-weight:700}
+:root[data-style="nyc"] .metro .mst:hover text,:root[data-style="nyc"] .metro .mst:focus text{text-decoration:underline}
+:root[data-style="nyc"] .metro .mst:hover circle,:root[data-style="nyc"] .metro .mst:focus circle{r:9}
+:root[data-style="nyc"] .metro .mst:focus{outline:none}
+:root[data-style="nyc"] .metro .mhub rect{fill:var(--paper);stroke:var(--ink);stroke-width:4}
+:root[data-style="nyc"] .metro .mhub text{font:700 14px var(--sans);fill:var(--ink);text-anchor:middle}
+:root[data-style="nyc"] .metro .mend circle{fill:var(--lc)}
+:root[data-style="nyc"] .metro .mend text{font:700 15px var(--sans);fill:var(--lct,#fff);text-anchor:middle}
+:root[data-style="nyc"] .skinx-metro .meta{color:var(--faint);font-size:var(--t-xs);margin-top:6px}
+
+/* ================= every page signed the same (9 Oct sweep) ========= */
+/* Jobs opens each section on its h2 with nothing under it, where School
+   has a sign: here the h2 is the sign, and a sub-label under it ("Want to
+   apply") is a bold sub-heading, so two black bars never stack. */
+:root[data-style="nyc"] .jobsview .pdtray>h2{display:block;
+  background:linear-gradient(var(--ny-rule),var(--ny-rule)) 0 4px/100% 1px no-repeat,var(--ny-sign);
+  color:#fff;font:700 1rem/1.2 var(--sans);letter-spacing:0;padding:.62em .75em .5em;border-radius:3px}
+:root[data-style="nyc"] .jobsview .pdtray>h2 .sccount{color:#a8a8a8;font:500 1rem/1 var(--sans)}
+:root[data-style="nyc"] .todaygrid.jobsview .pdtray h3.area{display:block;background:none;color:var(--ink);
+  padding:0;border-radius:0;font:700 .95rem/1.3 var(--sans);margin:14px 0 4px}
+/* Life: the sign shares its row with a link, and stretches to fill it */
+:root[data-style="nyc"] .lchead{gap:12px;align-items:center}
+:root[data-style="nyc"] .lchead>h3.area{flex:1;margin:0}
+/* Usage, Privacy, Routine and Kitchen draw their own section heads */
+:root[data-style="nyc"] :is(.uwrap>h2,.rzoomrow>h2,h2.kh2){display:block;
+  background:linear-gradient(var(--ny-rule),var(--ny-rule)) 0 4px/100% 1px no-repeat,var(--ny-sign);
+  color:#fff;font:700 1rem/1.2 var(--sans);letter-spacing:0;text-transform:none;
+  padding:.62em .75em .5em;border-radius:3px}
+:root[data-style="nyc"] .rzoomrow>h2{flex:1;margin:0}
+:root[data-style="nyc"] :is(.uwrap>h1,h1.kh1){font-family:var(--sans);font-weight:700;letter-spacing:-.022em}
+
+/* The Map's dots: the subway's colours, meanings unchanged. Her palette's
+   dot set ("ink" is all greys) is written at :root[data-style]; one more
+   attribute here outranks it whatever order the two arrive in. */
+:root[data-style="nyc"][data-style]{--overdue:#EE352E;--soon:#FF6319;--chase:#E8A900;
+  --cold:#0039A6;--waiting:#A7A9AC;--closed:#D9D9D4}
+:root[data-style="nyc"][data-style][data-theme="dark"]{--overdue:#FF6A5E;--soon:#FF8A4C;
+  --chase:#FFC233;--cold:#7DA6FF;--waiting:#8A8C8F;--closed:#3A3A3A}
+@media (prefers-color-scheme:dark){
+  :root[data-style="nyc"][data-style]:not([data-theme="light"]){--overdue:#FF6A5E;--soon:#FF8A4C;
+    --chase:#FFC233;--cold:#7DA6FF;--waiting:#8A8C8F;--closed:#3A3A3A}
+}
+
+/* ---- habits: each habit is a short green line (a colour no area uses);
+   this week's days are its stations: a filled stop for a day done, an open
+   ring for one missed, today the red-ringed you-are-here, the days ahead
+   faint dots on a grey stretch. The last 8 weeks are route bullets: filled
+   when the week hit its target, a ring with the count when it fell short. */
+:root[data-style="nyc"] .lhgrid{--hl:#00933C}
+:root[data-style="nyc"] .lhrow:not(.lhhd) .lhdays i{position:relative;box-sizing:border-box;
+  width:18px;height:18px;margin:2px;border-radius:50%;background:var(--paper);
+  border:3px solid var(--hl);outline:0}
+:root[data-style="nyc"] .lhrow:not(.lhhd) .lhdays i.on{background:var(--hl)}
+:root[data-style="nyc"] .lhrow:not(.lhhd) .lhdays i.today{border-color:var(--ink);
+  box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ny-red)}
+:root[data-style="nyc"] .lhrow:not(.lhhd) .lhdays i.on.today{background:var(--hl)}
+:root[data-style="nyc"] .lhrow:not(.lhhd) .lhdays i.future{border-color:transparent;
+  background:radial-gradient(circle,var(--line2) 3px,transparent 3.5px)}
+/* a connector runs from a ring's outer edge into the next ring's rim (the
+   ring's own 3px border sits outside the box an ::after is measured from) */
+:root[data-style="nyc"] .lhrow:not(.lhhd) .lhdays i:not(:last-child)::after{content:"";position:absolute;
+  left:calc(100% + 3px);top:50%;width:11px;height:4px;margin-top:-2px;background:var(--hl)}
+:root[data-style="nyc"] .lhrow:not(.lhhd) .lhdays i:is(.future,:has(+ i.future))::after{background:var(--line)}
+:root[data-style="nyc"] .lhhd .lhdays i.today{color:var(--ny-red)}
+:root[data-style="nyc"] .lhweeks .wpill{width:20px;min-width:20px;height:20px;padding:0;border-radius:50%;
+  font:700 10.5px/1 var(--sans)}
+:root[data-style="nyc"] .lhweeks .wpill.ok{background:var(--hl);color:#fff}
+:root[data-style="nyc"] .lhweeks .wpill.low{background:var(--paper);box-shadow:inset 0 0 0 2px var(--hl);color:var(--hl)}
+:root[data-style="nyc"] .lhweeks .wpill.none{background:radial-gradient(circle,var(--line2) 2.5px,transparent 3px);box-shadow:none}
+:root[data-style="nyc"] .lhrow.ok .lhcount,:root[data-style="nyc"] .lhrow.ok .lhcount b{color:var(--hl)}
+
+/* ---- the season as a service board: each day's load is its service
+   status, a strip along its top: green good service (free), yellow delays
+   (busy), red no room (full). Today is the you-are-here. ---- */
+:root[data-style="nyc"] .szday{background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  box-shadow:inset 0 5px 0 #00933C;padding-top:9px}
+:root[data-style="nyc"] .szday.szwknd{background:var(--sunken)}
+:root[data-style="nyc"] .szday.szbz1{box-shadow:inset 0 5px 0 var(--ny-yellow)}
+:root[data-style="nyc"] .szday.szbz2{box-shadow:inset 0 5px 0 var(--ny-red)}
+:root[data-style="nyc"] .szday.szbz1:not(.szwknd),:root[data-style="nyc"] .szday.szbz2:not(.szwknd){background:var(--surface)}
+:root[data-style="nyc"] .szday.sztoday{outline:3px solid var(--ink);outline-offset:-1px}
+:root[data-style="nyc"] .szday.sztoday .szn::after{content:"";display:inline-block;width:9px;height:9px;
+  margin-left:6px;border-radius:50%;background:var(--ny-red);box-shadow:0 0 0 2px var(--ny-red) inset;vertical-align:0}
+:root[data-style="nyc"] .szn{font:700 12.5px/1.3 var(--sans);color:var(--ink)}
+:root[data-style="nyc"] .szev i{color:var(--ink);font-weight:700}
+:root[data-style="nyc"] .szsw{border-radius:50%;background:#00933C;border:0}
+:root[data-style="nyc"] .szsw.szbz1{background:var(--ny-yellow)}
+:root[data-style="nyc"] .szsw.szbz2{background:var(--ny-red)}
+/* a planned outing in a day is a small route pill; on a phone's narrow
+   month columns it keeps to one line instead of wrapping letter by letter */
+:root[data-style="nyc"] .szday .szchip{border:1.5px solid var(--ink);border-radius:99px;
+  background:var(--surface);color:var(--ink);font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* ---------------------------------------------------------- phone */
+@media (max-width:760px){
+  :root[data-style="nyc"] .todaywrap .todaydoc>h1{font-size:1.85rem}
+  :root[data-style="nyc"] svg.metro{min-width:620px}
+  :root[data-style="nyc"] :is(.eyebrow,.area,.todaywrap .doc h2):not(summary){font-size:.95rem}
+}

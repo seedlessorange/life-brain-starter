@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "todoFeatureEnabled": false,
+  "env": {
+    "PYTHONUTF8": "1"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob|Bash|Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "for p in python3 python py; do \"$p\" -c \"\" 2>/dev/null && exec \"$p\" \"$CLAUDE_PROJECT_DIR/brain/tools/private_gate.py\"; done; exit 1"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 900,
+            "command": "for p in python3 python py; do \"$p\" -c \"\" 2>/dev/null && exec \"$p\" \"$CLAUDE_PROJECT_DIR/brain/tools/approve_gate.py\"; done; exit 1"
+          }
+        ]
+      }
+    ]
+  }
+}
